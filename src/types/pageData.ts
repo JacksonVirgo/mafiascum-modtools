@@ -18,7 +18,7 @@ export function isPageDataRequest(data: unknown): data is PageDataRequest {
 export type Vote = {
 	author: string;
 	post: number;
-	index: number | undefined; // For if there's multiple votes in one post
+	index: number; // For when there's multiple votes in one post
 	vote: string;
 };
 
