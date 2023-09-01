@@ -18,7 +18,7 @@ $(async function () {
 	const urlParams = getUrlParams();
 	if (!(urlParams.has('t') || urlParams.has('p'))) return console.log('Page is not a topic or post.');
 
-	let url = `https://forum.mafiascum.net/viewtopic.php?`; //t=${urlParams.get('t')}&p=${urlParams.get('p')}`
+	let url = `https://forum.mafiascum.net/viewtopic.php?`;
 	if (urlParams.has('t')) url += `t=${urlParams.get('t')}`;
 	if (urlParams.has('p')) url += `p=${urlParams.get('p')}`;
 
