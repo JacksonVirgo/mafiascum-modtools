@@ -19,6 +19,8 @@ export type PageDataResponse =
 	| {
 			status: 200;
 			pageTitle: string;
+			lastPage: number;
+			currentPage: number;
 	  }
 	| {
 			status: 500;
@@ -37,6 +39,13 @@ export function isPageDataResponse(data: unknown): data is PageDataResponse {
 	if (data.status === 200) {
 		if (!('pageTitle' in data)) return false;
 		if (typeof data.pageTitle !== 'string') return false;
+
+		if (!('lastPage' in data)) return false;
+		if (typeof data.lastPage !== 'number') return false;
+
+		if (!('currentPage' in data)) return false;
+		if (typeof data.currentPage !== 'number') return false;
+
 		return true;
 	}
 
