@@ -34,4 +34,9 @@ module.exports = {
 			patterns: [{ from: '.', to: '.', context: 'public' }],
 		}),
 	],
+	performance: {
+		hints: false,
+		maxEntrypointSize: 512000,
+		maxAssetSize: 512000,
+	},
 };
