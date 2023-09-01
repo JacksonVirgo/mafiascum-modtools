@@ -18,12 +18,22 @@ $(async function () {
 	const urlParams = getUrlParams();
 	if (!(urlParams.has('t') || urlParams.has('p'))) return console.log('Page is not a topic or post.');
 
-	let url = `https://forum.mafiascum.net/viewtopic.php?`;
-	if (urlParams.has('t')) url += `t=${urlParams.get('t')}`;
-	if (urlParams.has('p')) url += `p=${urlParams.get('p')}`;
+	// #post_content13769615 > p.author.modified > a:nth-child(3)
 
-	const pageData = await fetchPageData(url);
-	console.log('Page Data from Background Script', pageData);
+	$('.author').each((_index, element) => {
+		const data = $('<button>VC</button>')
+			.css('padding', '5px')
+			.css('border', '1px solid white')
+			.on('click', async () => {
+				let url = `https://forum.mafiascum.net/viewtopic.php?`;
+				if (urlParams.has('t')) url += `t=${urlParams.get('t')}`;
+				if (urlParams.has('p')) url += `p=${urlParams.get('p')}`;
+
+				const pageData = await fetchPageData(url);
+				console.log('Page Data from Background Script', pageData);
+			});
+		$(element).append(data);
+	});
 });
 
 async function fetchPageData(url: string) {
