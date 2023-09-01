@@ -26,8 +26,11 @@ $(async function () {
 			.css('border', '1px solid white')
 			.on('click', async () => {
 				let url = `https://forum.mafiascum.net/viewtopic.php?`;
-				if (urlParams.has('t')) url += `t=${urlParams.get('t')}`;
-				if (urlParams.has('p')) url += `p=${urlParams.get('p')}`;
+				const params: string[] = [];
+				if (urlParams.has('t')) params.push(`t=${urlParams.get('t')}`);
+				if (urlParams.has('p')) params.push(`p=${urlParams.get('p')}`);
+				if (urlParams.has('start')) params.push(`start=${urlParams.get('start')}`);
+				url += params.join('&');
 
 				/*
 					Fetch the current page, gather page data including the following:
