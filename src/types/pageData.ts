@@ -21,6 +21,7 @@ export type PageDataResponse =
 			pageTitle: string;
 			lastPage: number;
 			currentPage: number;
+			users: string[];
 	  }
 	| {
 			status: 500;
@@ -45,6 +46,9 @@ export function isPageDataResponse(data: unknown): data is PageDataResponse {
 
 		if (!('currentPage' in data)) return false;
 		if (typeof data.currentPage !== 'number') return false;
+
+		if (!('users' in data)) return false;
+		if (!Array.isArray(data.users)) return false;
 
 		return true;
 	}

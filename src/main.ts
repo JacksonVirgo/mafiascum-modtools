@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import browser from 'webextension-polyfill';
-import { isPageDataResponse } from './types/pageData';
+import { PageDataResponse, isPageDataResponse } from './types/pageData';
 
 export function getUrlParams() {
 	const urlParams = new URLSearchParams(window.location.search);
@@ -25,14 +25,17 @@ $(async function () {
 			.css('padding', '5px')
 			.css('border', '1px solid white')
 			.on('click', async () => {
-				let url = `https://forum.mafiascum.net/viewtopic.php?`;
-				const params: string[] = [];
-				if (urlParams.has('t')) params.push(`t=${urlParams.get('t')}`);
-				if (urlParams.has('p')) params.push(`p=${urlParams.get('p')}`);
-				if (urlParams.has('start')) params.push(`start=${urlParams.get('start')}`);
-				params.push('ppp=200');
+				const baseUrl = `https://forum.mafiascum.net/viewtopic.php?`;
+				const params = new Map<string, string>();
 
-				url += params.join('&');
+				if (urlParams.has('t')) params.set('t', `${urlParams.get('t')}`);
+				if (urlParams.has('p')) params.set('p', `${urlParams.get('p')}`);
+				if (urlParams.has('start')) params.set(`start`, `${urlParams.get('start')}`);
+				params.set('ppp', '200');
+
+				let initialURL = baseUrl;
+				for (const [key, value] of params) initialURL += `${key}=${value}&`;
+				if (initialURL[initialURL.length - 1] === '&') initialURL = initialURL.slice(0, -1);
 
 				/*
 					Fetch the current page, gather page data including the following:
@@ -45,7 +48,33 @@ $(async function () {
 					The following command fetches the initial page data.
 					It only currently fetches the page title, but it can be expanded to fetch more data (obv).
 				*/
-				const pageData = await fetchPageData(url);
+
+				const startTime = Date.now();
+
+				const pageData = await fetchPageData(initialURL);
+				if (!pageData) return console.error('Could not fetch page data.');
+				if (pageData.status != 200) return console.error('Could not fetch page data.', pageData.message);
+
+				const completedPages = [pageData.currentPage];
+				const fetchedData: PageDataResponse[] = [pageData];
+
+				for (let i = 0; i < pageData.lastPage; i++) {
+					if (completedPages.includes(i + 1)) continue;
+
+					const start = i * 200;
+					params.set('start', `${start}`);
+
+					let url = baseUrl;
+					for (const [key, value] of params) url += `${key}=${value}&`;
+					if (url[url.length - 1] === '&') url = url.slice(0, -1);
+
+					const pageData = await fetchPageData(url);
+					if (!pageData) return console.error('Could not fetch page data.');
+					if (pageData.status != 200) return console.error('Could not fetch page data.', pageData.message);
+
+					completedPages.push(pageData.currentPage);
+					fetchedData.push(pageData);
+				}
 
 				// Step 1. Insert logic to fetch all pages and their data.
 
@@ -55,7 +84,8 @@ $(async function () {
 
 				// Step 4. Insert logic to display the vote-counter on the screen (possibly a modal?)
 
-				console.log('Page Data from Background Script', pageData);
+				const timeSeconds = (Date.now() - startTime) / 1000;
+				console.log('Page Data from Background Script', fetchedData, `Took ${timeSeconds}s`);
 			});
 		$(element).append(data);
 	});
