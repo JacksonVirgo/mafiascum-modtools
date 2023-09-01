@@ -1,6 +1,6 @@
 import browser from 'webextension-polyfill';
 import { load } from 'cheerio';
-import { PageDataResponse, isPageDataRequest } from './types/pageData';
+import { PageDataResponse, Vote, isPageDataRequest } from './types/pageData';
 
 function sendResponse(response: PageDataResponse) {
 	return Promise.resolve(response);
@@ -43,12 +43,34 @@ async function fetchPageData(url: string) {
 		if (active) activePageNumber = num;
 	});
 
-	const users: string[] = [];
+	const votes: Vote[] = [];
+
 	$('.post').each((_index, element) => {
 		// This is a pretty dodgy selector but works for now
 		// Demonstrating how you can check through each post
 		const post = $(element).find('.inner > .postprofile > dt:nth-child(2) > a').text();
-		users.push(post);
+
+		const postNumberRaw = $(element).find('.author > a > .post-number-bolded').text().slice(1);
+		const postNumber = parseInt(postNumberRaw);
+		const posts = new Map<number, Vote[]>();
+
+		$(element)
+			.find('.inner > .postbody > div > .content > .bbvote')
+			.each((_index, element) => {
+				const array = posts.get(postNumber) ?? [];
+				array.push({
+					author: post,
+					post: postNumber,
+					index: array.length,
+					vote: $(element).text(),
+				});
+
+				posts.set(postNumber, array);
+			});
+
+		for (const [_key, value] of posts) {
+			votes.push(...value);
+		}
 	});
 
 	if (!title) return sendResponse({ status: 500, message: 'Could not find page title.' });
@@ -60,6 +82,6 @@ async function fetchPageData(url: string) {
 		pageTitle: title,
 		lastPage: largestPageNumber,
 		currentPage: activePageNumber,
-		users,
+		votes,
 	});
 }

@@ -15,13 +15,20 @@ export function isPageDataRequest(data: unknown): data is PageDataRequest {
 	return true;
 }
 
+export type Vote = {
+	author: string;
+	post: number;
+	index: number | undefined; // For if there's multiple votes in one post
+	vote: string;
+};
+
 export type PageDataResponse =
 	| {
 			status: 200;
 			pageTitle: string;
 			lastPage: number;
 			currentPage: number;
-			users: string[];
+			votes: Vote[];
 	  }
 	| {
 			status: 500;
@@ -47,8 +54,8 @@ export function isPageDataResponse(data: unknown): data is PageDataResponse {
 		if (!('currentPage' in data)) return false;
 		if (typeof data.currentPage !== 'number') return false;
 
-		if (!('users' in data)) return false;
-		if (!Array.isArray(data.users)) return false;
+		if (!('votes' in data)) return false;
+		if (!Array.isArray(data.votes)) return false;
 
 		return true;
 	}
