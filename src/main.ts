@@ -30,6 +30,8 @@ $(async function () {
 				if (urlParams.has('t')) params.push(`t=${urlParams.get('t')}`);
 				if (urlParams.has('p')) params.push(`p=${urlParams.get('p')}`);
 				if (urlParams.has('start')) params.push(`start=${urlParams.get('start')}`);
+				params.push('ppp=200');
+
 				url += params.join('&');
 
 				/*
