@@ -1,5 +1,6 @@
 import $ from 'jquery';
 import browser from 'webextension-polyfill';
+import { isPageDataResponse } from './types/pageData';
 
 export function getUrlParams() {
 	const urlParams = new URLSearchParams(window.location.search);
@@ -10,26 +11,29 @@ export function getUrlParams() {
 	return params;
 }
 
-$(function () {
+$(async function () {
 	console.log('Mafia Engine has loaded.');
 	console.log('This should only be called on forum.mafiascum.net');
 
 	const urlParams = getUrlParams();
-	console.log(urlParams);
+	if (!(urlParams.has('t') || urlParams.has('p'))) return console.log('Page is not a topic or post.');
 
-	if (urlParams.has('t') || urlParams.has('p')) {
-		let url = `https://forum.mafiascum.net/viewtopic.php?`; //t=${urlParams.get('t')}&p=${urlParams.get('p')}`
-		if (urlParams.has('t')) url += `t=${urlParams.get('t')}`;
-		if (urlParams.has('p')) url += `p=${urlParams.get('p')}`;
+	let url = `https://forum.mafiascum.net/viewtopic.php?`; //t=${urlParams.get('t')}&p=${urlParams.get('p')}`
+	if (urlParams.has('t')) url += `t=${urlParams.get('t')}`;
+	if (urlParams.has('p')) url += `p=${urlParams.get('p')}`;
 
-		browser.runtime
-			.sendMessage({ action: 'getPageData', url: url })
-			.then((response) => {
-				if (browser.runtime.lastError) return console.error(browser.runtime.lastError);
-				console.log('Background Script:', response);
-			})
-			.catch((error) => {
-				console.error(error);
-			});
-	}
+	const pageData = await fetchPageData(url);
+	console.log('Page Data from Background Script', pageData);
 });
+
+async function fetchPageData(url: string) {
+	try {
+		const pageData = await browser.runtime.sendMessage({ action: 'getPageData', url: url });
+		if (!isPageDataResponse(pageData)) return null;
+
+		return pageData;
+	} catch (err) {
+		console.error(err);
+		return null;
+	}
+}
