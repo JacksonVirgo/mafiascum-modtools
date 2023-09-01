@@ -60,7 +60,6 @@ async function fetchPageData(url: string) {
 	try {
 		const pageData = await browser.runtime.sendMessage({ action: 'getPageData', url: url });
 		if (!isPageDataResponse(pageData)) return null;
-
 		return pageData;
 	} catch (err) {
 		console.error(err);
