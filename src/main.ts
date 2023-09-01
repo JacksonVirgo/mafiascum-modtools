@@ -29,7 +29,27 @@ $(async function () {
 				if (urlParams.has('t')) url += `t=${urlParams.get('t')}`;
 				if (urlParams.has('p')) url += `p=${urlParams.get('p')}`;
 
+				/*
+					Fetch the current page, gather page data including the following:
+						- Page Title
+						- How many pages are there?
+						- What is the current page
+						- What are all the votes on the current page.
+						- More details if needed
+
+					The following command fetches the initial page data.
+					It only currently fetches the page title, but it can be expanded to fetch more data (obv).
+				*/
 				const pageData = await fetchPageData(url);
+
+				// Step 1. Insert logic to fetch all pages and their data.
+
+				// Step 2. Insert logic to parse all votes from all pages.
+
+				// Step 3. Insert logic to format the vote-counter.
+
+				// Step 4. Insert logic to display the vote-counter on the screen (possibly a modal?)
+
 				console.log('Page Data from Background Script', pageData);
 			});
 		$(element).append(data);
