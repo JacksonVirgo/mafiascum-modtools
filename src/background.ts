@@ -1,11 +1,13 @@
-chrome.runtime.onMessage.addListener((request, _sender, sendResponse) => {
+import browser from 'webextension-polyfill';
+
+browser.runtime.onMessage.addListener((request) => {
 	const req = request as unknown;
 	if (typeof req !== 'object' || req === null || !('action' in req)) {
-		return sendResponse({ status: 400, message: 'Invalid request' });
+		return Promise.resolve({ status: 400, message: 'Invalid request' });
 	}
 
 	if (request.action === 'getData') {
-		const data = { status: 200, message: 'Imagine this is fetched page/vote data' };
-		sendResponse(data);
+		const data = { status: 200, message: 'Imagine this is fetched page/vote data :)' };
+		return Promise.resolve(data);
 	}
 });
