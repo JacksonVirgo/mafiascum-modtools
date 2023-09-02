@@ -16,18 +16,3 @@ $(async function () {
 		$(element).find('a:nth-child(3)').after(data);
 	});
 });
-
-async function startVoteCount() {
-	const startTime = Date.now();
-
-	const params = getUrlParams(window.location.search);
-	if (!params) return console.error('Could not get url params.');
-	const threadId = params.get('t');
-	if (!threadId) return console.error('Could not get thread id.');
-
-	const threadData = await getThreadData(threadId);
-	if (!threadData) return console.error('Could not fetch page data.');
-
-	const timeSeconds = (Date.now() - startTime) / 1000;
-	console.log(`Took ${timeSeconds} seconds to fetch ${threadData.pageCount} pages of data.\n`, threadData);
-}
