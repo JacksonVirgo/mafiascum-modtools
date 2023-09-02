@@ -2,7 +2,7 @@ import { GameDefinition } from '../types/gameDefinition';
 import { getUrlParams } from '../utils/url';
 import { getThreadData } from './thread';
 
-export async function startVoteCount(gameDefinition: GameDefinition) {
+export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	const startTime = Date.now();
 
 	const params = getUrlParams(window.location.search);
@@ -15,8 +15,8 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 
 	const fetchTime = Date.now();
 
-	const startFrom = gameDefinition.startFrom ?? 0;
-	const endAt = gameDefinition.endAt;
+	const startFrom = gameDefinition?.startFrom ?? 0;
+	const endAt = gameDefinition?.endAt;
 
 	const currentVotes = threadData.votes.filter((vote) => {
 		if (vote.post === undefined) return false;

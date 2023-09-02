@@ -32,7 +32,7 @@ export function createModal() {
 	const spinner = createSpinner();
 	modal.append(spinner);
 
-	const form = createForm((def: GameDefinition) => {
+	const form = createForm((def: GameDefinition | null) => {
 		onFormSubmit(def);
 	});
 
@@ -40,7 +40,7 @@ export function createModal() {
 	modal.append(response);
 	const responseTextarea = response.find('textarea');
 
-	const onFormSubmit = async (def: GameDefinition) => {
+	const onFormSubmit = async (def: GameDefinition | null) => {
 		spinner.removeClass('spinner-hidden');
 		form.addClass('mafia-engine-form-hidden');
 		response.addClass('response-hidden');
@@ -68,7 +68,7 @@ export function createModal() {
 	return page.append(modal);
 }
 
-export function createForm(onSubmit: (def: GameDefinition) => void) {
+export function createForm(onSubmit: (def: GameDefinition | null) => void) {
 	const form = $('<form class="mafia-engine-form" id="mafia-engine-form"/>');
 	form.append($('<label for="mafia-engine-yaml" class="required">Upload game definition file</label>'))
 		.append(
@@ -99,19 +99,21 @@ export function createForm(onSubmit: (def: GameDefinition) => void) {
 				e.preventDefault();
 				console.log('Form Submitted', yamlString);
 
-				if (!yamlString) return;
-				const parsedJSON = convertYamlToJson(yamlString);
+				// if (!yamlString) return;
+				// const parsedJSON = convertYamlToJson(yamlString);
 
-				const gameDefinition = validateGameDefinition(parsedJSON);
-				if (!gameDefinition) return console.error('Invalid game definition.');
+				// const gameDefinition = validateGameDefinition(parsedJSON);
+				// if (!gameDefinition) return console.error('Invalid game definition.');
 
-				const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
-				const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;
+				// const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
+				// const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;
 
-				gameDefinition.startFrom = isNaN(startPost) ? 0 : startPost;
-				gameDefinition.endAt = isNaN(endPost) ? undefined : endPost;
+				// gameDefinition.startFrom = isNaN(startPost) ? 0 : startPost;
+				// gameDefinition.endAt = isNaN(endPost) ? undefined : endPost;
 
-				onSubmit(gameDefinition);
+				// onSubmit(gameDefinition);
+
+				onSubmit(null);
 			})
 		);
 
