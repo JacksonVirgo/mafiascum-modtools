@@ -11,7 +11,8 @@
 	"content_scripts": [
 		{
 			"matches": ["https://forum.mafiascum.net/*"],
-			"js": ["main.js"]
+			"js": ["main.js"],
+			"css": ["main.css"]
 		}
 	],
 	"background": {

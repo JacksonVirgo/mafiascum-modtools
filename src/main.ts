@@ -2,64 +2,32 @@ import $, { post } from 'jquery';
 import browser from 'webextension-polyfill';
 import { Vote, isPageDataResponse } from './types/pageData';
 import { getUrlParams } from './utils/url';
-import { getPageData } from './fg/thread';
+import { getPageData, getThreadData } from './fg/thread';
+import { createModal } from './fg/modal';
+
+let modalReference: JQuery<HTMLElement> = createModal();
 
 $(async function () {
+	$('body').append(modalReference);
 	$('.author').each((_index, element) => {
-		const data = $('<button>VC</button>')
-			.css('padding', '5px')
-			.css('border', '1px solid white')
-			.on('click', async () => {
-				const startTime = Date.now();
-
-				const pageData = await getEveryPageData();
-				if (!pageData) return console.error('Could not fetch page data.');
-
-				const timeSeconds = (Date.now() - startTime) / 1000;
-				console.log(`Took ${timeSeconds} seconds to fetch ${pageData.pageCount} pages of data.\n`, pageData);
-			});
-		$(element).append(data);
+		const data = $('<span class="mafia-engine-vc"> - <button>VC</button></span>').on('click', async () => {
+			modalReference.removeClass('mafia-engine-modal-closed');
+		});
+		$(element).find('a:nth-child(3)').after(data);
 	});
 });
 
-async function getEveryPageData() {
-	const urlParams = getUrlParams(window.location.search);
+async function startVoteCount() {
+	const startTime = Date.now();
 
-	const throwErr = (...values: string[]) => {
-		console.error(...values);
-		return null;
-	};
+	const params = getUrlParams(window.location.search);
+	if (!params) return console.error('Could not get url params.');
+	const threadId = params.get('t');
+	if (!threadId) return console.error('Could not get thread id.');
 
-	const threadId = urlParams.get('t');
-	if (!threadId) return throwErr('Could not find thread id in url.', JSON.stringify(urlParams));
+	const threadData = await getThreadData(threadId);
+	if (!threadData) return console.error('Could not fetch page data.');
 
-	let totalPages: number | undefined;
-	let pageTitle: string | undefined;
-	let votes: Vote[] = [];
-
-	let loopIndex = 0;
-	while (totalPages == undefined || loopIndex < totalPages) {
-		const pageData = await getPageData({
-			threadId,
-			take: 200,
-			skip: loopIndex * 200,
-		});
-
-		if (!pageData) return throwErr('Could not fetch page data.');
-		if (pageData.status != 200) return throwErr(`Page data status was ${pageData.status}.`);
-
-		totalPages = pageData.lastPage;
-		pageTitle = pageData.pageTitle;
-		votes = [...votes, ...pageData.votes];
-
-		loopIndex++;
-	}
-
-	if (!totalPages || !pageTitle) return throwErr('Could not find total pages or page title.');
-
-	return {
-		title: pageTitle,
-		pageCount: totalPages,
-		votes: votes,
-	};
+	const timeSeconds = (Date.now() - startTime) / 1000;
+	console.log(`Took ${timeSeconds} seconds to fetch ${threadData.pageCount} pages of data.\n`, threadData);
 }

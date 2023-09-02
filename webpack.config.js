@@ -1,9 +1,10 @@
 const CopyPlugin = require('copy-webpack-plugin');
+const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
 const path = require('path');
 const outputPath = 'dist';
 const entryPoints = {
-	main: [path.resolve(__dirname, 'src', 'main.ts')],
+	main: [path.resolve(__dirname, 'src', 'main.ts'), path.resolve(__dirname, 'src', 'main.css')],
 	background: path.resolve(__dirname, 'src', 'background.ts'),
 };
 
@@ -24,6 +25,10 @@ module.exports = {
 				exclude: /node_modules/,
 			},
 			{
+				test: /\.css$/i,
+				use: [MiniCssExtractPlugin.loader, 'css-loader'],
+			},
+			{
 				test: /\.(jpg|jpeg|png|gif|woff|woff2|eot|ttf|svg)$/i,
 				use: 'url-loader?limit=1024',
 			},
@@ -32,6 +37,9 @@ module.exports = {
 	plugins: [
 		new CopyPlugin({
 			patterns: [{ from: '.', to: '.', context: 'public' }],
+		}),
+		new MiniCssExtractPlugin({
+			filename: '[name].css',
 		}),
 	],
 	performance: {

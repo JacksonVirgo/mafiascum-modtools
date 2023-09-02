@@ -1,0 +1,112 @@
+.mafia-engine-vc > button {
+	color: white;
+}
+
+.mafia-engine-modal-page {
+	position: fixed;
+	top: 0;
+	left: 0;
+	width: 100vw;
+	height: 100svh;
+	background-color: rgba(0, 0, 0, 0.3);
+	backdrop-filter: blur(5px);
+	z-index: 1000;
+}
+
+.mafia-engine-modal {
+	position: fixed;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+
+	height: 50%;
+	aspect-ratio: 1/1;
+
+	background-color: #1f1f1f;
+	padding: 5px;
+
+	border: 2px solid white;
+	border-radius: 15px;
+
+	display: flex;
+	flex-direction: column;
+}
+
+.mafia-engine-modal-closed {
+	display: none;
+}
+
+.mafia-engine-modal-header {
+	display: flex;
+	flex-direction: row;
+	justify-content: flex-end;
+
+	padding: 5px;
+}
+.mafia-engine-modal-header > .exit {
+	color: red;
+	font-size: 1rem;
+}
+.mafia-engine-modal-header > .exit:hover {
+	cursor: pointer;
+}
+
+.mafia-engine-modal-content {
+	display: flex;
+	flex-direction: column;
+	flex-grow: 1;
+
+	text-align: center;
+	justify-content: flex-start;
+}
+
+.mafia-engine-btn {
+	background-color: #1f1f1f;
+	color: lightgray;
+	border: 2px solid lightgray;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 5px;
+}
+.mafia-engine-btn:hover {
+	cursor: pointer;
+	background-color: #2f2f2f;
+}
+
+.mafia-engine-form {
+	display: flex;
+	flex-direction: column;
+	justify-content: flex-start;
+	align-items: center;
+	flex-grow: 1;
+	padding: 15px;
+}
+
+.mafia-engine-form > input[type='submit'] {
+	background-color: #1f1f1f !important;
+	color: lightgray;
+	border: 2px solid lightgray;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 5px;
+}
+.mafia-engine-form > input[type='submit']:hover {
+	cursor: pointer;
+	background-color: #2f2f2f;
+}
+
+.mafia-engine-form > textarea {
+	background-color: #2f2f2f;
+	color: lightgray;
+	border: 2px solid lightgray;
+	border-radius: 5px;
+	padding: 5px;
+	margin: 5px;
+	resize: none;
+	outline: none;
+
+	flex-grow: 1;
+}
+.mafia-engine-form > textarea:focus {
+	outline: none;
+}
