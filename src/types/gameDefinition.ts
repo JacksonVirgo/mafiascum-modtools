@@ -8,6 +8,9 @@ export type GameDefinition = {
 	aliases?: Record<Username, Username[]>;
 	replacements?: Record<Username, Username[]>;
 	ignore?: Username[];
+
+	startFrom?: PostNumber;
+	endAt?: PostNumber;
 };
 
 export type ValidationResult = {
