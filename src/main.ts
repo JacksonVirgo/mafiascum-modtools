@@ -1,8 +1,4 @@
-import $, { post } from 'jquery';
-import browser from 'webextension-polyfill';
-import { Vote, isPageDataResponse } from './types/pageData';
-import { getUrlParams } from './utils/url';
-import { getPageData, getThreadData } from './fg/thread';
+import $ from 'jquery';
 import { createModal } from './fg/modal';
 
 let modalReference: JQuery<HTMLElement> = createModal();
