@@ -102,8 +102,10 @@ export function createForm(onSubmit: (def: GameDefinition) => void) {
 
 					const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
 					const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;
-					parsedJSON.startFrom = isNaN(startPost) ? 0 : startPost;
-					parsedJSON.endAt = isNaN(endPost) ? undefined : endPost;
+					parsedJSON.startFrom = isNaN(startPost) ? parsedJSON.startFrom ?? 0 : startPost;
+					parsedJSON.endAt = isNaN(endPost) ? parsedJSON.endAt : endPost;
+
+					console.log(parsedJSON.startFrom, parsedJSON.endAt);
 
 					onSubmit(parsedJSON);
 				} catch (err) {
