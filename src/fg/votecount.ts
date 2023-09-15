@@ -7,24 +7,32 @@ import $ from 'jquery';
 const CORRECTION_ACCEPT_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
 
+type VoteCount = NonNullable<Awaited<ReturnType<typeof startVoteCount>>>;
+
 export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	// Do proper error handling later
-	if (!gameDefinition) return console.error('No game definition provided.');
-	if (!gameDefinition.players) return console.error('No players provided.');
+
+	const error = (message: string) => {
+		console.error(message);
+		return null;
+	};
+
+	if (!gameDefinition) return error('No game definition provided.');
+	if (!gameDefinition.players) return error('No players provided.');
 
 	const startTime = Date.now();
 
 	const val = $('#page-body > h2 > a').attr('href')?.split('?');
-	if (!val) return console.error('Could not get url params.');
-	if (val.length < 2) return console.error('Could not get url params.');
+	if (!val) return error('Could not get url params.');
+	if (val.length < 2) return error('Could not get url params.');
 
 	const params = getUrlParams(val[1]);
-	if (!params) return console.error('Could not get url params.');
+	if (!params) return error('Could not get url params.');
 	const threadId = params.get('t');
-	if (!threadId) return console.error('Could not get thread id.');
+	if (!threadId) return error('Could not get thread id.');
 
 	const threadData = await getThreadData(threadId);
-	if (!threadData) return console.error('Could not fetch page data.');
+	if (!threadData) return error('Could not fetch page data.');
 
 	const fetchTime = Date.now();
 
@@ -151,6 +159,13 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 		}
 	}
 
+	const notVoting = livingPlayers.filter((p) => {
+		for (const [_, wagon] of Object.entries(wagons)) {
+			if (wagon.some((v) => v.author === p)) return false;
+		}
+		return true;
+	});
+
 	console.log(currentVotes);
 
 	return {
@@ -158,6 +173,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 		gameDefinition,
 		wagons,
 		majority,
+		notVoting,
 		logs: {
 			warnings,
 			errors,
@@ -169,4 +185,21 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	};
 }
 
-function formatVoteCountData(gameDefinition: GameDefinition, threadData: any) {}
+export function formatVoteCountData(voteCount: VoteCount) {
+	const wagonStrings: string[] = [];
+	for (const wagonHandle in voteCount.wagons) {
+		const wagon = voteCount.wagons[wagonHandle];
+		if (wagon.length <= 0) continue;
+		let wagonStr = `[b]${wagonHandle} (${wagon.length}/${voteCount.majority})[/b] -> ${wagon
+			.map((v) => `${v.author} ([post]${v.post}[/post])`)
+			.join(', ')}`;
+
+		wagonStrings.push(wagonStr);
+	}
+
+	const notVotingStr = `[b]Not Voting (${voteCount.notVoting.length})[/b] -> ${voteCount.notVoting.join(', ')}`;
+
+	let data = `[area=Current Votes]${wagonStrings.join('\n')}\n\n${notVotingStr}[/area]`;
+
+	return data;
+}

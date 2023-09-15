@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { convertYamlToJson } from '../utils/file';
 import { GameDefinition, isGameDefinition } from '../types/gameDefinition';
-import { startVoteCount } from './votecount';
+import { formatVoteCountData, startVoteCount } from './votecount';
 import { z } from 'zod';
 
 let yamlString: string | undefined;
@@ -49,25 +49,12 @@ export function createModal() {
 		const vc = await startVoteCount(def);
 		if (!vc) return console.error('Error starting vote count.');
 
-		const formattedWagons: string[] = [];
-		for (const wagonHandle in vc.wagons) {
-			const wagon = vc.wagons[wagonHandle];
-			if (wagon.length <= 0) continue;
-			let wagonStr = `${wagonHandle} (${wagon.length}) -> ${wagon
-				.map((v) => {
-					return `${v.author} (${v.post})`;
-				})
-				.join(', ')}`;
-
-			formattedWagons.push(wagonStr);
-		}
-
-		const data = `MAJORITY = ${vc.majority}\n\n${formattedWagons.join('\n')}`;
+		const format = formatVoteCountData(vc);
 
 		spinner.addClass('spinner-hidden');
 		form.addClass('mafia-engine-form-hidden');
 
-		if (data) responseTextarea.val(data);
+		if (format) responseTextarea.val(format);
 		else responseTextarea.val('Error formatting vote count data.');
 
 		response.removeClass('response-hidden');
