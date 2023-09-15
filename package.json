@@ -12,6 +12,7 @@
 	"devDependencies": {
 		"@types/jquery": "^3.5.14",
 		"@types/js-yaml": "^4.0.5",
+		"@types/string-similarity": "^4.0.0",
 		"@types/webextension-polyfill": "^0.10.2",
 		"copy-webpack-plugin": "^11.0.0",
 		"css-loader": "^6.8.1",
@@ -25,6 +26,8 @@
 	"dependencies": {
 		"cheerio": "^1.0.0-rc.12",
 		"jquery": "^3.6.0",
-		"js-yaml": "^4.1.0"
+		"js-yaml": "^4.1.0",
+		"string-similarity": "^4.0.4",
+		"zod": "^3.22.2"
 	}
 }

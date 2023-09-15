@@ -1,76 +1,48 @@
+import { z } from 'zod';
+
+export const GameDefinitionSchema = z.object({
+	players: z.array(z.string()),
+	aliases: z.record(z.array(z.string())).optional(),
+	replacements: z.record(z.array(z.string())).optional(),
+	ignore: z.array(z.string()).optional(),
+	dead: z.record(z.number()).optional(),
+	startFrom: z.number().optional(),
+	endAt: z.number().optional(),
+});
+
+export type GameDefinition = z.infer<typeof GameDefinitionSchema>;
+
+export function isGameDefinition(obj: unknown): obj is GameDefinition {
+	try {
+		const parse = GameDefinitionSchema.parse(obj);
+		if (parse) return true;
+		return false;
+	} catch (err) {
+		console.log(err);
+		return false;
+	}
+}
+
 // Semantic Types
 type Username = string;
 type PostNumber = number;
 
-// I have absolutely no idea what to name this
-export type GameDefinition = {
-	players: Username[];
-	aliases?: Record<Username, Username[]>;
-	replacements?: Record<Username, Username[]>;
-	ignore?: Username[];
-
-	startFrom?: PostNumber;
-	endAt?: PostNumber;
-};
-
-export type ValidationResult = {
-	isValid: boolean;
-	errors: string[];
-};
-
-function isGameDefinition(obj: unknown): obj is GameDefinition {
-	if (typeof obj !== 'object' || obj === null) {
-		return false;
-	}
-
-	const gameDef = obj as GameDefinition;
-
-	if (!Array.isArray(gameDef.players) || gameDef.players.length === 0) {
-		return false;
-	}
-
-	// Check 'aliases' if it exists
-	if (gameDef.aliases) {
-		if (typeof gameDef.aliases !== 'object') {
-			return false;
-		}
-		for (const username in gameDef.aliases) {
-			if (!Array.isArray(gameDef.aliases[username])) {
-				return false;
-			}
-		}
-	}
-
-	// Check 'replacements' if it exists
-	if (gameDef.replacements) {
-		if (typeof gameDef.replacements !== 'object') {
-			return false;
-		}
-		for (const username in gameDef.replacements) {
-			if (!Array.isArray(gameDef.replacements[username])) {
-				return false;
-			}
-		}
-	}
-
-	// Check 'ignore' if it exists
-	if (gameDef.ignore) {
-		if (!Array.isArray(gameDef.ignore)) {
-			return false;
-		}
-	}
-
-	return true;
+export enum VoteType {
+	VOTE,
+	UNVOTE,
 }
 
-export function validateGameDefinition(obj: unknown): GameDefinition | null {
-	if (!isGameDefinition(obj)) return null;
-	const gameDef = obj;
-
-	return {
-		players: gameDef.players.slice(),
-		aliases: gameDef.aliases ? { ...gameDef.aliases } : undefined,
-		replacements: gameDef.replacements ? { ...gameDef.replacements } : undefined,
-		ignore: gameDef.ignore ? gameDef.ignore.slice() : undefined,
-	};
+export enum VoteCorrection {
+	ACCEPT,
+	WARN,
+	REJECT,
 }
+
+export type ValidatedVote = {
+	type: VoteType;
+	author: Username;
+	post: PostNumber;
+	target?: Username;
+	rawTarget?: string;
+	validity: VoteCorrection;
+};

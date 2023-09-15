@@ -1,7 +1,8 @@
 import $ from 'jquery';
 import { convertYamlToJson } from '../utils/file';
-import { GameDefinition, validateGameDefinition } from '../types/gameDefinition';
+import { GameDefinition, isGameDefinition } from '../types/gameDefinition';
 import { startVoteCount } from './votecount';
+import { z } from 'zod';
 
 let yamlString: string | undefined;
 let formattedVoteCount: string | undefined;
@@ -32,7 +33,7 @@ export function createModal() {
 	const spinner = createSpinner();
 	modal.append(spinner);
 
-	const form = createForm((def: GameDefinition | null) => {
+	const form = createForm((def: GameDefinition) => {
 		onFormSubmit(def);
 	});
 
@@ -40,7 +41,7 @@ export function createModal() {
 	modal.append(response);
 	const responseTextarea = response.find('textarea');
 
-	const onFormSubmit = async (def: GameDefinition | null) => {
+	const onFormSubmit = async (def: GameDefinition) => {
 		spinner.removeClass('spinner-hidden');
 		form.addClass('mafia-engine-form-hidden');
 		response.addClass('response-hidden');
@@ -48,17 +49,26 @@ export function createModal() {
 		const vc = await startVoteCount(def);
 		if (!vc) return console.error('Error starting vote count.');
 
-		const data = vc.voteCount
-			.map((v) => {
-				const { author, vote, post } = v;
-				return `${author} posted "${vote}" on post ${post}`;
-			})
-			.join('\n');
+		const formattedWagons: string[] = [];
+		for (const wagonHandle in vc.wagons) {
+			const wagon = vc.wagons[wagonHandle];
+			if (wagon.length <= 0) continue;
+			let wagonStr = `${wagonHandle} (${wagon.length}) -> ${wagon
+				.map((v) => {
+					return `${v.author} (${v.post})`;
+				})
+				.join(', ')}`;
+
+			formattedWagons.push(wagonStr);
+		}
+
+		const data = `MAJORITY = ${vc.majority}\n\n${formattedWagons.join('\n')}`;
 
 		spinner.addClass('spinner-hidden');
 		form.addClass('mafia-engine-form-hidden');
 
-		responseTextarea.val(data ?? 'Error formatting vote count data.');
+		if (data) responseTextarea.val(data);
+		else responseTextarea.val('Error formatting vote count data.');
 
 		response.removeClass('response-hidden');
 	};
@@ -68,7 +78,7 @@ export function createModal() {
 	return page.append(modal);
 }
 
-export function createForm(onSubmit: (def: GameDefinition | null) => void) {
+export function createForm(onSubmit: (def: GameDefinition) => void) {
 	const form = $('<form class="mafia-engine-form" id="mafia-engine-form"/>');
 	form.append($('<label for="mafia-engine-yaml" class="required">Upload game definition file</label>'))
 		.append(
@@ -97,23 +107,22 @@ export function createForm(onSubmit: (def: GameDefinition | null) => void) {
 		.append(
 			$('<input type="submit" value="Load Game Definition"/>').on('click', async (e) => {
 				e.preventDefault();
-				console.log('Form Submitted', yamlString);
+				if (!yamlString) return;
 
-				// if (!yamlString) return;
-				// const parsedJSON = convertYamlToJson(yamlString);
+				try {
+					const parsedJSON = convertYamlToJson(yamlString);
+					if (!isGameDefinition(parsedJSON)) return console.error('Invalid game definition.');
 
-				// const gameDefinition = validateGameDefinition(parsedJSON);
-				// if (!gameDefinition) return console.error('Invalid game definition.');
+					const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
+					const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;
+					parsedJSON.startFrom = isNaN(startPost) ? 0 : startPost;
+					parsedJSON.endAt = isNaN(endPost) ? undefined : endPost;
 
-				// const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
-				// const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;
-
-				// gameDefinition.startFrom = isNaN(startPost) ? 0 : startPost;
-				// gameDefinition.endAt = isNaN(endPost) ? undefined : endPost;
-
-				// onSubmit(gameDefinition);
-
-				onSubmit(null);
+					onSubmit(parsedJSON);
+				} catch (err) {
+					if (err instanceof z.ZodError) console.error('Validation errors: ', err.errors);
+					else console.error('An unexpected error occurred: ', err);
+				}
 			})
 		);
 

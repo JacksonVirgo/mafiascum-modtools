@@ -1,67 +1,56 @@
-export type PageDataRequest = {
-	action: 'getPageData';
-	url: string;
-};
+import { z } from 'zod';
 
+export const PageDataRequestSchema = z.object({
+	action: z.literal('getPageData'),
+	url: z.string(),
+});
+
+export type PageDataRequest = z.infer<typeof PageDataRequestSchema>;
 export function isPageDataRequest(data: unknown): data is PageDataRequest {
-	if (!data || typeof data !== 'object') return false;
-	if (!('action' in data)) return false;
-	if (!('url' in data)) return false;
-
-	if (typeof data.action !== 'string') return false;
-	if (data.action !== 'getPageData') return false;
-	if (typeof data.url !== 'string') return false;
-
-	return true;
+	try {
+		const parse = PageDataRequestSchema.parse(data);
+		if (parse) return true;
+		return false;
+	} catch (err) {
+		return false;
+	}
 }
 
-export type Vote = {
-	author: string;
-	post: number;
-	index: number; // For when there's multiple votes in one post
-	vote: string;
-};
+export const VoteSchema = z.object({
+	author: z.string(),
+	post: z.number(),
+	index: z.number(), // For when there is multiple votes per post
+	vote: z.string(),
+});
 
-export type PageDataResponse =
-	| {
-			status: 200;
-			pageTitle: string;
-			lastPage: number;
-			currentPage: number;
-			votes: Vote[];
-	  }
-	| {
-			status: 500;
-			message: string;
-	  }
-	| {
-			status: 400;
-			message: string;
-	  };
+export type Vote = z.infer<typeof VoteSchema>;
+
+export const PageDataSchema = z.object({
+	status: z.literal(200),
+	pageTitle: z.string(),
+	lastPage: z.number(),
+	currentPage: z.number(),
+	votes: z.array(VoteSchema),
+});
+
+export type PageData = z.infer<typeof PageDataSchema>;
+
+export const ErrorResponseSchema = z.object({
+	status: z.union([z.literal(400), z.literal(500)]),
+	message: z.string(),
+});
+
+export type ErrorResponse = z.infer<typeof ErrorResponseSchema>;
+
+export const PageDataResponseSchema = z.union([PageDataSchema, ErrorResponseSchema]);
+export type PageDataResponse = z.infer<typeof PageDataResponseSchema>;
 
 export function isPageDataResponse(data: unknown): data is PageDataResponse {
-	if (!data || typeof data !== 'object') return false;
-	if (!('status' in data)) return false;
-	if (typeof data.status !== 'number') return false;
-
-	if (data.status === 200) {
-		if (!('pageTitle' in data)) return false;
-		if (typeof data.pageTitle !== 'string') return false;
-
-		if (!('lastPage' in data)) return false;
-		if (typeof data.lastPage !== 'number') return false;
-
-		if (!('currentPage' in data)) return false;
-		if (typeof data.currentPage !== 'number') return false;
-
-		if (!('votes' in data)) return false;
-		if (!Array.isArray(data.votes)) return false;
-
-		return true;
+	try {
+		const parse = PageDataResponseSchema.parse(data);
+		if (parse) return true;
+		return false;
+	} catch (err) {
+		return false;
 	}
-
-	if (data.status != 500 && data.status != 400) return false;
-	if (!('message' in data)) return false;
-	if (typeof data.message !== 'string') return false;
-	return true;
 }
