@@ -7,6 +7,9 @@ import $ from 'jquery';
 const CORRECTION_ACCEPT_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
 
+const UNVOTE_TAG = 'unvote';
+const NO_ELIMINATION_TAG = 'no elimination';
+
 type VoteCount = NonNullable<Awaited<ReturnType<typeof startVoteCount>>>;
 
 export async function startVoteCount(gameDefinition: GameDefinition | null) {
@@ -94,12 +97,13 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 			console.log(aliasLegend);
 
 			const totalVotables = Array.from(aliasLegend.keys());
-			totalVotables.push('unvote');
+			totalVotables.push(UNVOTE_TAG);
+			totalVotables.push(NO_ELIMINATION_TAG);
 
 			const closestMatch = stringSimilarity.findBestMatch(vote.target.toLowerCase(), totalVotables).bestMatch;
 
 			let validatedName = closestMatch.target;
-			if (validatedName != 'unvote') validatedName = aliasLegend.get(validatedName) ?? validatedName;
+			if (validatedName != UNVOTE_TAG && validatedName != NO_ELIMINATION_TAG) validatedName = aliasLegend.get(validatedName) ?? validatedName;
 			vote.target = validatedName;
 
 			if (closestMatch.rating >= CORRECTION_ACCEPT_THRESHOLD) vote.validity = VoteCorrection.ACCEPT;
@@ -131,8 +135,9 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 
 		// Check if one of the wagons has reached a majority
 		let isMajorityReached: boolean | undefined;
-		for (const [_, wagonVotes] of Object.entries(wagons)) {
-			if (wagonVotes.length >= majority) {
+		for (const [wagon, wagonVotes] of Object.entries(wagons)) {
+			const maj = wagon == NO_ELIMINATION_TAG ? Math.ceil(livingPlayers.length / 2) : majority;
+			if (wagonVotes.length >= maj) {
 				isMajorityReached = true;
 				break;
 			}
@@ -150,7 +155,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 		} else if (type === VoteType.VOTE) {
 			if (!target) continue;
 			for (const wagon in wagons) {
-				if (wagon !== target) wagons[wagon] = wagons[wagon].filter((v) => v.author !== author);
+				if (wagon !== target || target == UNVOTE_TAG) wagons[wagon] = wagons[wagon].filter((v) => v.author !== author);
 			}
 
 			if (!wagons[target]) wagons[target] = [];
@@ -172,6 +177,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 		wagons,
 		majority,
 		notVoting,
+		livingPlayers,
 		logs: {
 			warnings,
 			errors,
@@ -189,11 +195,14 @@ export function formatVoteCountData(voteCount: VoteCount) {
 	for (const wagonHandle in voteCount.wagons) {
 		const wagon = voteCount.wagons[wagonHandle];
 		if (wagon.length <= 0) continue;
-		let wagonStr = `[b]${wagonHandle} (${wagon.length}/${voteCount.majority})[/b] -> ${wagon
+
+		const calculatedMajority = wagonHandle == NO_ELIMINATION_TAG ? Math.ceil(voteCount.livingPlayers.length / 2) : voteCount.majority;
+		const wagonLength = wagonHandle == NO_ELIMINATION_TAG ? -1 : wagon.length;
+		const wagonTitle = wagonHandle == NO_ELIMINATION_TAG ? 'No Elimination' : wagonHandle;
+		const wagonStr = `[b]${wagonTitle} (${wagon.length}/${calculatedMajority})[/b] -> ${wagon
 			.map((v) => `${v.author} ([post]${v.post}[/post])`)
 			.join(', ')}`;
-
-		wagonStrings.push([wagonStr, wagon.length]);
+		wagonStrings.push([wagonStr, wagonLength]);
 	}
 
 	const notVotingStr = `[b]Not Voting (${voteCount.notVoting.length})[/b] -> ${voteCount.notVoting.join(', ')}`;
