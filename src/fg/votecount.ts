@@ -186,7 +186,8 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 }
 
 export function formatVoteCountData(voteCount: VoteCount) {
-	const wagonStrings: string[] = [];
+	const wagonStrings: [string, number][] = [];
+
 	for (const wagonHandle in voteCount.wagons) {
 		const wagon = voteCount.wagons[wagonHandle];
 		if (wagon.length <= 0) continue;
@@ -194,12 +195,14 @@ export function formatVoteCountData(voteCount: VoteCount) {
 			.map((v) => `${v.author} ([post]${v.post}[/post])`)
 			.join(', ')}`;
 
-		wagonStrings.push(wagonStr);
+		wagonStrings.push([wagonStr, wagon.length]);
 	}
 
 	const notVotingStr = `[b]Not Voting (${voteCount.notVoting.length})[/b] -> ${voteCount.notVoting.join(', ')}`;
 
-	let data = `[area=Current Votes]${wagonStrings.join('\n')}\n\n${notVotingStr}[/area]`;
+	wagonStrings.sort((a, b) => b[1] - a[1]);
+
+	let data = `[area=Current Votes]${wagonStrings.map((v) => v[0]).join('\n')}\n\n${notVotingStr}[/area]`;
 
 	return data;
 }
