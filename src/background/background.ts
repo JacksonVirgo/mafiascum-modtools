@@ -1,8 +1,9 @@
 import browser from 'webextension-polyfill';
 import { load } from 'cheerio';
-import { PageDataResponse, Vote, isPageDataRequest } from './types/pageData';
+import { AnyResponse, Vote } from '../types/backgroundResponse';
+import { isMemberVerificationRequest, isPageDataRequest } from '../types/backgroundRequests';
 
-function sendResponse(response: PageDataResponse) {
+function sendResponse(response: AnyResponse) {
 	return Promise.resolve(response);
 }
 
@@ -11,6 +12,8 @@ browser.runtime.onMessage.addListener(async (request) => {
 		switch (true) {
 			case isPageDataRequest(request):
 				return await fetchPageData(request.url);
+			case isMemberVerificationRequest(request):
+				return await verifyMemberExists(request.username);
 			default:
 				return sendResponse({ status: 400, message: 'Invalid request' });
 		}
@@ -78,10 +81,20 @@ async function fetchPageData(url: string) {
 	if (!activePageNumber) return sendResponse({ status: 500, message: 'Could not find active page number.' });
 
 	return sendResponse({
+		action: 'pageData',
 		status: 200,
 		pageTitle: title,
 		lastPage: largestPageNumber,
 		currentPage: activePageNumber,
 		votes,
 	});
+}
+
+async function verifyMemberExists(username: string) {
+	const fetchUrl = `https://forum.mafiascum.net/memberlist.php?username=${username}`;
+	const response = await fetch(fetchUrl);
+	const text = await response.text();
+	const $ = load(text);
+	const member = $('#memberlist > tbody > tr > td:nth-child(1) > a').first().text();
+	return sendResponse({ action: 'verifyMember', status: 200, username, verified: member === username });
 }

@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { createModal } from './fg/modal';
+import { createModal } from './modal';
 
 let modalReference: JQuery<HTMLElement> = createModal();
 

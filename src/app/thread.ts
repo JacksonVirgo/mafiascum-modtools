@@ -1,5 +1,5 @@
 import browser from 'webextension-polyfill';
-import { Vote, isPageDataResponse } from '../types/pageData';
+import { Vote, isPageDataResponse } from '../types/backgroundResponse';
 
 export type PageQuery = {
 	threadId: string;

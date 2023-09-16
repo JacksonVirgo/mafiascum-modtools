@@ -3,6 +3,9 @@ import { getUrlParams } from '../utils/url';
 import { getThreadData } from './thread';
 import stringSimilarity from 'string-similarity';
 import $ from 'jquery';
+import browser from 'webextension-polyfill';
+import { MemberVerificationRequestSchema } from '../types/backgroundRequests';
+import { isMemberVerificationResponse } from '../types/backgroundResponse';
 
 const CORRECTION_ACCEPT_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
@@ -11,6 +14,25 @@ const UNVOTE_TAG = 'unvote';
 const NO_ELIMINATION_TAG = 'no elimination';
 
 type VoteCount = NonNullable<Awaited<ReturnType<typeof startVoteCount>>>;
+
+export async function validateGameDefinition(gameDefinition: GameDefinition) {
+	const playerVerification = new Map<string, boolean>();
+	for (const player of gameDefinition.players) {
+		try {
+			const request = MemberVerificationRequestSchema.parse({ action: 'verifyMember', username: player });
+			const verification = await browser.runtime.sendMessage(request);
+			if (!isMemberVerificationResponse(verification)) playerVerification.set(player, false);
+			else playerVerification.set(player, verification.verified);
+		} catch (err) {
+			console.error(err);
+			playerVerification.set(player, false);
+		}
+	}
+
+	return {
+		players: playerVerification,
+	};
+}
 
 export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	// Do proper error handling later
