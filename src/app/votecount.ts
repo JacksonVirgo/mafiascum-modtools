@@ -3,8 +3,6 @@ import { getUrlParams } from '../utils/url';
 import { getThreadData } from './thread';
 import stringSimilarity from 'string-similarity';
 import $ from 'jquery';
-import browser from 'webextension-polyfill';
-import { MemberVerificationRequestSchema } from '../types/backgroundRequests';
 import { isMemberVerificationResponse } from '../types/backgroundResponse';
 import { sendBackgroundRequest } from './request';
 

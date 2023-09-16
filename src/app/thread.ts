@@ -1,4 +1,3 @@
-import browser from 'webextension-polyfill';
 import { Vote, isPageDataResponse } from '../types/backgroundResponse';
 import { sendBackgroundRequest } from './request';
 
