@@ -166,8 +166,6 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 		return true;
 	});
 
-	console.log(currentVotes);
-
 	return {
 		threadData,
 		gameDefinition,
