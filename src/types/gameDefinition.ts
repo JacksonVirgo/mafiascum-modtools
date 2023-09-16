@@ -8,6 +8,7 @@ export const GameDefinitionSchema = z.object({
 	dead: z.record(z.number()).optional(),
 	startFrom: z.number().optional(),
 	endAt: z.number().optional(),
+	disable: z.array(z.string()).optional(),
 });
 
 export type GameDefinition = z.infer<typeof GameDefinitionSchema>;

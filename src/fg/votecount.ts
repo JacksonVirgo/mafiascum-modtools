@@ -98,7 +98,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 
 			const totalVotables = Array.from(aliasLegend.keys());
 			totalVotables.push(UNVOTE_TAG);
-			totalVotables.push(NO_ELIMINATION_TAG);
+			if (!gameDefinition.disable?.includes('No Elimination')) totalVotables.push(NO_ELIMINATION_TAG);
 
 			const closestMatch = stringSimilarity.findBestMatch(vote.target.toLowerCase(), totalVotables).bestMatch;
 
