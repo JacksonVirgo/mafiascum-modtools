@@ -13,4 +13,6 @@ npm install
 npm run build
 ```
 
-It should create a `/dist` folder with the compiled extension. You can then load it into your browser.
+It should create a `/dist` folder with the compiled extensions for both manifest v2 and v3. You can then load it into your browsers depending on which version the browser supports.
+
+Generally Chrome-based browsers will use v3 whereas Firefox will use v2. If you're not sure, try v3 followed by v2.

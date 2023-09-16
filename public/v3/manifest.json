@@ -1,7 +1,7 @@
 {
 	"name": "Mafia Engine",
 	"description": "Aid in the playing and hosting of games on MafiaScum",
-	"version": "0.0.0",
+	"version": "0.0.2",
 	"manifest_version": 3,
 	"icons": {
 		"128": "/images/cog-128.png",

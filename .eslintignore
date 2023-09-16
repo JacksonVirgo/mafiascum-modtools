@@ -1,2 +1,7 @@
 node_modules
 dist
+
+
+webpack.config.js
+webpack.config.v2.js
+webpack.config.v3.js
