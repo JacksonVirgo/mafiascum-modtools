@@ -74,7 +74,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 			if (!isAuthorPlayer) return false;
 
 			// Check if author is dead
-			let isAuthorDead = false;
+			const isAuthorDead = false;
 			for (const [key, value] of Object.entries(gameDefinition?.dead ?? {}))
 				if (vote.author.toLowerCase() === key.toLowerCase() && value <= vote.post) return false;
 			if (isAuthorDead) return false;
@@ -147,11 +147,11 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 
 	const majority = Math.floor(livingPlayers.length / 2) + 1;
 
-	let warnings: number[] = [];
-	let errors: number[] = [];
+	const warnings: number[] = [];
+	const errors: number[] = [];
 
 	for (const vote of currentVotes) {
-		const { author, post, target, rawTarget, type, validity } = vote;
+		const { author, post, target, type, validity } = vote;
 
 		// Check if one of the wagons has reached a majority
 		let isMajorityReached: boolean | undefined;
@@ -185,8 +185,8 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	}
 
 	const notVoting = livingPlayers.filter((p) => {
-		for (const [_, wagon] of Object.entries(wagons)) {
-			if (wagon.some((v) => v.author === p)) return false;
+		for (const entry of Object.entries(wagons)) {
+			if (entry[1].some((v) => v.author === p)) return false;
 		}
 		return true;
 	});
@@ -229,7 +229,5 @@ export function formatVoteCountData(voteCount: VoteCount) {
 
 	wagonStrings.sort((a, b) => b[1] - a[1]);
 
-	let data = `[area=Current Votes]${wagonStrings.map((v) => v[0]).join('\n')}\n\n${notVotingStr}[/area]`;
-
-	return data;
+	return `[area=Current Votes]${wagonStrings.map((v) => v[0]).join('\n')}\n\n${notVotingStr}[/area]`;
 }

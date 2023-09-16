@@ -5,7 +5,6 @@ import { formatVoteCountData, startVoteCount } from './votecount';
 import { z } from 'zod';
 
 let yamlString: string | undefined;
-let formattedVoteCount: string | undefined;
 
 export function createModal() {
 	const page = $('<div class="mafia-engine-modal-page mafia-engine-modal-closed"/>');

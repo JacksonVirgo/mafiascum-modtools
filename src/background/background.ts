@@ -9,14 +9,9 @@ function sendResponse(response: AnyResponse) {
 
 browser.runtime.onMessage.addListener(async (request) => {
 	try {
-		switch (true) {
-			case isPageDataRequest(request):
-				return await fetchPageData(request.url);
-			case isMemberVerificationRequest(request):
-				return await verifyMemberExists(request.username);
-			default:
-				return sendResponse({ status: 400, message: 'Invalid request' });
-		}
+		if (isPageDataRequest(request)) return await fetchPageData(request.url);
+		if (isMemberVerificationRequest(request)) return await verifyMemberExists(request.username);
+		return sendResponse({ status: 400, message: 'Invalid request' });
 	} catch (err) {
 		console.log(err); // Do proper error handling later
 		return sendResponse({ status: 500, message: 'Unexpected error' });
@@ -71,8 +66,8 @@ async function fetchPageData(url: string) {
 				posts.set(postNumber, array);
 			});
 
-		for (const [_key, value] of posts) {
-			votes.push(...value);
+		for (const post of posts) {
+			votes.push(...post[1]);
 		}
 	});
 

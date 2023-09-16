@@ -1,7 +1,7 @@
 import $ from 'jquery';
 import { createModal } from './modal';
 
-let modalReference: JQuery<HTMLElement> = createModal();
+const modalReference: JQuery<HTMLElement> = createModal();
 
 $(async function () {
 	$('body').append(modalReference);
