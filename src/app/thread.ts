@@ -1,5 +1,6 @@
 import browser from 'webextension-polyfill';
 import { Vote, isPageDataResponse } from '../types/backgroundResponse';
+import { sendBackgroundRequest } from './request';
 
 export type PageQuery = {
 	threadId: string;
@@ -20,7 +21,7 @@ export async function getPageData(query: PageQuery) {
 	if (url[url.length - 1] === '&') url = url.slice(0, -1);
 
 	try {
-		const pageData = await browser.runtime.sendMessage({ action: 'getPageData', url: url });
+		const pageData = await sendBackgroundRequest({ action: 'getPageData', url: url });
 		if (!isPageDataResponse(pageData)) return null;
 		return pageData;
 	} catch (err) {

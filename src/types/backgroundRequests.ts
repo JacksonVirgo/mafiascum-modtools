@@ -31,3 +31,6 @@ export function isMemberVerificationRequest(obj: unknown): obj is z.infer<typeof
 		return false;
 	}
 }
+
+export const AnyRequestSchema = z.union([PageDataRequestSchema, MemberVerificationRequestSchema]);
+export type AnyRequest = z.infer<typeof AnyRequestSchema>;
