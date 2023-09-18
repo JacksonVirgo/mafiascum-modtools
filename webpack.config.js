@@ -37,7 +37,7 @@ const mv2Config = {
 	plugins: [
 		new CopyPlugin({
 			patterns: [
-				{ from: '.', to: './images', context: 'public/images' },
+				{ from: '.', to: '.', context: 'public/globals' },
 				{
 					from: '.',
 					to: './',
@@ -85,7 +85,7 @@ const mv3Config = {
 	plugins: [
 		new CopyPlugin({
 			patterns: [
-				{ from: '.', to: './images', context: 'public/images' },
+				{ from: '.', to: '.', context: 'public/globals' },
 				{
 					from: '.',
 					to: './',
