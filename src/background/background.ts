@@ -1,7 +1,7 @@
 import browser from 'webextension-polyfill';
 import { load } from 'cheerio';
 import { AnyResponse, Vote } from '../types/backgroundResponse';
-import { isMemberVerificationRequest, isPageDataRequest } from '../types/backgroundRequests';
+import { MemberVerificationRequestValidator, PageRequestValidator } from '../types/backgroundRequests';
 
 function sendResponse(response: AnyResponse) {
 	return Promise.resolve(response);
@@ -9,8 +9,8 @@ function sendResponse(response: AnyResponse) {
 
 browser.runtime.onMessage.addListener(async (request) => {
 	try {
-		if (isPageDataRequest(request)) return await fetchPageData(request.url);
-		if (isMemberVerificationRequest(request)) return await verifyMemberExists(request.username);
+		if (PageRequestValidator.parse(request)) return await fetchPageData(request.url);
+		else if (MemberVerificationRequestValidator.parse(request)) return await verifyMemberExists(request.username);
 		return sendResponse({ status: 400, message: 'Invalid request' });
 	} catch (err) {
 		console.log(err); // Do proper error handling later
