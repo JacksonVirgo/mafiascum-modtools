@@ -113,9 +113,6 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 					});
 				}
 			}
-
-			console.log(aliasLegend);
-
 			const totalVotables = Array.from(aliasLegend.keys());
 			totalVotables.push(UNVOTE_TAG);
 			if (!gameDefinition.disable?.includes('No Elimination')) totalVotables.push(NO_ELIMINATION_TAG);

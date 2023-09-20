@@ -10,7 +10,7 @@ $secondary-color: lightgray;
 
 .mafia-engine-modal-closed,
 .mafia-engine-hidden {
-	display: none;
+	display: none !important;
 }
 
 .mafia-engine-btn {
