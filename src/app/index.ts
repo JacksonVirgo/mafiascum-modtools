@@ -7,6 +7,7 @@ $(async function () {
 	if (!modal) return;
 
 	$('body').append(modal);
+
 	const vcButton = await getTemplate('vcButton');
 	if (vcButton) {
 		$('.author').each((_index, element) => {

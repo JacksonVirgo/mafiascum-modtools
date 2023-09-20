@@ -6,7 +6,7 @@ const output = 'dist';
 const entryPoints = {
 	main: [path.resolve(__dirname, 'src', 'app', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
-	styling: path.resolve(__dirname, 'src', 'styles', 'main.scss'),
+	styling: path.resolve(__dirname, 'src', 'styles', '_main.scss'),
 };
 
 function fillConfig(outputDir) {
