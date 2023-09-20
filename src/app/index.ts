@@ -1,14 +1,23 @@
 import $ from 'jquery';
-import { createModal } from './modal';
-
-const modalReference: JQuery<HTMLElement> = createModal();
+import { CSS_HIDDEN, createModal } from './modal';
+import { getTemplate } from './request';
 
 $(async function () {
-	$('body').append(modalReference);
-	$('.author').each((_index, element) => {
-		const data = $('<span class="mafia-engine-vc"> - <button>VC</button></span>').on('click', async () => {
-			modalReference.removeClass('mafia-engine-modal-closed');
+	const modal = await createModal();
+	if (!modal) return;
+
+	$('body').append(modal);
+	const vcButton = await getTemplate('vcButton');
+	if (vcButton) {
+		$('.author').each((_index, element) => {
+			const button = $(vcButton);
+			button
+				.find('button')
+				.first()
+				.on('click', async () => {
+					modal.removeClass(CSS_HIDDEN);
+				});
+			$(element).find('a:nth-child(3)').after(button);
 		});
-		$(element).find('a:nth-child(3)').after(data);
-	});
+	}
 });

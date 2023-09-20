@@ -4,104 +4,64 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const output = 'dist';
 const entryPoints = {
-	main: [path.resolve(__dirname, 'src', 'app', 'index.ts'), path.resolve(__dirname, 'src', 'main.css')],
+	main: [path.resolve(__dirname, 'src', 'app', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
+	styling: path.resolve(__dirname, 'src', 'styles', 'main.scss'),
 };
 
-const mv2Config = {
-	entry: entryPoints,
-	output: {
-		path: path.join(__dirname, output, 'v2'),
-		filename: '[name].js',
-	},
-	resolve: {
-		extensions: ['.ts', '.js'],
-	},
-	module: {
-		rules: [
-			{
-				test: /\.tsx?$/,
-				loader: 'ts-loader',
-				exclude: /node_modules/,
-			},
-			{
-				test: /\.css$/i,
-				use: [MiniCssExtractPlugin.loader, 'css-loader'],
-			},
-			{
-				test: /\.(jpg|jpeg|png|gif|woff|woff2|eot|ttf|svg)$/i,
-				use: 'url-loader?limit=1024',
-			},
-		],
-	},
-	plugins: [
-		new CopyPlugin({
-			patterns: [
-				{ from: '.', to: '.', context: 'public/globals' },
+function fillConfig(outputDir) {
+	return {
+		entry: entryPoints,
+		output: {
+			path: path.join(__dirname, output, outputDir),
+			filename: '[name].js',
+		},
+		resolve: {
+			extensions: ['.ts', '.js'],
+		},
+		module: {
+			rules: [
 				{
-					from: '.',
-					to: './',
-					context: 'public/v2',
+					test: /\.tsx?$/,
+					loader: 'ts-loader',
+					exclude: /node_modules/,
+				},
+				{
+					test: /\.(jpg|jpeg|png|gif|woff|woff2|eot|ttf|svg)$/i,
+					use: 'url-loader?limit=1024',
+				},
+				{
+					test: /\.(s[ac]ss|css)$/i,
+					use: [
+						// 'style-loader', // Injects CSS into the DOM
+						MiniCssExtractPlugin.loader,
+						'css-loader', // Translates CSS into CommonJS
+						'sass-loader', // Compiles Sass to CSS
+					],
 				},
 			],
-		}),
-		new MiniCssExtractPlugin({
-			filename: '[name].css',
-		}),
-	],
-	performance: {
-		hints: false,
-		maxEntrypointSize: 512000,
-		maxAssetSize: 512000,
-	},
-};
-
-const mv3Config = {
-	entry: entryPoints,
-	output: {
-		path: path.join(__dirname, output, 'v3'),
-		filename: '[name].js',
-	},
-	resolve: {
-		extensions: ['.ts', '.js'],
-	},
-	module: {
-		rules: [
-			{
-				test: /\.tsx?$/,
-				loader: 'ts-loader',
-				exclude: /node_modules/,
-			},
-			{
-				test: /\.css$/i,
-				use: [MiniCssExtractPlugin.loader, 'css-loader'],
-			},
-			{
-				test: /\.(jpg|jpeg|png|gif|woff|woff2|eot|ttf|svg)$/i,
-				use: 'url-loader?limit=1024',
-			},
+		},
+		plugins: [
+			new CopyPlugin({
+				patterns: [
+					{ from: '.', to: '.', context: 'public/globals' },
+					{
+						from: '.',
+						to: './',
+						context: `public/${outputDir}`,
+					},
+				],
+			}),
+			new MiniCssExtractPlugin({
+				filename: '[name].css',
+			}),
 		],
-	},
-	plugins: [
-		new CopyPlugin({
-			patterns: [
-				{ from: '.', to: '.', context: 'public/globals' },
-				{
-					from: '.',
-					to: './',
-					context: 'public/v3',
-				},
-			],
-		}),
-		new MiniCssExtractPlugin({
-			filename: '[name].css',
-		}),
-	],
-	performance: {
-		hints: false,
-		maxEntrypointSize: 512000,
-		maxAssetSize: 512000,
-	},
-};
+		performance: {
+			hints: false,
+			maxEntrypointSize: 512000,
+			maxAssetSize: 512000,
+		},
+	};
+}
 
-module.exports = [mv2Config, mv3Config];
+module.exports = [fillConfig('v2'), fillConfig('v3')];

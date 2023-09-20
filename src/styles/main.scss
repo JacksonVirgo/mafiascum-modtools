@@ -2,7 +2,7 @@
 	color: white;
 }
 
-.mafia-engine-modal-page {
+#mafia-engine-modal-page {
 	position: fixed;
 	top: 0;
 	left: 0;
@@ -13,7 +13,7 @@
 	z-index: 1000;
 }
 
-.mafia-engine-modal {
+#mafia-engine-modal-page > .modal {
 	position: fixed;
 	top: 50%;
 	left: 50%;
@@ -35,23 +35,32 @@
 .mafia-engine-modal-closed {
 	display: none;
 }
+.mafia-engine-hidden {
+	display: none;
+}
+.mafia-engine-block {
+	display: block;
+}
+.mafia-engine-flex {
+	display: flex;
+}
 
-.mafia-engine-modal-header {
+#mafia-engine-modal-page > .modal-header {
 	display: flex;
 	flex-direction: row;
 	justify-content: flex-end;
 
 	padding: 5px;
 }
-.mafia-engine-modal-header > .exit {
+#mafia-engine-modal-page > .modal-header > .exit {
 	color: red;
 	font-size: 1rem;
 }
-.mafia-engine-modal-header > .exit:hover {
+#mafia-engine-modal-page > .modal-header > .exit:hover {
 	cursor: pointer;
 }
 
-.mafia-engine-modal-content {
+#mafia-engine-modal-page > .content {
 	display: flex;
 	flex-direction: column;
 	text-align: center;

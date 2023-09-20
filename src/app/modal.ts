@@ -3,31 +3,28 @@ import { convertYamlToJson } from '../utils/file';
 import { GameDefinition, isGameDefinition } from '../types/gameDefinition';
 import { formatVoteCountData, startVoteCount } from './votecount';
 import { z } from 'zod';
+import { getTemplate } from './request';
 
 let yamlString: string | undefined;
 
-export function createModal() {
-	const page = $('<div class="mafia-engine-modal-page mafia-engine-modal-closed"/>');
+export const CSS_HIDDEN = 'mafia-engine-hidden';
 
+export async function createModal() {
+	const pageTemplate = await getTemplate('gamedef.html');
+	if (!pageTemplate) return null;
+
+	const page = $(pageTemplate);
+	page.addClass(CSS_HIDDEN);
 	page.on('click', (e) => {
-		if (e.target === page[0]) {
-			page.addClass('mafia-engine-modal-closed');
-		}
+		if (e.target === page[0]) page.addClass(CSS_HIDDEN);
 	});
 
-	const modal = $('<div class="mafia-engine-modal"/>');
+	// #mafia-engine-modal-page
+	// #mafia-engine-modal-exit
 
-	const header = $('<div class="mafia-engine-modal-header"/>');
-	header.append($('<span class="exit">❌</span>').on('click', () => page.addClass('mafia-engine-modal-closed')));
-	modal.append(header);
+	$('#mafia-engine-modal-exit').on('click', () => page.addClass(CSS_HIDDEN));
 
-	modal.append(
-		$('<div class="mafia-engine-modal-content"/>')
-			.append($('<h1>Vote Count</h1>'))
-			.append(
-				$('<p>Welcome to the Mafia Scum vote-count tool made by JacksonVirgo<br/>To start, please select where the game definition is</p>')
-			)
-	);
+	const modal = $('#mafia-engine-modal-page > .modal');
 
 	const spinner = createSpinner();
 	modal.append(spinner);

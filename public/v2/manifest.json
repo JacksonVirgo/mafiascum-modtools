@@ -12,7 +12,7 @@
 		{
 			"matches": ["https://forum.mafiascum.net/*"],
 			"js": ["main.js"],
-			"css": ["main.css"]
+			"css": ["styling.css"]
 		}
 	],
 	"background": {

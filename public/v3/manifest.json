@@ -12,9 +12,16 @@
 		{
 			"matches": ["https://forum.mafiascum.net/*"],
 			"js": ["main.js"],
-			"css": ["main.css"]
+			"css": ["styling.css"]
 		}
 	],
+	"web_accessible_resources": [
+		{
+			"resources": ["templates/*", "images/*"],
+			"matches": ["https://forum.mafiascum.net/*"]
+		}
+	],
+
 	"background": {
 		"service_worker": "background.js"
 	},
