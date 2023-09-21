@@ -1,0 +1,41 @@
+<div id="mafia-engine-modal-page" class="css-reset">
+	<div class="modal">
+		<div class="header"><span class="exit">❌</span></div>
+		<div class="mafia-engine-spinner">
+			<div class="ripple">
+				<div></div>
+				<div></div>
+			</div>
+		</div>
+		<form id="mafia-engine-form">
+			<div>
+				<div class="menu">
+					<div>Upload</div>
+					<div class="selected">General</div>
+					<div>Players</div>
+					<div>Aliases</div>
+				</div>
+				<div class="form-content">
+					<section>
+						<span class="section-identifier">Upload</span>
+						<label for="mafia-engine-yaml" class="required">Upload game definition file</label>
+						<input type="file" id="mafia-engine-yaml" name="mafia-engine-yaml" accept=".yaml,.yml" />
+					</section>
+
+					<section>
+						<span class="section-identifier">General</span>
+						<label for="mafia-engine-start-post">Start From Post #</label>
+						<input type="number" id="mafia-engine-start-post" name="mafia-engine-start-post" placeholder="Default = 0" />
+						<label for="mafia-engine-end-post">End At Post #</label>
+						<input type="number" id="mafia-engine-end-post" name="mafia-engine-end-post" placeholder="Default = none" />
+					</section>
+				</div>
+			</div>
+			<input type="submit" value="Generate Vote Count" />
+		</form>
+		<div class="response">
+			<p>To redo this form, refresh the page.</p>
+			<textarea></textarea>
+		</div>
+	</div>
+</div>

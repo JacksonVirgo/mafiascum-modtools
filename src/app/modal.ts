@@ -10,11 +10,10 @@ let yamlString: string | undefined;
 export const CSS_HIDDEN = 'mafia-engine-hidden';
 
 export async function createModal() {
-	const pageTemplate = await getTemplate('gamedef.html');
+	const pageTemplate = await getTemplate('votecountModal.html');
 	if (!pageTemplate) return null;
 
 	const page = $(pageTemplate);
-
 	page.addClass(CSS_HIDDEN);
 
 	const exitButton = page.find('.modal > .header > .exit');
@@ -27,11 +26,44 @@ export async function createModal() {
 	response.addClass(CSS_HIDDEN);
 	form.removeClass(CSS_HIDDEN);
 
-	const exitModal = (e: JQuery.ClickEvent) => {
+	page.on('click', (e) => {
 		if (e.target === page[0]) page.addClass(CSS_HIDDEN);
+	});
+	exitButton.on('click', () => page.addClass(CSS_HIDDEN));
+
+	const formMenu = form.find('div > div.menu').first();
+	const formContent = form.find('div > div.form-content').first();
+
+	const focusOnMenu = (menu: string) => {
+		formMenu.children().each((_, childElement) => {
+			const child = $(childElement);
+			const childText = child.text();
+			if (childText === menu) child.addClass('selected');
+			else child.removeClass('selected');
+		});
+
+		formContent.children().each((_, contentChild) => {
+			const content = $(contentChild);
+			const identifier = content.find('.section-identifier').text();
+			if (!identifier) {
+				content.addClass(CSS_HIDDEN);
+				return;
+			}
+
+			if (identifier === menu) content.removeClass(CSS_HIDDEN);
+			else content.addClass(CSS_HIDDEN);
+		});
 	};
-	page.on('click', exitModal);
-	exitButton.on('click', exitModal);
+
+	formMenu.children().each((_, childElement) => {
+		const child = $(childElement);
+		const childText = child.text();
+		child.on('click', () => {
+			focusOnMenu(childText);
+		});
+	});
+
+	focusOnMenu(formMenu.children().first().text());
 
 	const gameDefinitionUpload = form.find('#mafia-engine-yaml');
 	gameDefinitionUpload.on('change', (e) => {
