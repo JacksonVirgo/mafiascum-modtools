@@ -34,7 +34,6 @@
 		"jquery": "^3.6.0",
 		"js-yaml": "^4.1.0",
 		"sass": "^1.67.0",
-		"string-similarity": "^4.0.4",
 		"zod": "^3.22.2"
 	}
 }

@@ -1,10 +1,10 @@
 import { GameDefinition, ValidatedVote, VoteCorrection, VoteType } from '../types/gameDefinition';
 import { getUrlParams } from '../utils/url';
 import { getThreadData } from './thread';
-import stringSimilarity from 'string-similarity';
 import $ from 'jquery';
 import { isMemberVerificationResponse } from '../types/backgroundResponse';
 import { sendBackgroundRequest } from './request';
+import { findBestMatch } from '../utils/stringCorrection';
 
 const CORRECTION_ACCEPT_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
@@ -117,7 +117,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 			totalVotables.push(UNVOTE_TAG);
 			if (!gameDefinition.disable?.includes('No Elimination')) totalVotables.push(NO_ELIMINATION_TAG);
 
-			const closestMatch = stringSimilarity.findBestMatch(vote.target.toLowerCase(), totalVotables).bestMatch;
+			const closestMatch = findBestMatch(vote.target.toLowerCase(), totalVotables).bestMatch;
 
 			let validatedName = closestMatch.target;
 			if (validatedName != UNVOTE_TAG && validatedName != NO_ELIMINATION_TAG) validatedName = aliasLegend.get(validatedName) ?? validatedName;
