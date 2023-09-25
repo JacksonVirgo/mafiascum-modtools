@@ -74,7 +74,19 @@ export async function createModal() {
 		reader.onload = (e) => {
 			try {
 				const yaml = e.target?.result as string;
-				yamlString = yaml;
+				yamlString = yaml; // Phase this out
+
+				const json = convertYamlToJson(yaml);
+				if (!isGameDefinition(json)) return console.error('Invalid game definition.');
+
+				const startPost = json.startAt ?? 0;
+				const endPost = json.endAt ?? undefined;
+
+				console.log('Start post:', startPost);
+				console.log('End post:', endPost);
+
+				$('#mafia-engine-start-post').val(startPost);
+				if (endPost) $('#mafia-engine-end-post').val(endPost);
 			} catch (err) {
 				console.error(err);
 			}
@@ -92,7 +104,7 @@ export async function createModal() {
 
 			const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
 			const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;
-			parsedJSON.startFrom = isNaN(startPost) ? parsedJSON.startFrom ?? 0 : startPost;
+			parsedJSON.startAt = isNaN(startPost) ? parsedJSON.startAt ?? 0 : startPost;
 			parsedJSON.endAt = isNaN(endPost) ? parsedJSON.endAt : endPost;
 
 			loadingSpinner.removeClass(CSS_HIDDEN);

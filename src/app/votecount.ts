@@ -59,7 +59,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 
 	const fetchTime = Date.now();
 
-	const startFrom = gameDefinition?.startFrom ?? 0;
+	const startFrom = gameDefinition?.startAt ?? 0;
 	const endAt = gameDefinition?.endAt;
 
 	const currentVotes = threadData.votes

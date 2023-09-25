@@ -6,7 +6,7 @@ export const GameDefinitionSchema = z.object({
 	replacements: z.record(z.array(z.string())).optional(),
 	ignore: z.array(z.string()).optional(),
 	dead: z.record(z.number()).optional(),
-	startFrom: z.number().optional(),
+	startAt: z.number().optional(),
 	endAt: z.number().optional(),
 	disable: z.array(z.string()).optional(),
 });
@@ -20,6 +20,7 @@ export function isGameDefinition(obj: unknown): obj is GameDefinition {
 		return false;
 	} catch (err) {
 		console.log(err);
+		console.log('[ GAME DEF ]', obj);
 		return false;
 	}
 }
