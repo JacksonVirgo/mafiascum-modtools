@@ -82,9 +82,6 @@ export async function createModal() {
 				const startPost = json.startAt ?? 0;
 				const endPost = json.endAt ?? undefined;
 
-				console.log('Start post:', startPost);
-				console.log('End post:', endPost);
-
 				$('#mafia-engine-start-post').val(startPost);
 				if (endPost) $('#mafia-engine-end-post').val(endPost);
 			} catch (err) {
@@ -101,6 +98,7 @@ export async function createModal() {
 		try {
 			const parsedJSON = convertYamlToJson(yamlString);
 			if (!isGameDefinition(parsedJSON)) return console.error('Invalid game definition.');
+			if (parsedJSON.startFrom && !parsedJSON.startAt) parsedJSON.startAt = parsedJSON.startFrom;
 
 			const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
 			const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;

@@ -9,6 +9,9 @@ export const GameDefinitionSchema = z.object({
 	startAt: z.number().optional(),
 	endAt: z.number().optional(),
 	disable: z.array(z.string()).optional(),
+
+	// ALIASES
+	startFrom: z.number().optional(), // alias for startAt
 });
 
 export type GameDefinition = z.infer<typeof GameDefinitionSchema>;
