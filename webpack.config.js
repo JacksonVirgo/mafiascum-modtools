@@ -36,6 +36,7 @@ function fillConfig(outputDir) {
 						// 'style-loader', // Injects CSS into the DOM
 						MiniCssExtractPlugin.loader,
 						'css-loader', // Translates CSS into CommonJS
+						'postcss-loader', // Process CSS with PostCSS
 						'sass-loader', // Compiles Sass to CSS
 					],
 				},

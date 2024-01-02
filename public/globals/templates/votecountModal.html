@@ -11,6 +11,10 @@
 			<div>
 				<div class="menu">
 					<div class="selected">General</div>
+					<div>Players</div>
+					<div>Replacements</div>
+					<div>Aliases</div>
+					<div>Misc</div>
 				</div>
 				<div class="form-content">
 					<section>
@@ -21,6 +25,23 @@
 						<input type="number" id="mafia-engine-start-post" name="mafia-engine-start-post" placeholder="Default = 0" />
 						<label for="mafia-engine-end-post">End At Post #</label>
 						<input type="number" id="mafia-engine-end-post" name="mafia-engine-end-post" placeholder="Default = none" />
+					</section>
+
+					<section>
+						<span class="section-identifier">Players</span>
+						<div>Add the list of ORIGINAL players, replacements are to be listed in the replacements tab</div>
+						<label for="mafia-engine-end-post" class="text-red-500">Add New Player</label>
+						<div>
+							<input type="number" id="mafia-engine-end-post" name="mafia-engine-end-post" placeholder="Default = none" />
+							<button>Add Player</button>
+						</div>
+
+						<ul id="mafia-engine-player-list">
+							<li>
+								<div class="player-name">Player Name</div>
+								<div class="player-remove">❌</div>
+							</li>
+						</ul>
 					</section>
 				</div>
 			</div>

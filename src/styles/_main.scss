@@ -7,6 +7,10 @@ $secondary-color: lightgray;
 @import 'spinner';
 @import 'cssreset';
 
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
+
 .mafia-engine-vc > button {
 	color: white;
 }
