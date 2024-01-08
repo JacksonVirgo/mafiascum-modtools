@@ -1,19 +1,22 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 
+const fs = require('fs');
 const path = require('path');
 const output = 'dist';
+const json = require('./manifest.json');
+
 const entryPoints = {
 	main: [path.resolve(__dirname, 'src', 'content', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
 	styling: path.resolve(__dirname, 'src', 'styles', '_main.scss'),
 };
 
-function fillConfig(outputDir) {
+function fillConfig(version) {
 	return {
 		entry: entryPoints,
 		output: {
-			path: path.join(__dirname, output, outputDir),
+			path: path.join(__dirname, output, version),
 			filename: '[name].js',
 		},
 		resolve: {
@@ -45,17 +48,32 @@ function fillConfig(outputDir) {
 		plugins: [
 			new CopyPlugin({
 				patterns: [
-					{ from: '.', to: '.', context: 'public/globals' },
+					{ from: '.', to: '.', context: 'public' },
 					{
 						from: '.',
 						to: './',
-						context: `public/${outputDir}`,
+						context: `public`,
 					},
 				],
 			}),
 			new MiniCssExtractPlugin({
 				filename: '[name].css',
 			}),
+			{
+				apply(compiler) {
+					compiler.hooks.afterEmit.tap('AfterEmitPlugin', () => {
+						const commonFields = json['commonFields'];
+						const versionFields = json[version];
+
+						const compiledManifest = {
+							...commonFields,
+							...versionFields,
+						};
+
+						fs.writeFileSync(`./${output}/${version}/manifest.json`, JSON.stringify(compiledManifest, null, 2));
+					});
+				},
+			},
 		],
 		performance: {
 			hints: false,

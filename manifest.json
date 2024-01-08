@@ -1,0 +1,34 @@
+{
+	"commonFields": {
+		"name": "Mafia Engine",
+		"description": "Aid in the playing and hosting of games on MafiaScum",
+		"version": "0.0.2",
+		"icons": {
+			"128": "/images/cog-128.png",
+			"512": "/images/cog-512.png"
+		},
+		"permissions": ["activeTab", "storage", "https://forum.mafiascum.net/*"],
+		"content_scripts": [
+			{
+				"matches": ["https://forum.mafiascum.net/*"],
+				"js": ["main.js"],
+				"css": ["styling.css"]
+			}
+		],
+		"web_accessible_resources": ["images/*"]
+	},
+	"v2": {
+		"manifest_version": 2,
+		"background": {
+			"scripts": ["background.js"],
+			"persistent": false
+		}
+	},
+	"v3": {
+		"manifest_version": 3,
+		"background": {
+			"service_worker": "background.js"
+		},
+		"host_permissions": ["https://forum.mafiascum.net/*"]
+	}
+}
