@@ -28,8 +28,7 @@ export function compareTwoStrings(first: string, second: string) {
 }
 
 export function findBestMatch(mainString: string, targetStrings: string[]) {
-	if (!areArgsValid(mainString, targetStrings))
-		throw new Error('Bad arguments: First argument should be a string, second should be an array of strings');
+	if (!areArgsValid(mainString, targetStrings)) throw new Error('Bad arguments: First argument should be a string, second should be an array of strings');
 
 	const ratings = [];
 	let bestMatchIndex = 0;

@@ -7,28 +7,35 @@
 			"128": "/images/cog-128.png",
 			"512": "/images/cog-512.png"
 		},
-		"permissions": ["activeTab", "storage", "https://forum.mafiascum.net/*"],
 		"content_scripts": [
 			{
 				"matches": ["https://forum.mafiascum.net/*"],
 				"js": ["main.js"],
 				"css": ["styling.css"]
 			}
-		],
-		"web_accessible_resources": ["images/*"]
+		]
 	},
 	"v2": {
 		"manifest_version": 2,
 		"background": {
 			"scripts": ["background.js"],
 			"persistent": false
-		}
+		},
+		"web_accessible_resources": ["images/*"],
+		"permissions": ["activeTab", "storage", "https://forum.mafiascum.net/*"]
 	},
 	"v3": {
 		"manifest_version": 3,
 		"background": {
 			"service_worker": "background.js"
 		},
-		"host_permissions": ["https://forum.mafiascum.net/*"]
+		"host_permissions": ["https://forum.mafiascum.net/*"],
+		"web_accessible_resources": [
+			{
+				"resources": ["templates/*", "images/*"],
+				"matches": ["https://forum.mafiascum.net/*"]
+			}
+		],
+		"permissions": ["activeTab", "storage"]
 	}
 }

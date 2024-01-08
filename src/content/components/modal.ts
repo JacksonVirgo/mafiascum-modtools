@@ -1,9 +1,9 @@
 import $ from 'jquery';
-import { convertYamlToJson } from '../utils/file';
-import { isGameDefinition } from '../types/gameDefinition';
-import { formatVoteCountData, startVoteCount } from './votecount';
+import { convertYamlToJson } from '../../utils/file';
+import { isGameDefinition } from '../../types/gameDefinition';
+import { formatVoteCountData, startVoteCount } from '../votecount';
 import { z } from 'zod';
-import { getTemplate } from './request';
+import { getTemplate } from '../request';
 
 let yamlString: string | undefined;
 
@@ -124,6 +124,8 @@ export async function createModal() {
 			else console.error('An unexpected error occurred: ', err);
 		}
 	});
+
+	$('body').append(page);
 
 	return page;
 }
