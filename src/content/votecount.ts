@@ -4,7 +4,7 @@ import { getThreadData } from './thread';
 import $ from 'jquery';
 import { isMemberVerificationResponse } from '../types/backgroundResponse';
 import { sendBackgroundRequest } from './request';
-import { findBestMatch } from '../utils/stringCorrection';
+import { stringSimilarityAlgs } from '../utils/stringCorrection';
 
 const CORRECTION_ACCEPT_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
@@ -75,8 +75,7 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 
 			// Check if author is dead
 			const isAuthorDead = false;
-			for (const [key, value] of Object.entries(gameDefinition?.dead ?? {}))
-				if (vote.author.toLowerCase() === key.toLowerCase() && value <= vote.post) return false;
+			for (const [key, value] of Object.entries(gameDefinition?.dead ?? {})) if (vote.author.toLowerCase() === key.toLowerCase() && value <= vote.post) return false;
 			if (isAuthorDead) return false;
 
 			return true;
@@ -117,14 +116,13 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 			totalVotables.push(UNVOTE_TAG);
 			if (!gameDefinition.disable?.includes('No Elimination')) totalVotables.push(NO_ELIMINATION_TAG);
 
-			const closestMatch = findBestMatch(vote.target.toLowerCase(), totalVotables).bestMatch;
-
-			let validatedName = closestMatch.target;
+			const closestMatch = stringSimilarityAlgs.dice_coefficient.bestMatch(vote.target.toLowerCase(), totalVotables).bestMatch;
+			let validatedName = closestMatch[0];
 			if (validatedName != UNVOTE_TAG && validatedName != NO_ELIMINATION_TAG) validatedName = aliasLegend.get(validatedName) ?? validatedName;
 			vote.target = validatedName;
 
-			if (closestMatch.rating >= CORRECTION_ACCEPT_THRESHOLD) vote.validity = VoteCorrection.ACCEPT;
-			else if (closestMatch.rating >= CORRECTION_WARN_THRESHOLD) vote.validity = VoteCorrection.WARN;
+			if (closestMatch[1] >= CORRECTION_ACCEPT_THRESHOLD) vote.validity = VoteCorrection.ACCEPT;
+			else if (closestMatch[1] >= CORRECTION_WARN_THRESHOLD) vote.validity = VoteCorrection.WARN;
 			else vote.validity = VoteCorrection.REJECT;
 			return vote;
 		})
@@ -216,9 +214,7 @@ export function formatVoteCountData(voteCount: VoteCount) {
 		const calculatedMajority = wagonHandle == NO_ELIMINATION_TAG ? Math.ceil(voteCount.livingPlayers.length / 2) : voteCount.majority;
 		const wagonLength = wagonHandle == NO_ELIMINATION_TAG ? -1 : wagon.length;
 		const wagonTitle = wagonHandle == NO_ELIMINATION_TAG ? 'No Elimination' : wagonHandle;
-		const wagonStr = `[b]${wagonTitle} (${wagon.length}/${calculatedMajority})[/b] -> ${wagon
-			.map((v) => `${v.author} ([post]${v.post}[/post])`)
-			.join(', ')}`;
+		const wagonStr = `[b]${wagonTitle} (${wagon.length}/${calculatedMajority})[/b] -> ${wagon.map((v) => `${v.author} ([post]${v.post}[/post])`).join(', ')}`;
 		wagonStrings.push([wagonStr, wagonLength]);
 	}
 
