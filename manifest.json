@@ -22,7 +22,14 @@
 			"persistent": false
 		},
 		"web_accessible_resources": ["images/*"],
-		"permissions": ["activeTab", "storage", "https://forum.mafiascum.net/*"]
+		"permissions": ["activeTab", "storage", "https://forum.mafiascum.net/*"],
+		"browser_action": {
+			"default_popup": "popup.html",
+			"default_icon": {
+				"128": "/images/cog-128.png",
+				"512": "/images/cog-512.png"
+			}
+		}
 	},
 	"v3": {
 		"manifest_version": 3,
@@ -36,6 +43,13 @@
 				"matches": ["https://forum.mafiascum.net/*"]
 			}
 		],
-		"permissions": ["activeTab", "storage"]
+		"permissions": ["activeTab", "storage"],
+		"action": {
+			"default_popup": "popup.html",
+			"default_icon": {
+				"128": "/images/cog-128.png",
+				"512": "/images/cog-512.png"
+			}
+		}
 	}
 }

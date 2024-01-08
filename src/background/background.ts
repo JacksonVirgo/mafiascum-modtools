@@ -34,6 +34,14 @@ browser.runtime.onMessage.addListener(async (request) => {
 				currentPage,
 				votes,
 			});
+		} else if (action === 'getHighlightQuotes') {
+			let highlight: string | null = null;
+			const storage = browser.storage.sync || browser.storage.local;
+			storage.get(['highlightQuotes']).then((values) => {
+				highlight = values['highlightQuotes'] ?? 'off';
+			});
+
+			return highlight;
 		} else {
 			return sendResponse({ status: 400, message: 'Invalid request, unknown action' });
 		}

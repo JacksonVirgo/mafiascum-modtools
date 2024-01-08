@@ -1,13 +1,14 @@
 import $ from 'jquery';
+import { getHighlight } from '../../utils/storage';
 
-export default () => {
-	const isHighlightingQuotes = localStorage.getItem('highlightQuotes');
-	if (!isHighlightingQuotes || isHighlightingQuotes != 'on') return;
+export default async () => {
+	const isHighlightingQuotes = await getHighlight();
+	if (isHighlightingQuotes != 'on') return;
 
 	const username = $('#username_logged_in .username').first().text();
 	if (!username) return;
 
-	$('.post blockquote').each((i, el) => {
+	$('.post blockquote').each((_, el) => {
 		const quote = $(el);
 		const cite = quote.find('cite').first();
 		const citedUsername = cite.find('a').last().text();
@@ -16,5 +17,4 @@ export default () => {
 			quote.css('border-left', '2px solid yellow');
 		}
 	});
-	// #post_content14038610 > div.content > blockquote:nth-child(1) > div > cite > a:nth-child(2)
 };

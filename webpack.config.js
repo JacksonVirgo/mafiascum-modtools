@@ -1,5 +1,8 @@
 const CopyPlugin = require('copy-webpack-plugin');
 const MiniCssExtractPlugin = require('mini-css-extract-plugin');
+const HtmlPlugin = require('html-webpack-plugin');
+const tailwindcss = require('tailwindcss');
+const autoprefixer = require('autoprefixer');
 
 const fs = require('fs');
 const path = require('path');
@@ -10,11 +13,13 @@ const entryPoints = {
 	main: [path.resolve(__dirname, 'src', 'content', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
 	styling: path.resolve(__dirname, 'src', 'styles', '_main.scss'),
+	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'),
 };
 
 function fillConfig(version) {
 	return {
 		entry: entryPoints,
+		devtool: 'cheap-module-source-map',
 		output: {
 			path: path.join(__dirname, output, version),
 			filename: '[name].js',
@@ -39,8 +44,16 @@ function fillConfig(version) {
 						// 'style-loader', // Injects CSS into the DOM
 						MiniCssExtractPlugin.loader,
 						'css-loader', // Translates CSS into CommonJS
-						'postcss-loader', // Process CSS with PostCSS
-						'sass-loader', // Compiles Sass to CSS
+						{
+							loader: 'postcss-loader', // postcss loader needed for tailwindcss
+							options: {
+								postcssOptions: {
+									ident: 'postcss',
+									plugins: [tailwindcss, autoprefixer],
+								},
+							},
+						},
+						'sass-loader', // Compiles Sass to CSS,
 					],
 				},
 			],
@@ -58,6 +71,11 @@ function fillConfig(version) {
 			}),
 			new MiniCssExtractPlugin({
 				filename: '[name].css',
+			}),
+			new HtmlPlugin({
+				title: 'Mafia Engine',
+				filename: 'popup.html',
+				chunks: ['popup'],
 			}),
 			{
 				apply(compiler) {
