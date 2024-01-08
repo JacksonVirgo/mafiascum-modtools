@@ -1,12 +1,11 @@
 import $ from 'jquery';
 import { getTemplate } from '../request';
-// import { CSS_HIDDEN } from './modal';
 
 export default async () => {
 	const pageTemplate = await getTemplate('vc_form.html');
 	if (!pageTemplate) return null;
 
-	$('.post').each((index, postElement) => {
+	$('.post').each((_, postElement) => {
 		const post = $(postElement);
 		const author = post.find('.author').first();
 		const button = $('<span class="mafia-engine-vc"> - <button>VC</button></span>');
