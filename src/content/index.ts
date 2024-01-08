@@ -9,6 +9,5 @@ $(async function () {
 	const modal = await createModal();
 	if (modal) loadVcButtons();
 	loadMultiIso();
-
 	mountHighlightedQuotes();
 });

@@ -1,15 +1,30 @@
 import $ from 'jquery';
-import { CSS_HIDDEN } from './modal';
+import { getTemplate } from '../request';
+// import { CSS_HIDDEN } from './modal';
 
-export default () => {
-	$('.author').each((_index, element) => {
+export default async () => {
+	const pageTemplate = await getTemplate('vc_form.html');
+	if (!pageTemplate) return null;
+
+	$('.post').each((index, postElement) => {
+		const post = $(postElement);
+		const author = post.find('.author').first();
 		const button = $('<span class="mafia-engine-vc"> - <button>VC</button></span>');
+
+		const fillerDiv = $(pageTemplate);
+		fillerDiv.insertBefore(post);
+
 		button
 			.find('button')
 			.first()
 			.on('click', async () => {
-				$('#mafia-engine-modal-page').removeClass(CSS_HIDDEN);
+				if (fillerDiv.hasClass('me_hidden')) {
+					fillerDiv.removeClass('me_hidden');
+				} else {
+					// TODO: Remount to get up to date information
+					fillerDiv.addClass('me_hidden');
+				}
 			});
-		$(element).find('a:nth-child(3)').after(button);
+		author.find('a:nth-child(3)').after(button);
 	});
 };
