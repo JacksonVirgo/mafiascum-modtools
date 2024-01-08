@@ -4,7 +4,7 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const path = require('path');
 const output = 'dist';
 const entryPoints = {
-	main: [path.resolve(__dirname, 'src', 'app', 'index.ts')],
+	main: [path.resolve(__dirname, 'src', 'content', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
 	styling: path.resolve(__dirname, 'src', 'styles', '_main.scss'),
 };
