@@ -1,56 +1,57 @@
 import browser from 'webextension-polyfill';
-import { AnyResponse } from '../types/backgroundResponse';
 import { verifyMember } from './requests/verifyMember';
 import { getPageData } from './requests/getPageData';
-import { MemberVerificationRequestValidator, PageRequestValidator } from '../types/backgroundRequests';
-import { ZodError } from 'zod';
+import { initTRPC } from '@trpc/server';
+import { z } from 'zod';
+import { createChromeHandler } from '../utils/trpc/adapter';
 
-function sendResponse(response: AnyResponse) {
-	return Promise.resolve(response);
-}
+const t = initTRPC.create({
+	isServer: false,
+	allowOutsideOfServer: true,
+});
 
-browser.runtime.onMessage.addListener(async (request) => {
-	try {
-		const action = request.action;
-		if (action === 'verifyMember') {
-			const { username } = MemberVerificationRequestValidator.parse(request);
-			const verified = await verifyMember(username);
-			return sendResponse({ action: 'verifyMember', status: 200, username, verified });
-		} else if (action == 'getPageData') {
-			const { url } = PageRequestValidator.parse(request);
+const appRouter = t.router({
+	verifyMember: t.procedure
+		.input(
+			z.object({
+				username: z.string(),
+			})
+		)
+		.query(async ({ input: { username } }) => {
+			const isVerified = await verifyMember(username);
+			return isVerified;
+		}),
+
+	getPageData: t.procedure
+		.input(
+			z.object({
+				url: z.string().url(),
+			})
+		)
+		.query(async ({ input: { url } }) => {
 			const pageData = await getPageData(url);
-			if (!pageData) return sendResponse({ status: 500, message: 'Could not fetch data from URL' });
+			if (!pageData) return null;
 
 			const { title, lastPage, currentPage, votes } = pageData;
-			if (!pageData.title) return sendResponse({ status: 500, message: 'Could not find page title.' });
-			if (!lastPage) return sendResponse({ status: 500, message: 'Could not find largest page number.' });
-			if (!currentPage) return sendResponse({ status: 500, message: 'Could not find active page number.' });
+			if (!(pageData.title && lastPage && currentPage)) return null;
 
-			return sendResponse({
-				action: 'pageData',
-				status: 200,
+			return {
 				pageTitle: title,
 				lastPage,
 				currentPage,
 				votes,
-			});
-		} else if (action === 'getHighlightQuotes') {
-			let highlight: string | null = null;
-			const storage = browser.storage.sync || browser.storage.local;
-			storage.get(['highlightQuotes']).then((values) => {
-				highlight = values['highlightQuotes'] ?? 'off';
-			});
+			};
+		}),
 
-			return highlight;
-		} else {
-			return sendResponse({ status: 400, message: 'Invalid request, unknown action' });
-		}
-	} catch (err) {
-		console.log(err);
-		if (err instanceof ZodError) {
-			return sendResponse({ status: 400, message: 'Invalid input' });
-		} else {
-			return sendResponse({ status: 500, message: 'Unexpected error' });
-		}
-	}
+	getHighlightQuotes: t.procedure.query(async () => {
+		let highlight: string | null = null;
+		const storage = browser.storage.sync || browser.storage.local;
+		const fetchedData = await storage.get(['highlightedQuotes']);
+		highlight = fetchedData['highlightQuotes'] ?? 'off';
+		return highlight === 'on';
+	}),
 });
+
+export type AppRouter = typeof appRouter;
+
+createChromeHandler({ router: appRouter });

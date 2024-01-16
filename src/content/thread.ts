@@ -1,5 +1,4 @@
-import { Vote, isPageDataResponse } from '../types/backgroundResponse';
-import { sendBackgroundRequest } from './request';
+import { trpc } from '.';
 
 export type PageQuery = {
 	threadId: string;
@@ -20,8 +19,7 @@ export async function getPageData(query: PageQuery) {
 	if (url[url.length - 1] === '&') url = url.slice(0, -1);
 
 	try {
-		const pageData = await sendBackgroundRequest({ action: 'getPageData', url: url });
-		if (!isPageDataResponse(pageData)) return null;
+		const pageData = await trpc.getPageData.query({ url });
 		return pageData;
 	} catch (err) {
 		console.error(err);
@@ -37,7 +35,12 @@ export async function getThreadData(threadId: string) {
 
 	let totalPages: number | undefined;
 	let pageTitle: string | undefined;
-	let votes: Vote[] = [];
+	let votes: {
+		author: string;
+		post: number;
+		index: number;
+		vote: string;
+	}[] = [];
 
 	let loopIndex = 0;
 	while (totalPages == undefined || loopIndex < totalPages) {
@@ -48,7 +51,6 @@ export async function getThreadData(threadId: string) {
 		});
 
 		if (!pageData) return throwErr('Could not fetch page data.');
-		if (pageData.status != 200) return throwErr(`Page data status was ${pageData.status}.`);
 
 		totalPages = pageData.lastPage;
 		pageTitle = pageData.pageTitle;

@@ -2,9 +2,8 @@ import { GameDefinition, ValidatedVote, VoteCorrection, VoteType } from '../type
 import { getUrlParams } from '../utils/url';
 import { getThreadData } from './thread';
 import $ from 'jquery';
-import { isMemberVerificationResponse } from '../types/backgroundResponse';
-import { sendBackgroundRequest } from './request';
 import { stringSimilarityAlgs } from '../utils/stringCorrection';
+import { trpc } from '.';
 
 const CORRECTION_ACCEPT_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
@@ -18,9 +17,8 @@ export async function validateGameDefinition(gameDefinition: GameDefinition) {
 	const playerVerification = new Map<string, boolean>();
 	for (const player of gameDefinition.players) {
 		try {
-			const verification = await sendBackgroundRequest({ action: 'verifyMember', username: player });
-			if (!isMemberVerificationResponse(verification)) playerVerification.set(player, false);
-			else playerVerification.set(player, verification.verified);
+			const isVerified = await trpc.verifyMember.query({ username: player });
+			playerVerification.set(player, isVerified);
 		} catch (err) {
 			console.error(err);
 			playerVerification.set(player, false);

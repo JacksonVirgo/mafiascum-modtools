@@ -1,8 +1,4 @@
-import { AnyRequest } from '../types/backgroundRequests';
 import browser from 'webextension-polyfill';
-export async function sendBackgroundRequest(request: AnyRequest): Promise<unknown> {
-	return await browser.runtime.sendMessage(request);
-}
 
 export async function getTemplate(templateName: string) {
 	let fileName = `templates/${templateName}`;
