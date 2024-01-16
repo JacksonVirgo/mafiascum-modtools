@@ -6,7 +6,8 @@
 	"scripts": {
 		"build": "webpack --config webpack.config.js --mode production",
 		"dev": "webpack --mode development --watch",
-		"lint": "eslint ."
+		"lint": "eslint .",
+		"typecheck": "tsc --noEmit"
 	},
 	"author": "JacksonVirgo",
 	"license": "MIT",

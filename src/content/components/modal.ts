@@ -7,66 +7,98 @@ import { getTemplate } from '../request';
 
 let yamlString: string | undefined;
 
-export const CSS_HIDDEN = 'mafia-engine-hidden';
+export const CSS_HIDDEN = 'me_hidden';
 
 export async function createModal() {
-	const pageTemplate = await getTemplate('votecountModal.html');
+	const pageTemplate = await getTemplate('vc_popup.html');
 	if (!pageTemplate) return null;
 
 	const page = $(pageTemplate);
 	page.addClass(CSS_HIDDEN);
 
-	const exitButton = page.find('.modal > .header > .exit');
-	const loadingSpinner = page.find('.modal > .mafia-engine-spinner');
-	const form = page.find('.modal > form');
-	const response = page.find('.modal > .response');
+	addVisibilityLogic(page);
+	addFileUploadLogic(page);
+
+	const loadingSpinner = page.find('#me_spinner');
+	const form = page.find('form');
+
+	const formWrapper = page.find('.wrapper');
+	const response = page.find('#me_vc_results');
 	const responseTextarea = response.find('textarea');
 
-	loadingSpinner.addClass(CSS_HIDDEN);
-	response.addClass(CSS_HIDDEN);
-	form.removeClass(CSS_HIDDEN);
+	form.on('submit', async (e) => {
+		e.preventDefault();
+		if (!yamlString) return;
+
+		try {
+			const parsedJSON = convertYamlToJson(yamlString);
+			if (!isGameDefinition(parsedJSON)) return console.error('Invalid game definition.');
+			if (parsedJSON.startFrom && !parsedJSON.startAt) parsedJSON.startAt = parsedJSON.startFrom;
+
+			const startPost = parseInt($('#me_start').val() as string) ?? undefined;
+			const endPost = parseInt($('#me_end').val() as string) ?? undefined;
+			parsedJSON.startAt = isNaN(startPost) ? parsedJSON.startAt ?? 0 : startPost;
+			parsedJSON.endAt = isNaN(endPost) ? parsedJSON.endAt : endPost;
+
+			loadingSpinner.removeClass(CSS_HIDDEN);
+			formWrapper.addClass(CSS_HIDDEN);
+			response.addClass(CSS_HIDDEN);
+
+			const vc = await startVoteCount(parsedJSON);
+			console.log('Calculated Votes', vc);
+			if (!vc) return console.error('Error starting vote count.');
+			const format = formatVoteCountData(vc);
+
+			response.removeClass(CSS_HIDDEN);
+			loadingSpinner.addClass(CSS_HIDDEN);
+			formWrapper.addClass(CSS_HIDDEN);
+
+			if (format) responseTextarea.val(format);
+			else responseTextarea.val('Error formatting vote count data.');
+		} catch (err) {
+			if (err instanceof z.ZodError) console.error('Validation errors: ', err.errors);
+			else console.error('An unexpected error occurred: ', err);
+		}
+	});
+
+	$('body').append(page);
+
+	return page;
+}
+
+function addVisibilityLogic(page: JQuery<HTMLElement>) {
+	const exitButton = page.find('#me_exit_vc_popup');
 
 	page.on('click', (e) => {
-		if (e.target === page[0]) page.addClass(CSS_HIDDEN);
-	});
-	exitButton.on('click', () => page.addClass(CSS_HIDDEN));
-
-	const formMenu = form.find('div > div.menu').first();
-	const formContent = form.find('div > div.form-content').first();
-
-	const focusOnMenu = (menu: string) => {
-		formMenu.children().each((_, childElement) => {
-			const child = $(childElement);
-			const childText = child.text();
-			if (childText === menu) child.addClass('selected');
-			else child.removeClass('selected');
-		});
-
-		formContent.children().each((_, contentChild) => {
-			const content = $(contentChild);
-			const identifier = content.find('.section-identifier').text();
-			if (!identifier) {
-				content.addClass(CSS_HIDDEN);
-				return;
-			}
-
-			if (identifier === menu) content.removeClass(CSS_HIDDEN);
-			else content.addClass(CSS_HIDDEN);
-		});
-	};
-
-	formMenu.children().each((_, childElement) => {
-		const child = $(childElement);
-		const childText = child.text();
-		child.on('click', () => {
-			focusOnMenu(childText);
-		});
+		if (e.target === page[0]) toggleFormVisibility('invisible');
 	});
 
-	focusOnMenu(formMenu.children().first().text());
+	if (exitButton) exitButton.on('click', () => toggleFormVisibility('invisible'));
+}
 
-	const gameDefinitionUpload = form.find('#mafia-engine-yaml');
-	gameDefinitionUpload.on('change', (e) => {
+/**
+ * Sets the visibility of the popup, as well as the scroll-state of the main page
+ * @param setManual set the visibility manually, otherwise it just switches state
+ */
+export function toggleFormVisibility(setManual?: 'visible' | 'invisible') {
+	const page = $('#me_votecount');
+	if (!page) return;
+	if (setManual == undefined) {
+		page.toggleClass(CSS_HIDDEN);
+		if (page.hasClass(CSS_HIDDEN)) $('body').removeClass('me_stop_scroll');
+		else $('body').addClass('me_stop_scroll');
+	} else if (setManual === 'visible') {
+		page.removeClass(CSS_HIDDEN);
+		$('body').addClass('me_stop_scroll');
+	} else if (!page.hasClass(CSS_HIDDEN)) {
+		page.addClass(CSS_HIDDEN);
+		$('body').removeClass('me_stop_scroll');
+	}
+}
+
+function addFileUploadLogic(page: JQuery<HTMLElement>) {
+	const gameDefInput = page.find('#me_game_def');
+	gameDefInput.on('change', (e) => {
 		const file = (e.target as HTMLInputElement).files?.[0];
 		if (!file) return;
 
@@ -82,50 +114,12 @@ export async function createModal() {
 				const startPost = json.startAt ?? 0;
 				const endPost = json.endAt ?? undefined;
 
-				$('#mafia-engine-start-post').val(startPost);
-				if (endPost) $('#mafia-engine-end-post').val(endPost);
+				$('#me_start').val(startPost);
+				if (endPost) $('#me_end').val(endPost);
 			} catch (err) {
 				console.error(err);
 			}
 		};
 		reader.readAsText(file);
 	});
-
-	form.on('submit', async (e) => {
-		e.preventDefault();
-		if (!yamlString) return;
-
-		try {
-			const parsedJSON = convertYamlToJson(yamlString);
-			if (!isGameDefinition(parsedJSON)) return console.error('Invalid game definition.');
-			if (parsedJSON.startFrom && !parsedJSON.startAt) parsedJSON.startAt = parsedJSON.startFrom;
-
-			const startPost = parseInt($('#mafia-engine-start-post').val() as string) ?? undefined;
-			const endPost = parseInt($('#mafia-engine-end-post').val() as string) ?? undefined;
-			parsedJSON.startAt = isNaN(startPost) ? parsedJSON.startAt ?? 0 : startPost;
-			parsedJSON.endAt = isNaN(endPost) ? parsedJSON.endAt : endPost;
-
-			loadingSpinner.removeClass(CSS_HIDDEN);
-			form.addClass(CSS_HIDDEN);
-			response.addClass(CSS_HIDDEN);
-
-			const vc = await startVoteCount(parsedJSON);
-			if (!vc) return console.error('Error starting vote count.');
-			const format = formatVoteCountData(vc);
-
-			response.removeClass(CSS_HIDDEN);
-			loadingSpinner.addClass(CSS_HIDDEN);
-			form.addClass(CSS_HIDDEN);
-
-			if (format) responseTextarea.val(format);
-			else responseTextarea.val('Error formatting vote count data.');
-		} catch (err) {
-			if (err instanceof z.ZodError) console.error('Validation errors: ', err.errors);
-			else console.error('An unexpected error occurred: ', err);
-		}
-	});
-
-	$('body').append(page);
-
-	return page;
 }

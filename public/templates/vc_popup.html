@@ -1,0 +1,60 @@
+<div id="me_votecount" class="me_hidden">
+	<form>
+		<div class="wrapper">
+			<div class="form">
+				<nav>
+					<ul>
+						<li class="focused" data-section="general">General</li>
+						<!-- <li data-section="players">Players</li> -->
+					</ul>
+				</nav>
+
+				<div class="me_input_fields">
+					<section data-section="general" class="focused">
+						<div>
+							<label for="me_game_def">Import Definition File:</label>
+							<input type="file" id="me_game_def" name="me_game_def" accept=".yaml,.yml" />
+						</div>
+						<div>
+							<label for="me_start">Start from Post #</label>
+							<input type="number" id="me_start" name="me_start" placeholder="Default = 0" />
+						</div>
+						<div>
+							<label for="me_end">End at Post #</label>
+							<input type="number" id="me_end" name="me_end" placeholder="Default = none" />
+						</div>
+					</section>
+
+					<section data-section="players">
+						<div>
+							<label for="me_add_user">Username</label>
+							<input type="text" id="me_add_user" name="me_add_user" placeholder="Username" />
+						</div>
+						<div>
+							<label for="me_replaced">Replacing?</label>
+							<input type="text" id="me_replaced" name="me_replaced" placeholder="Username of who they replaced (if any)" />
+						</div>
+					</section>
+				</div>
+
+				<div class="me_exit_button_wrapper"><span id="me_exit_vc_popup">❌</span></div>
+			</div>
+
+			<div class="submit-wrapper">
+				<button>Generate Votecount</button>
+			</div>
+		</div>
+
+		<div id="me_spinner" class="me_hidden">
+			<div class="ripple">
+				<div></div>
+				<div></div>
+			</div>
+		</div>
+
+		<div id="me_vc_results" class="me_hidden">
+			<p>To redo this form, refresh the page.</p>
+			<textarea></textarea>
+		</div>
+	</form>
+</div>
