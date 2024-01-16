@@ -1,5 +1,4 @@
 import { load } from 'cheerio';
-import { Vote } from '../../types/backgroundResponse';
 
 export async function getPageData(url: string) {
 	const response = await fetch(url);
@@ -23,7 +22,12 @@ export async function getPageData(url: string) {
 		if (active) activePageNumber = num;
 	});
 
-	const votes: Vote[] = [];
+	const votes: {
+		author: string;
+		post: number;
+		index: number;
+		vote: string;
+	}[] = [];
 
 	$('.post').each((_index, element) => {
 		// This is a pretty dodgy selector but works for now
@@ -32,7 +36,15 @@ export async function getPageData(url: string) {
 
 		const postNumberRaw = $(element).find('.author > a > .post-number-bolded').text().slice(1);
 		const postNumber = parseInt(postNumberRaw);
-		const posts = new Map<number, Vote[]>();
+		const posts = new Map<
+			number,
+			{
+				author: string;
+				post: number;
+				index: number;
+				vote: string;
+			}[]
+		>();
 
 		$(element)
 			.find('.inner > .postbody > div > .content > .bbvote')
