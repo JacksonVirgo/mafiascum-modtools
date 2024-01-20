@@ -9,3 +9,13 @@ export function convertYamlToJson(yamlString: string) {
 		return null;
 	}
 }
+
+export function convertJsonToYaml(json: object) {
+	try {
+		const yamlStr = yaml.dump(json);
+		return yamlStr;
+	} catch (err) {
+		console.error('Error converting json to yaml');
+		return null;
+	}
+}

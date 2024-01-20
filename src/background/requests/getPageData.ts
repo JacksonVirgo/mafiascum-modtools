@@ -6,8 +6,13 @@ export async function getPageData(url: string) {
 	const html = await response.text();
 
 	const $ = load(html);
-	const title = $('h2').first().text();
+	const titleElement = $('h2').first();
+	const title = titleElement.text();
+	const localURL = titleElement.find('a').first().attr('href');
 	const pagination = $('.pagination:first > ul > li');
+
+	const urlSearchParams = new URLSearchParams(localURL?.split('?')[1]);
+	const threadId = urlSearchParams.get('t');
 
 	// Check page numbers
 	let largestPageNumber: number | undefined;
@@ -70,5 +75,6 @@ export async function getPageData(url: string) {
 		lastPage: largestPageNumber,
 		currentPage: activePageNumber,
 		votes,
+		threadId,
 	};
 }

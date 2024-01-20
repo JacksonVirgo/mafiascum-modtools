@@ -1,27 +1,28 @@
 import { TRPCClientError, TRPCLink } from '@trpc/client';
 import type { AnyRouter } from '@trpc/server';
 import { observable } from '@trpc/server/observable';
-
 import type { TRPCChromeRequest, TRPCChromeResponse } from '../types';
 import browser from 'webextension-polyfill';
 
 export type ChromeLinkOptions = {
 	port: browser.Runtime.Port;
+	onDisconnect: () => void;
 };
 
 export const chromeLink = <TRouter extends AnyRouter>(opts: ChromeLinkOptions): TRPCLink<TRouter> => {
 	return (runtime) => {
 		const { port } = opts;
+
 		return ({ op }) => {
 			return observable((observer) => {
 				const listeners: (() => void)[] = [];
-
 				const { id, type, path } = op;
 
 				try {
 					const input = runtime.transformer.serialize(op.input);
 
 					const onDisconnect = () => {
+						opts.onDisconnect();
 						observer.error(new TRPCClientError('Port disconnected prematurely'));
 					};
 
@@ -37,7 +38,12 @@ export const chromeLink = <TRouter extends AnyRouter>(opts: ChromeLinkOptions): 
 
 						if ('error' in trpc) {
 							const error = runtime.transformer.deserialize(trpc.error);
+
+							console.log('Ello There', error);
+
 							observer.error(TRPCClientError.from({ ...trpc, error }));
+
+							console.log('After');
 							return;
 						}
 
@@ -69,6 +75,7 @@ export const chromeLink = <TRouter extends AnyRouter>(opts: ChromeLinkOptions): 
 						},
 					} as TRPCChromeRequest);
 				} catch (cause) {
+					console.log('Second Location', cause instanceof Error ? cause.message : 'Unknown error');
 					observer.error(new TRPCClientError(cause instanceof Error ? cause.message : 'Unknown error'));
 				}
 

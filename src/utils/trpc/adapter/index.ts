@@ -30,6 +30,13 @@ export const createChromeHandler = <TRouter extends AnyRouter>(opts: CreateChrom
 		listeners.push(() => port.onDisconnect.removeListener(onDisconnect));
 
 		const onMessage = async (message: TRPCChromeRequest) => {
+			if ('action' in message) {
+				if (message.action == 'openConnection') {
+					console.log(message.action);
+					return;
+				}
+			}
+
 			if (!('trpc' in message)) return;
 			const { trpc } = message;
 			if (!('id' in trpc) || trpc.id === null || trpc.id === undefined) return;
@@ -182,6 +189,9 @@ export const createChromeHandler = <TRouter extends AnyRouter>(opts: CreateChrom
 		};
 
 		port.onMessage.addListener(onMessage);
+		port.onMessage.addListener((msg) => {
+			console.log(msg);
+		});
 		listeners.push(() => port.onMessage.removeListener(onMessage));
 	});
 };

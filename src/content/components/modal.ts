@@ -4,6 +4,7 @@ import { isGameDefinition } from '../../types/gameDefinition';
 import { formatVoteCountData, startVoteCount } from '../votecount';
 import { z } from 'zod';
 import { getTemplate } from '../request';
+import { trpc } from '..';
 
 let yamlString: string | undefined;
 
@@ -18,6 +19,22 @@ export async function createModal() {
 
 	addVisibilityLogic(page);
 	addFileUploadLogic(page);
+	refreshForm(page);
+
+	const currentURL = window.location.href;
+	const pageData = await trpc.getPageData.query({ url: currentURL });
+	const initialFormData = pageData ? await trpc.getGameDefinition.query({ thread: pageData.threadId }) : null;
+	if (initialFormData) refreshForm(page, initialFormData);
+
+	const vcDataInput = page.find('#me_vc_data');
+	vcDataInput.on('input', async () => {
+		const value = vcDataInput.val()?.toString();
+		const currentURL = window.location.href;
+		const pageData = await trpc.getPageData.query({ url: currentURL });
+		if (value && pageData?.threadId) {
+			await trpc.syncGameDefinition.mutate({ thread: pageData.threadId, data: value });
+		}
+	});
 
 	const loadingSpinner = page.find('#me_spinner');
 	const form = page.find('form');
@@ -98,6 +115,8 @@ export function toggleFormVisibility(setManual?: 'visible' | 'invisible') {
 
 function addFileUploadLogic(page: JQuery<HTMLElement>) {
 	const gameDefInput = page.find('#me_game_def');
+	const vcDataInput = page.find('#me_vc_data');
+
 	gameDefInput.on('change', (e) => {
 		const file = (e.target as HTMLInputElement).files?.[0];
 		if (!file) return;
@@ -105,8 +124,11 @@ function addFileUploadLogic(page: JQuery<HTMLElement>) {
 		const reader = new FileReader();
 		reader.onload = (e) => {
 			try {
-				const yaml = e.target?.result as string;
+				const yaml = e.target?.result?.toString() ?? '';
 				yamlString = yaml; // Phase this out
+
+				vcDataInput.val(yaml);
+				vcDataInput.trigger('input');
 
 				const json = convertYamlToJson(yaml);
 				if (!isGameDefinition(json)) return console.error('Invalid game definition.');
@@ -121,5 +143,50 @@ function addFileUploadLogic(page: JQuery<HTMLElement>) {
 			}
 		};
 		reader.readAsText(file);
+	});
+}
+
+function refreshForm(page: JQuery<HTMLElement>, yaml: string = '') {
+	const gameDef = convertYamlToJson(yaml);
+	const navList = page.find('#me_vc_form_list');
+	const inputFields = page.find('.me_input_fields');
+
+	page.find('> section').each((_, el) => {
+		const sectionItem = $(el);
+		if (sectionItem.hasClass('dynamic')) sectionItem.remove();
+	});
+	navList.find('li').each((_, el) => {
+		const listItem = $(el);
+		if (listItem.hasClass('dynamic')) listItem.remove();
+	});
+
+	const isGameDef = isGameDefinition(gameDef);
+	if (!isGameDef) return;
+
+	gameDef.players.forEach((v) => {
+		const inline = `player-${v.split(' ').join('_').toLowerCase()}`;
+		const newList = $(`<li data-section="${inline}" class="dynamic">${v}</li>`);
+		const newSection = $(`<section data-section="${inline}" class="dynamic form-section"><div>${v}</div></section>`);
+		inputFields.append(newSection);
+		navList.append(newList);
+	});
+
+	const listItems = navList.find('li');
+	const sections = inputFields.find('section');
+	listItems.each((_, el) => {
+		const listItem = $(el);
+		listItem.on('click', () => {
+			listItems.each((_, el) => {
+				$(el).removeClass('focused');
+			});
+			listItem.addClass('focused');
+			const section = listItem.attr('data-section');
+			sections.each((_, sectionElement) => {
+				const sec = $(sectionElement);
+				const secSection = sec.attr('data-section');
+				sec.removeClass('focused');
+				if (secSection === section) sec.addClass('focused');
+			});
+		});
 	});
 }

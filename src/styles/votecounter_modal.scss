@@ -90,9 +90,12 @@
 						flex-grow: 1;
 						width: 100%;
 						display: none;
+						flex-direction: column;
+						justify-content: flex-start;
+						align-items: center;
 
 						&.focused {
-							display: block;
+							display: flex;
 						}
 
 						> div {
@@ -128,17 +131,17 @@
 				flex-direction: row;
 				justify-content: center;
 				align-items: center;
-
-				> button {
-					background-color: rgb(113 113 122) !important;
-					color: white !important;
-					padding: 0.5rem !important;
-					border: 1px solid rgb(82 82 91) !important;
-					margin-left: 0.5rem !important;
-				}
 			}
 		}
 	}
+}
+
+.me_button {
+	background-color: rgb(113 113 122);
+	color: white;
+	padding: 0.5rem;
+	border: 1px solid rgb(82 82 91);
+	margin-left: 0.5rem;
 }
 
 #me_vc_results {

@@ -3,14 +3,14 @@
 		<div class="wrapper">
 			<div class="form">
 				<nav>
-					<ul>
+					<ul id="me_vc_form_list">
 						<li class="focused" data-section="general">General</li>
-						<!-- <li data-section="players">Players</li> -->
+						<li data-section="players">Add Player</li>
 					</ul>
 				</nav>
 
 				<div class="me_input_fields">
-					<section data-section="general" class="focused">
+					<section data-section="general" class="form-section focused">
 						<div>
 							<label for="me_game_def">Import Definition File:</label>
 							<input type="file" id="me_game_def" name="me_game_def" accept=".yaml,.yml" />
@@ -25,15 +25,26 @@
 						</div>
 					</section>
 
-					<section data-section="players">
+					<section data-section="players" class="form-section">
 						<div>
-							<label for="me_add_user">Username</label>
-							<input type="text" id="me_add_user" name="me_add_user" placeholder="Username" />
+							<label for="me_add_user_username">Username</label>
+							<input type="text" id="me_add_user_username" name="me_add_user_username" placeholder="Username" />
 						</div>
 						<div>
-							<label for="me_replaced">Replacing?</label>
-							<input type="text" id="me_replaced" name="me_replaced" placeholder="Username of who they replaced (if any)" />
+							<label for="me_add_user_replacement">Replacing?</label>
+							<input type="text" id="me_add_user_replacement" name="me_add_user_replacement" placeholder="Username of who they replaced (if any)" />
 						</div>
+						<div>
+							<label for="me_add_user_death">Post Num of Player Death</label>
+							<input type="number" id="me_add_user_death" name="me_add_user_death" placeholder="Leave blank if they are still alive" />
+						</div>
+						<div>
+							<label for="me_add_user_aliases">Player Aliases, comma seperated</label>
+							<input type="number" id="me_add_user_aliases" name="me_add_user_aliases" placeholder="Leave blank if they are still alive" />
+						</div>
+
+						<br />
+						<button id="me_add_new_player" class="me_button">Add New Player</button>
 					</section>
 				</div>
 
@@ -41,7 +52,7 @@
 			</div>
 
 			<div class="submit-wrapper">
-				<button>Generate Votecount</button>
+				<button class="me_button">Generate Votecount</button>
 			</div>
 		</div>
 
@@ -56,5 +67,7 @@
 			<p>To redo this form, refresh the page.</p>
 			<textarea></textarea>
 		</div>
+
+		<textarea id="me_vc_data" name="me_vc_data" class="me_hidden"></textarea>
 	</form>
 </div>
