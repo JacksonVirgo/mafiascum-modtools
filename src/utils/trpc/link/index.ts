@@ -6,7 +6,6 @@ import browser from 'webextension-polyfill';
 
 export type ChromeLinkOptions = {
 	port: browser.Runtime.Port;
-	onDisconnect: () => void;
 };
 
 export const chromeLink = <TRouter extends AnyRouter>(opts: ChromeLinkOptions): TRPCLink<TRouter> => {
@@ -22,7 +21,6 @@ export const chromeLink = <TRouter extends AnyRouter>(opts: ChromeLinkOptions): 
 					const input = runtime.transformer.serialize(op.input);
 
 					const onDisconnect = () => {
-						opts.onDisconnect();
 						observer.error(new TRPCClientError('Port disconnected prematurely'));
 					};
 
