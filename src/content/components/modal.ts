@@ -1,10 +1,12 @@
 import $ from 'jquery';
-import { convertYamlToJson } from '../../utils/file';
+import { convertJsonToYaml, convertYamlToJson } from '../../utils/file';
 import { isGameDefinition } from '../../types/gameDefinition';
 import { formatVoteCountData, startVoteCount } from '../votecount';
 import { z } from 'zod';
 import { getTemplate } from '../request';
 import { trpc } from '..';
+
+type JQueryElement = JQuery<HTMLElement>;
 
 let yamlString: string | undefined;
 
@@ -20,6 +22,8 @@ export async function createModal() {
 	addVisibilityLogic(page);
 	addFileUploadLogic(page);
 	refreshForm(page);
+
+	addNewPlayerForm(page);
 
 	const currentURL = window.location.href;
 	const pageData = await trpc.getPageData.query({ url: currentURL });
@@ -83,7 +87,7 @@ export async function createModal() {
 	return page;
 }
 
-function addVisibilityLogic(page: JQuery<HTMLElement>) {
+function addVisibilityLogic(page: JQueryElement) {
 	const exitButton = page.find('#me_exit_vc_popup');
 
 	page.on('click', (e) => {
@@ -113,7 +117,7 @@ export function toggleFormVisibility(setManual?: 'visible' | 'invisible') {
 	}
 }
 
-function addFileUploadLogic(page: JQuery<HTMLElement>) {
+function addFileUploadLogic(page: JQueryElement) {
 	const gameDefInput = page.find('#me_game_def');
 	const vcDataInput = page.find('#me_vc_data');
 
@@ -138,6 +142,9 @@ function addFileUploadLogic(page: JQuery<HTMLElement>) {
 
 				$('#me_start').val(startPost);
 				if (endPost) $('#me_end').val(endPost);
+
+				refreshForm(page, yaml);
+				gameDefInput.val('');
 			} catch (err) {
 				console.error(err);
 			}
@@ -146,15 +153,17 @@ function addFileUploadLogic(page: JQuery<HTMLElement>) {
 	});
 }
 
-function refreshForm(page: JQuery<HTMLElement>, yaml: string = '') {
+function refreshForm(page: JQueryElement, yaml: string = '') {
 	const gameDef = convertYamlToJson(yaml);
 	const navList = page.find('#me_vc_form_list');
 	const inputFields = page.find('.me_input_fields');
 
-	page.find('> section').each((_, el) => {
-		const sectionItem = $(el);
-		if (sectionItem.hasClass('dynamic')) sectionItem.remove();
-	});
+	page.find('.me_input_fields')
+		.find('section')
+		.each((_, el) => {
+			const sectionItem = $(el);
+			if (sectionItem.hasClass('dynamic')) sectionItem.remove();
+		});
 	navList.find('li').each((_, el) => {
 		const listItem = $(el);
 		if (listItem.hasClass('dynamic')) listItem.remove();
@@ -166,7 +175,9 @@ function refreshForm(page: JQuery<HTMLElement>, yaml: string = '') {
 	gameDef.players.forEach((v) => {
 		const inline = `player-${v.split(' ').join('_').toLowerCase()}`;
 		const newList = $(`<li data-section="${inline}" class="dynamic">${v}</li>`);
-		const newSection = $(`<section data-section="${inline}" class="dynamic form-section"><div>${v}</div></section>`);
+		const newSection = createPlayerSection({
+			username: v,
+		});
 		inputFields.append(newSection);
 		navList.append(newList);
 	});
@@ -188,5 +199,100 @@ function refreshForm(page: JQuery<HTMLElement>, yaml: string = '') {
 				if (secSection === section) sec.addClass('focused');
 			});
 		});
+	});
+
+	const usernameInput = page.find('#me_add_user_username');
+	const replacementInput = page.find('#me_add_user_replacement');
+	const deathInput = page.find('#me_add_user_death');
+	const aliasInput = page.find('#me_add_user_aliases');
+
+	usernameInput.val('');
+	replacementInput.val('');
+	deathInput.val('');
+	aliasInput.val('');
+}
+
+type PlayerSection = {
+	username: string;
+	replacing?: string;
+	diedAt?: number;
+	aliases?: string[];
+};
+function createPlayerSection(player: PlayerSection) {
+	const dataSection = `player-${player.username.split(' ').join('_').toLowerCase()}`;
+
+	const wrapper = $('<div></div>');
+	const usernameForm = $('<div></div>');
+	usernameForm.append($(`<label for="dynamic-${dataSection}">Username</label>`));
+	usernameForm.append($(`<input type="text" id="dynamic-${dataSection}" name="dynamic-${dataSection}" value="${player.username}" />`));
+
+	wrapper.append(usernameForm);
+
+	const newSection = $(`<section data-section="${dataSection}" class="dynamic form-section"></section>`);
+	newSection.append(wrapper);
+
+	return newSection;
+}
+
+function addNewPlayerForm(page: JQueryElement) {
+	const addNewPlayerButton = page.find('#me_add_new_player');
+
+	const usernameInput = page.find('#me_add_user_username');
+	const replacementInput = page.find('#me_add_user_replacement');
+	const deathInput = page.find('#me_add_user_death');
+	const aliasInput = page.find('#me_add_user_aliases');
+
+	addNewPlayerButton.on('click', async (e) => {
+		e.preventDefault();
+		let username = usernameInput.val()?.toString();
+		if (!username) return;
+		username = username.trim();
+
+		const replacement = replacementInput.val()?.toString();
+		const deathPostStr = deathInput.val()?.toString();
+		const deathPost = deathPostStr ? parseInt(deathPostStr) : NaN;
+		const aliases = (aliasInput.val()?.toString() ?? '')
+			.split(',')
+			.map((v) => v.trim())
+			.filter((v) => v != '');
+
+		const currentURL = window.location.href;
+		const pageData = await trpc.getPageData.query({ url: currentURL });
+		const threadId = pageData?.threadId;
+		if (!threadId) return;
+		const initialFormData = await trpc.getGameDefinition.query({ thread: threadId });
+		if (!initialFormData) return;
+
+		const gameDef = convertYamlToJson(initialFormData);
+		const validated = isGameDefinition(gameDef);
+		if (!validated) return;
+
+		console.log('Validated');
+
+		if (gameDef.players.includes(username)) return;
+		gameDef.players.push(username);
+
+		if (deathPost) {
+			if (!gameDef.dead) gameDef.dead = {};
+			gameDef.dead[username] = deathPost;
+		}
+
+		if (replacement) {
+			if (!gameDef.replacements) gameDef.replacements = {};
+			gameDef.replacements[replacement] = [username];
+		}
+
+		if (aliases && aliases.length > 0) {
+			if (!gameDef.aliases) gameDef.aliases = {};
+			gameDef.aliases[username] = aliases;
+		}
+
+		const newYaml = convertJsonToYaml(gameDef);
+		console.log(newYaml);
+		if (!newYaml) return;
+
+		await trpc.syncGameDefinition.mutate({ thread: threadId, data: newYaml });
+
+		refreshForm(page, newYaml);
 	});
 }
