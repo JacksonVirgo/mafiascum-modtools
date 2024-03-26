@@ -40,10 +40,7 @@ export async function getThreadData(threadId: string) {
 	let votes: Vote[] = [];
 
 	let loopIndex = 0;
-	// totalPages is from website pagination (25 posts)
-	// getPageData fetches 200 posts at a time
-	// so we don't need to fetch more than Math.ceil(totalPages / 8) times
-	while (totalPages == undefined || loopIndex < Math.ceil(totalPages)) {
+	while (totalPages == undefined || loopIndex < totalPages) {
 		const pageData = await getPageData({
 			threadId,
 			take: 200,
