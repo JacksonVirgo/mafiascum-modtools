@@ -13,6 +13,8 @@ export async function getPageData(url: string) {
 	// Check page numbers
 	let largestPageNumber: number | undefined;
 	let activePageNumber: number | undefined;
+
+	// currently threads with only 1 page is not handled
 	pagination.each((_index, element) => {
 		const text = $(element).text();
 		const active = $(element).hasClass('active');
@@ -55,8 +57,8 @@ export async function getPageData(url: string) {
 
 	return {
 		title,
-		lastPage: largestPageNumber,
-		currentPage: activePageNumber,
+		lastPage: largestPageNumber || 1,
+		currentPage: activePageNumber || 1,
 		votes,
 	};
 }
