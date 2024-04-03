@@ -54,13 +54,13 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	const threadId = params.get('t');
 	if (!threadId) return error('Could not get thread id.');
 
-	const threadData = await getThreadData(threadId);
+	const startFrom = gameDefinition?.startAt ?? 0;
+	const endAt = gameDefinition?.endAt;
+
+	const threadData = await getThreadData(threadId, startFrom);
 	if (!threadData) return error('Could not fetch page data.');
 
 	const fetchTime = Date.now();
-
-	const startFrom = gameDefinition?.startAt ?? 0;
-	const endAt = gameDefinition?.endAt;
 
 	const currentVotes = threadData.votes
 		.filter((vote) => {
