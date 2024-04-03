@@ -54,13 +54,13 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	const threadId = params.get('t');
 	if (!threadId) return error('Could not get thread id.');
 
-	const threadData = await getThreadData(threadId);
+	const startFrom = gameDefinition?.startAt ?? 0;
+	const endAt = gameDefinition?.endAt;
+
+	const threadData = await getThreadData(threadId, startFrom);
 	if (!threadData) return error('Could not fetch page data.');
 
 	const fetchTime = Date.now();
-
-	const startFrom = gameDefinition?.startAt ?? 0;
-	const endAt = gameDefinition?.endAt;
 
 	const currentVotes = threadData.votes
 		.filter((vote) => {
@@ -146,7 +146,13 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	const errors: number[] = [];
 
 	for (const vote of currentVotes) {
-		const { author, post, target, type, validity } = vote;
+		const { author, post, type, validity } = vote;
+		let { target } = vote;
+
+		// Check if target has been replaced
+		if(target && gameDefinition.replacements?.[target]) {
+			target = gameDefinition.replacements?.[target][0];
+		}
 
 		// Check if one of the wagons has reached a majority
 		let isMajorityReached: boolean | undefined;

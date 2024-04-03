@@ -10,14 +10,16 @@ export type PageQuery = {
 export const BASE_THREAD_URL = 'https://forum.mafiascum.net/viewtopic.php?';
 
 export async function getPageData(query: PageQuery) {
-	const params = new Map<string, string>();
+	const params = new URLSearchParams();
 	params.set('t', query.threadId);
 	params.set('ppp', query.take.toString());
 	params.set('start', query.skip.toString());
+	// reduces response payload size by over 90%!
+	// simplifies the html DOM tree
+	// removes scripts and css which we don't care about
+	params.set('view', 'print');	
 
-	let url = BASE_THREAD_URL;
-	for (const [key, value] of params) url += `${key}=${value}&`;
-	if (url[url.length - 1] === '&') url = url.slice(0, -1);
+	const url = BASE_THREAD_URL + params.toString();
 
 	try {
 		const pageData = await sendBackgroundRequest({ action: 'getPageData', url: url });
@@ -29,7 +31,7 @@ export async function getPageData(query: PageQuery) {
 	}
 }
 
-export async function getThreadData(threadId: string) {
+export async function getThreadData(threadId: string, startFrom: number) {
 	const throwErr = (...values: string[]) => {
 		console.error(...values);
 		return null;
@@ -44,7 +46,8 @@ export async function getThreadData(threadId: string) {
 		const pageData = await getPageData({
 			threadId,
 			take: 200,
-			skip: loopIndex * 200,
+			// skips fetching posts we don't need to parse
+			skip: loopIndex * 200 + startFrom,
 		});
 
 		if (!pageData) return throwErr('Could not fetch page data.');

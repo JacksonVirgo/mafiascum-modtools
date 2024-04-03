@@ -6,42 +6,49 @@ export async function getPageData(url: string) {
 	if (response.status !== 200) return null;
 	const html = await response.text();
 
+	const qs = new URLSearchParams(url);
+	const start = parseInt(qs.get('start') ?? '0');
+
 	const $ = load(html);
 	const title = $('h2').first().text();
-	const pagination = $('.pagination:first > ul > li');
+
+	// what pagination looks like in view=print mode
+	// 'Page 7 of 9'
+	const pagination = $('.page-number:first > strong');
 
 	// Check page numbers
-	let largestPageNumber: number | undefined;
-	let activePageNumber: number | undefined;
+	let largestPageNumber: number = 1;
+	let activePageNumber: number = 1;
 
-	// currently threads with only 1 page is not handled
 	pagination.each((_index, element) => {
 		const text = $(element).text();
-		const active = $(element).hasClass('active');
 		const num = parseInt(text);
+		const active = _index === 0;
 		if (isNaN(num)) return;
 		if (num.toString() !== text) return;
-		if (!largestPageNumber || num > largestPageNumber) largestPageNumber = num;
-		if (active) activePageNumber = num;
+		if (active) {
+			activePageNumber = num;
+		} else {
+			largestPageNumber = num;
+		}
 	});
 
 	const votes: Vote[] = [];
 
 	$('.post').each((_index, element) => {
-		// This is a pretty dodgy selector but works for now
-		// Demonstrating how you can check through each post
-		const post = $(element).find('.inner > .postprofile > dt:nth-child(2) > a').text();
+		const author = $(element).find('.author > strong').text();
 
-		const postNumberRaw = $(element).find('.author > a > .post-number-bolded').text().slice(1);
-		const postNumber = parseInt(postNumberRaw);
+		// post number is not returned in the html response anymore
+		// can be inferred from offset + index
+		const postNumber = start + _index;
 		const posts = new Map<number, Vote[]>();
 
 		$(element)
-			.find('.inner > .postbody > div > .content > .bbvote')
+			.find('.content > .bbvote')
 			.each((_index, element) => {
 				const array = posts.get(postNumber) ?? [];
 				array.push({
-					author: post,
+					author,
 					post: postNumber,
 					index: array.length,
 					vote: $(element).text(),
@@ -57,8 +64,8 @@ export async function getPageData(url: string) {
 
 	return {
 		title,
-		lastPage: largestPageNumber || 1,
-		currentPage: activePageNumber || 1,
+		lastPage: largestPageNumber,
+		currentPage: activePageNumber,
 		votes,
 	};
 }

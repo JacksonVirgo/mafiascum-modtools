@@ -111,7 +111,7 @@ function addFileUploadLogic(page: JQuery<HTMLElement>) {
 				const json = convertYamlToJson(yaml);
 				if (!isGameDefinition(json)) return console.error('Invalid game definition.');
 
-				const startPost = json.startAt ?? 0;
+				const startPost = (json.startAt || json.startFrom) ?? 0;
 				const endPost = json.endAt ?? undefined;
 
 				$('#me_start').val(startPost);
