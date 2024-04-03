@@ -19,7 +19,7 @@ export async function getPageData(query: PageQuery) {
 	// removes scripts and css which we don't care about
 	params.set('view', 'print');	
 
-	let url = BASE_THREAD_URL + params.toString();
+	const url = BASE_THREAD_URL + params.toString();
 
 	try {
 		const pageData = await sendBackgroundRequest({ action: 'getPageData', url: url });

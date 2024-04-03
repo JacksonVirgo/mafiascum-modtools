@@ -7,14 +7,14 @@ export async function getPageData(url: string) {
 	const html = await response.text();
 
 	const qs = new URLSearchParams(url);
-	const start = parseInt(qs.get("start") ?? '0');
+	const start = parseInt(qs.get('start') ?? '0');
 
 	const $ = load(html);
 	const title = $('h2').first().text();
 
 	// what pagination looks like in view=print mode
-	// "Page 7 of 9"
-	const pagination = $('.page-number:first > strong')
+	// 'Page 7 of 9'
+	const pagination = $('.page-number:first > strong');
 
 	// Check page numbers
 	let largestPageNumber: number = 1;

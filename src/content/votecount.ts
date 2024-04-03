@@ -146,7 +146,8 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	const errors: number[] = [];
 
 	for (const vote of currentVotes) {
-		let { author, post, target, type, validity } = vote;
+		const { author, post, type, validity } = vote;
+		let { target } = vote;
 
 		// Check if target has been replaced
 		if(target && gameDefinition.replacements?.[target]) {
