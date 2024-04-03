@@ -146,7 +146,12 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 	const errors: number[] = [];
 
 	for (const vote of currentVotes) {
-		const { author, post, target, type, validity } = vote;
+		let { author, post, target, type, validity } = vote;
+
+		// Check if target has been replaced
+		if(target && gameDefinition.replacements?.[target]) {
+			target = gameDefinition.replacements?.[target][0];
+		}
 
 		// Check if one of the wagons has reached a majority
 		let isMajorityReached: boolean | undefined;
