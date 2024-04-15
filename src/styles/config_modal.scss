@@ -1,0 +1,18 @@
+#me-config-modal {
+    h1 {
+        margin: 0;
+        padding: 0;
+    }
+}
+
+.btn.btn-me-primary {
+    padding: 2px 5px;
+    font-weight: bold;
+    line-height: 1.5;
+    font-size: 1em;
+    border-color: #5b5b5b;
+    color: #000;
+    background-color: #D2D2D2;
+    background-image: -webkit-linear-gradient(top, #EFEFEF 0%, #D2D2D2 100%);
+    background-image: linear-gradient(to bottom, #EFEFEF 0%, #D2D2D2 100%);
+}
