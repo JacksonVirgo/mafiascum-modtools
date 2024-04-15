@@ -1,6 +1,6 @@
 import $ from 'jquery';
 import { createModal } from './components/modal';
-import { mount } from './components/configParser';
+import { mount } from './components/reactApp';
 
 import loadVcButtons from './components/vcButton';
 import loadMultiIso from './components/multiISO';

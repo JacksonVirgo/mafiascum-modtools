@@ -1,5 +1,4 @@
-import React, { ChangeEvent, ReactElement, useState } from 'react';
-import ReactDOM from 'react-dom/client';
+import React, { useState } from 'react';
 import { Modal, Button, Form, InputGroup, Tab, Tabs, FormControl } from 'react-bootstrap';
 import { storage } from 'webextension-polyfill';
 
@@ -180,14 +179,4 @@ export function DialogContent() {
         </Modal>
         </div>
     )
-}
-
-export function mount() {
-    const anchor = document.createElement('div');
-    // document.body.append(anchor)
-
-    const search = document.querySelector('.submit-buttons');
-    search?.append(anchor)
-    const root = ReactDOM.createRoot(anchor);
-    root.render(<DialogContent />);
 }
