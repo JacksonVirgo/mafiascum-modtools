@@ -3,8 +3,7 @@ $primary-lighter: #343434;
 $secondary-color: lightgray;
 
 @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Raleway:wght@400;900&family=Roboto&display=swap');
-// @import 'bootstrap/dist/css/bootstrap.min.css';
-@import 'bootstrap_override';
+@import 'chakra_override';
 @import 'config_modal';
 @import 'votecounter_modal';
 @import 'spinner';

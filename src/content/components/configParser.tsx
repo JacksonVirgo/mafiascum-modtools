@@ -1,182 +1,145 @@
-import React, { useState } from 'react';
-import { Modal, Button, Form, InputGroup, Tab, Tabs, FormControl } from 'react-bootstrap';
+import React, { FormEventHandler, useEffect, useState } from 'react';
+
+import { 
+    useDisclosure,
+    Modal, ModalOverlay, ModalContent, 
+    Button, Box,
+    Input, NumberInput, NumberInputField, Switch, InputGroup, InputLeftAddon, InputRightAddon,
+    FormControl, FormLabel, FormHelperText,
+    Slider, SliderMark, SliderTrack, SliderFilledTrack, SliderThumb,
+    SimpleGrid,
+} from '@chakra-ui/react';
 import { storage } from 'webextension-polyfill';
 
-interface IMap<T, P> {
-    [any: string]: string
+
+interface IMap {
+    [key: string]: any;
 }
-
-interface IASProps {
-    count: number,
-    formName: string,
-    data: IMap<string, string>
-}
-
-
-function Players(props: any) {
-    const { count, formName, handleChange } = props;
-
-    const handleInputChange = (e: any, i: number) => {
-        handleChange((prev: any) => {
-            return {
-                ...prev,
-                [i]: (e.target as HTMLInputElement).value
-            }
-        })
-    }
-
-    return new Array(count).fill(0).map((x, i) => (
-        <InputGroup key={i}>
-            <InputGroup.Text style={{textAlign: 'left', minWidth: '50px'}}>{i+1}.</InputGroup.Text>
-            <Form.Control as='input' name={formName} placeholder="Enter username" onChange={e => handleInputChange(e, i)} required></Form.Control>
-        </InputGroup>
-    ))
-}
-
-function Replacements(props: IASProps) {
-    const { count, formName, data = {} } = props;
-
-    return new Array(count).fill(0).map((x, i) => (
-        <InputGroup key={i}>
-            <InputGroup.Text style={{textAlign: 'left', minWidth: '50px'}}>{i+1}.</InputGroup.Text>
-            <Form.Select aria-label='aliase' id="replaced" name={formName} defaultValue=""
-                required
-            >
-                <option value="" disabled hidden>Select username</option>
-                {Object.values(data).map(x => <option key={x} value={x}>{x}</option>)}
-            </Form.Select>
-            <Form.Control as='input' name={formName} placeholder="Replaced out"></Form.Control>
-        </InputGroup>
-    ))
-}
-
-function Aliases(props: IASProps) {
-    const { count, formName, data = {} } = props;
-
-    return new Array(count).fill(0).map((x, i) => (
-        <InputGroup key={i}>
-            <InputGroup.Text style={{textAlign: 'left', minWidth: '50px'}}>{i+1}.</InputGroup.Text>
-            <Form.Select aria-label='aliase' id="aliases" name={formName} defaultValue=""
-                required
-            >
-                <option value="" disabled hidden>Select username</option>
-                {Object.values(data).map(x => <option key={x} value={x}>{x}</option>)}
-            </Form.Select>
-            <Form.Control as='input' name={formName} placeholder="Alias"></Form.Control>
-        </InputGroup>
-    ))
-}
-
-
-
 
 export function DialogContent() {
-    const [show, setShow] = useState(false);
-    const [players, setPlayers] = useState({});
     const [playerNum, setPlayerNum] = useState(5);
-    const [replacements, setReplacements] = useState(0);
-    const [aliases, setAliases] = useState(0);
+    const { isOpen, onOpen, onClose } = useDisclosure();
 
-    const handleAdd = () => {
-        setPlayerNum(prev => prev + 1)
+    useEffect(() => {
+        storage.local.get('me_game_definition').then(x => {
+            console.log(x)
+        })
+
+        storage.local.get('me_game_definition_not_there').then(x => {
+            console.log(x)
+        })
+    }, [])
+
+    const smStyle = {
+        mt: '-10',
+        ml: '-6',
+        color: 'white',
+        bg: 'blue.500',
+        // textAlign: 'center',
+        w: "12"
     }
 
-    const handleDel = () => {
-        setPlayerNum(prev => Math.max(prev - 1, 1))
-    }
-
-    const handleAddR = () => {
-        setReplacements(prev => prev + 1)
-    }
-
-    const handleDelR = () => {
-        setReplacements(prev => Math.max(prev - 1, 0))
-    }
-
-    const handleAddA = () => {
-        setAliases(prev => prev + 1)
-    }
-
-    const handleDelA = () => {
-        setAliases(prev => Math.max(prev - 1, 0))
-    }
-
-    const handleSave = (e: any) => {
+    const handleSave: FormEventHandler<any> = (e) => {
         e.preventDefault();
 
-        const form = e.currentTarget;
-        const formData = new FormData(form);
+        const d = new FormData(e.currentTarget);
+        console.dir(d)
 
-        console.log(formData.getAll("players"))
+        const start = d.get('start');
+        const end = d.get('end')
+        const players = d.getAll('players');
 
-        /**
-            players: string[],
-            aliases: map<string, string[]>,
-            replacements: map<string, string[]>,
-            startAt: number,
-            endAt: number
-        */
+        const map: IMap = {};
+        [...d.keys()].forEach(k => {
+            if(k.startsWith('alias')) {
+                const u = k.split('-')[1];
+                const value = d.get(k) as string;
+                map[u] = value.split(',').map(x => x.trim())
+            }
+        })
 
-        const startAt = formData.get("startAt");
-        const endAt = formData.get("endAt");
-        const players = formData.getAll("players");
-        const replacements = formData.getAll("replacements");
-        const aliases = formData.getAll("aliases");
+        const gameDef = {
+            start,
+            end,
+            players,
+            aliases: map
+        }
 
-        console.log(players)
-        console.log(replacements)
-        console.log(aliases)
-
+        storage.local.set({'me_game_definition': JSON.stringify(gameDef)}).then(
+            _ => console.log("OK")
+        )
     }
 
     return (
-        <div style={{color: 'black'}}>
-        <Button variant="me-primary" onClick={() => setShow(true)}>Configure Settings</Button>
-        <Modal id="me-config-modal" show={show} onHide={() => setShow(false)}>
-            <h2>Game Setting</h2>
-            <Form onSubmit={handleSave}>
-                <Tabs defaultActiveKey="general">
-                    <Tab eventKey="general" title="General">
-                        <Form.Group id="group-1">
-                            <Form.Label style={{color: 'black'}}>Starting from Post #</Form.Label>
-                            <Form.Control type="number" name="startAt" />
-                            <Form.Label style={{color: 'black'}}>End at Post #</Form.Label>
-                            <Form.Control type="number" name="endAt" />
-                        </Form.Group>
-                    </Tab>
-                    <Tab eventKey="players" title="Players">
-                        <Form.Group id="group-2" className='divider'>
-                            <Form.Label style={{color: 'black'}}>Add players</Form.Label>
-                            <div className='btn-control-proj'>
-                                <Button variant="outline-form" onClick={handleAdd}>+ Add</Button>
-                                <Button variant="outline-form" onClick={handleDel} disabled={playerNum <= 1}>- Remove</Button>
-                            </div>
-                            {/* @ts-expect-error Server Component */}
-                            <Players count={playerNum} formName='players' handleChange={setPlayers} />
-                        </Form.Group>
-                    </Tab>
-                    <Tab eventKey="misc" title="Additional Settings">
-                        <Form.Group id="group-3">
-                            <Form.Label style={{color: 'black'}}>Replacements</Form.Label>
-                            <div className='btn-control-proj'>
-                                <Button variant="outline-form" onClick={handleAddR}>+ Add</Button>
-                                <Button variant="outline-form" onClick={handleDelR} disabled={replacements <= 0}>- Remove</Button>
-                            </div>
-                            {/* @ts-expect-error Server Component */}
-                            <Replacements count={replacements} formName='replacements' data={players} />
-                            <Form.Label style={{color: 'black'}}>Aliases</Form.Label>
-                            <div className='btn-control-proj'>
-                                <Button variant="outline-form" onClick={handleAddA}>+ Add</Button>
-                                <Button variant="outline-form" onClick={handleDelA} disabled={aliases <= 0}>- Remove</Button>
-                            </div>
-                            {/* @ts-expect-error Server Component */}
-                            <Aliases count={aliases} formName='aliases' data={players} />
-                        </Form.Group>
-                    </Tab>
-                </Tabs>
-                <Button variant="me-primary" type="submit">Save</Button>
-            </Form>
+        <div>
+        <Button onClick={onOpen}>Configure Settings</Button>
+        <Modal id="me-config-modal" isOpen={isOpen} onClose={onClose}>
+            <ModalOverlay />
+            <ModalContent>
+            <form id="setting" onSubmit={handleSave}>
+                <h2>Game Setting</h2>
+                <h4>General</h4>
+                <SimpleGrid columns={2} spacing={5}>
+                <InputGroup>
+                    <FormLabel minW='60px'>Start At</FormLabel>
+                    <NumberInput name="start"><NumberInputField /></NumberInput>
+                </InputGroup>
+                <InputGroup>
+                    <FormLabel minW='60px'>End At</FormLabel>
+                    <NumberInput name='end'><NumberInputField /></NumberInput>
+                </InputGroup>
+                </SimpleGrid>
+
+                <h4>Players</h4>
+                <Box p={5} pt={10}>
+                    <Slider aria-label='playerNum' defaultValue={playerNum} min={1} max={25} step={1} onChange={(value) => setPlayerNum(value)}>
+                        {/* <SliderMark value={9} {...smStyle}>9</SliderMark> */}
+                        <SliderMark value={1} mt='2' ml='-1'>1</SliderMark>
+                        <SliderMark value={13} mt='2' ml='-2'>13</SliderMark>
+                        <SliderMark value={25} mt='2' ml='-3'>25</SliderMark>
+                        {/* <SliderMark value={17} {...smStyle}>17</SliderMark> */}
+                        <SliderMark value={playerNum} {...smStyle} textAlign='center'>{playerNum}</SliderMark>
+                        <SliderTrack><SliderFilledTrack /></SliderTrack>
+                        <SliderThumb />
+                    </Slider>
+                </Box>
+                <p>Click the switch to enable Aliases & Replacements for a player slot</p>
+                {[...Array(playerNum)].map((_, i) => <PlayerBox i={i} key={i} />)}
+
+                <Button type="submit" form="setting">Save</Button>
+            </form>
+            </ModalContent>
         </Modal>
         </div>
     )
+}
+
+function PlayerBox(props: {i: number}) {
+    const {i} = props;
+
+    const [value, setValue] = useState('');
+    const handleChange = (e: any) => setValue(e.target.value);
+    const [useAlias, setUseAlias] = useState(false);
+    const [aliases, setAliases] = useState([]);
+
+    const handleCheck = (e: any) => {
+        setUseAlias(e.target.checked)
+    }
+
+    return <FormControl>
+        <InputGroup>
+            <InputLeftAddon minW='60px'>{i+1}.</InputLeftAddon>
+            <Input type='text' name='players' onChange={handleChange} value={value} placeholder='enter username' />
+            <InputRightAddon>
+                <Switch size='sm' onChange={handleCheck} />
+            </InputRightAddon>
+        </InputGroup>
+        {useAlias && 
+        <FormControl>
+            <Input type='text' name={`alias-${value}`} />
+            <FormHelperText>Enter multiple values separated with a comma ","</FormHelperText>
+        </FormControl>
+        }
+        {/* <Button aria-label='add-alias'>Add Replacement</Button> */}
+    </FormControl>
 }

@@ -1,5 +1,6 @@
 import React from 'react';
 import ReactDOM from 'react-dom/client';
+import { ChakraProvider } from '@chakra-ui/react';
 import {DialogContent} from './configParser';
 
 
@@ -10,5 +11,5 @@ export function mount() {
     const search = document.querySelector('.submit-buttons');
     search?.append(anchor)
     const root = ReactDOM.createRoot(anchor);
-    root.render(<DialogContent />);
+    root.render(<ChakraProvider><DialogContent /></ChakraProvider>);
 }
