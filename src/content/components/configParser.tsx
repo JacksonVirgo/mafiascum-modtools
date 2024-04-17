@@ -11,9 +11,37 @@ import {
 } from '@chakra-ui/react';
 import { storage } from 'webextension-polyfill';
 
+interface IMap<T> {
+    [key: string]: T | any;
+}
 
-interface IMap {
-    [key: string]: any;
+const LOCAL_STORAGE_KEY = 'me_game_defs';
+
+export async function setData(id: string, data: Object) {
+    const store = storage.local.get(LOCAL_STORAGE_KEY) as IMap<string>;
+    const newData = {[id]: data};
+    let oldData = {};
+
+    if(store.hasOwnProperty(LOCAL_STORAGE_KEY)) {
+        oldData = JSON.parse(store[LOCAL_STORAGE_KEY])
+    }
+
+    const mergedData = {...oldData, ...newData};
+
+    storage.local.set({'me_game_definition': JSON.stringify(mergedData)}).then(
+        _ => console.log("OK")
+    )
+}
+
+export async function getAllSavedData() {
+    const store = storage.local.get(LOCAL_STORAGE_KEY) as IMap<string>;
+    let data = {};
+
+    if(store.hasOwnProperty(LOCAL_STORAGE_KEY)) {
+        data = JSON.parse(store[LOCAL_STORAGE_KEY])
+    }
+
+    return data;
 }
 
 export function DialogContent() {
@@ -49,7 +77,7 @@ export function DialogContent() {
         const end = d.get('end')
         const players = d.getAll('players');
 
-        const map: IMap = {};
+        const map: IMap<string[]> = {};
         [...d.keys()].forEach(k => {
             if(k.startsWith('alias')) {
                 const u = k.split('-')[1];
