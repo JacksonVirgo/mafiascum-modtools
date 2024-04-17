@@ -25,7 +25,7 @@ function fillConfig(version) {
 			filename: '[name].js',
 		},
 		resolve: {
-			extensions: ['.ts', '.js'],
+			extensions: ['.ts', '.js', '.tsx', '.jsx'],
 		},
 		module: {
 			rules: [
