@@ -4,11 +4,13 @@ interface NumberInputProps {
 	name: string;
 	label: string;
 	placeholder?: string;
+	onChange?: (value: number) => void;
 }
 export default function NumberInput({
 	name,
 	label,
 	placeholder,
+	onChange,
 }: NumberInputProps) {
 	return (
 		<div>
@@ -18,6 +20,12 @@ export default function NumberInput({
 				id={name}
 				name={name}
 				placeholder={placeholder}
+				onChange={(e) => {
+					if (!onChange) return;
+					const value = Number(e.target.value);
+					if (Number.isNaN(value)) return;
+					onChange(value);
+				}}
 			/>
 		</div>
 	);
