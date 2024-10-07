@@ -2,6 +2,12 @@ $primary-color: #1f1f1f;
 $primary-lighter: #343434;
 $secondary-color: lightgray;
 
+// Tailwind
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+// Other
 @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Raleway:wght@400;900&family=Roboto&display=swap');
 @import 'votecounter_modal';
 @import 'spinner';
