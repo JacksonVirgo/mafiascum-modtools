@@ -1,6 +1,7 @@
 import React from 'react';
 import $ from 'jquery';
 import { renderReact } from '../../utils/react';
+import { modalManager } from './modal';
 
 export default async () => {
 	$('.post').each((_, postElement) => {
@@ -12,16 +13,15 @@ export default async () => {
 
 const VcButton = () => {
 	const onClick = () => {
-		const dialog = $('#me_votecount');
-		if (!dialog) return;
-		dialog.toggleClass('me_hidden');
-		$('body').toggleClass('me_stop_scroll');
+		modalManager.show();
 	};
 
 	return (
-		<span className="mafia-engine-vc">
+		<span>
 			{' - '}
-			<button onClick={onClick}>VC</button>
+			<button onClick={onClick} className="tw-text-white">
+				VC
+			</button>
 		</span>
 	);
 };
