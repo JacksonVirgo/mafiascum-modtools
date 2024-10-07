@@ -115,7 +115,6 @@ export const ModalForm = () => {
 
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
-		console.log('Here at form submit', yamlStr, startNumber, endNumber);
 		if (!yamlStr) return;
 
 		try {
