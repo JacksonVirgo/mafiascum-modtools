@@ -126,7 +126,6 @@ interface ModalHandle {
 const modalRef = createRef<ModalHandle>();
 export const modalManager = {
 	show: () => {
-		console.log('Entered SHOW', !!modalRef.current);
 		if (modalRef.current) {
 			modalRef.current.show();
 		}
@@ -144,7 +143,6 @@ export const Modal = forwardRef((_props, ref) => {
 
 	useImperativeHandle(ref, () => ({
 		show: () => {
-			console.log('Opening modal');
 			setIsVisible(true);
 		},
 		hide: () => setIsVisible(false),
