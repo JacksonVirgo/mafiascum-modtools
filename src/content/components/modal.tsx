@@ -160,6 +160,9 @@ export const Modal = forwardRef((_props, ref) => {
 			<div className="aspect-[3/2] h-1/2 max-h-1/2 flex flex-col bg-primary-color p-4 rounded-[15px] border-2 border-white justify-center items-center">
 				{currentState == ModalState.Loading && <LoadingSpinner />}
 				{currentState == ModalState.Form && <ModalForm />}
+				{currentState == ModalState.Response && (
+					<div>{'Not yet implemented'}</div>
+				)}
 			</div>
 
 			{/* {currentState == ModalState.Loading && <LoadingSpinner />}
