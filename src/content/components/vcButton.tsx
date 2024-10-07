@@ -19,7 +19,7 @@ const VcButton = () => {
 	return (
 		<span>
 			{' - '}
-			<button onClick={onClick} className="tw-text-white">
+			<button onClick={onClick} className="text-white">
 				VC
 			</button>
 		</span>

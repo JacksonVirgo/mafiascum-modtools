@@ -1,7 +1,9 @@
 /** @type {import('tailwindcss').Config} */
 module.exports = {
 	content: ['./src/**/*.tsx'],
-	prefix: 'tw-',
+	corePlugins: {
+		preflight: false,
+	},
 	theme: {
 		extend: {
 			backgroundColor: {

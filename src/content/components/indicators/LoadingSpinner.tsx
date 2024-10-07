@@ -7,7 +7,7 @@ export default function LoadingSpinner() {
 			height="24"
 			viewBox="0 0 24 24"
 			xmlns="http://www.w3.org/2000/svg"
-			className="tw-scale-[1.9]"
+			className="scale-[2]"
 		>
 			<style>
 				{`.spinner_ajPY {

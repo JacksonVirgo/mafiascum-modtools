@@ -153,11 +153,11 @@ export const Modal = forwardRef((_props, ref) => {
 	return (
 		<div
 			id="me_votecount"
-			className={`tw-fixed tw-top-0 tw-left-0 tw-w-screen tw-h-screen tw-bg-[rgba(0, 0, 0, 0.3)] tw-backdrop-blur-sm tw-z-[50] tw-flex tw-flex-col tw-justify-center tw-items-center ${
-				isVisible ? '' : '!tw-hidden'
+			className={`fixed top-0 left-0 w-screen h-screen bg-[rgba(0, 0, 0, 0.3)] backdrop-blur-sm z-[50] flex flex-col justify-center items-center ${
+				isVisible ? '' : '!hidden'
 			}`}
 		>
-			<div className="tw-aspect-[3/2] tw-h-1/2 tw-max-h-1/2 tw-flex tw-flex-col tw-bg-primary-color tw-p-4 tw-rounded-[15px] tw-border-2 tw-border-white tw-justify-center tw-items-center">
+			<div className="aspect-[3/2] h-1/2 max-h-1/2 flex flex-col bg-primary-color p-4 rounded-[15px] border-2 border-white justify-center items-center">
 				{currentState == ModalState.Loading && <LoadingSpinner />}
 				{currentState == ModalState.Form && <ModalForm />}
 			</div>
@@ -186,17 +186,17 @@ export const Modal = forwardRef((_props, ref) => {
 
 export const ModalForm = () => {
 	return (
-		<form className="tw-border-2 tw-border-white tw-grow tw-w-full tw-flex tw-flex-row">
+		<form className="border-2 border-white grow w-full flex flex-row">
 			<nav>
-				<ul className="tw-list-none">
+				<ul className="list-none">
 					<li className="focused" data-section="general">
 						General
 					</li>
 				</ul>
 			</nav>
 
-			<div className="tw-flex tw-flex-col tw-gap-0">
-				<section data-section="general" className="focused tw-grow">
+			<div className="flex flex-col gap-0">
+				<section data-section="general" className="focused grow">
 					<FileInput
 						name="me_game_def"
 						label="Import Definition File:"
@@ -216,7 +216,7 @@ export const ModalForm = () => {
 					/>
 				</section>
 
-				<div className="tw-shrink">
+				<div className="shrink">
 					<button>Generate Votecount</button>
 				</div>
 			</div>
