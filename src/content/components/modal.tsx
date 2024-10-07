@@ -128,8 +128,6 @@ export const ModalForm = () => {
 				: json.startAt ?? json.startFrom ?? 0;
 			json.endAt = endNumber ? endNumber : json.endAt ?? undefined;
 
-			console.log(json.startAt);
-
 			modalManager.setLoading();
 
 			const vc = await startVoteCount(json);
