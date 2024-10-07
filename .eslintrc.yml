@@ -24,6 +24,6 @@ rules:
     semi:
         - error
         - always
-    no-unused-vars:
+    '@typescript-eslint/no-unused-vars':
         - warn
         - { 'argsIgnorePattern': '^_', 'varsIgnorePattern': '^_' }
