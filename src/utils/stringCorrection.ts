@@ -1,7 +1,10 @@
 import diceCoefficient from './stringSimilarity/dice';
 import trigramSimilarity from './stringSimilarity/trigrams';
 
-export type StringSimilarityCompareFunc = (first: string, second: string) => number;
+export type StringSimilarityCompareFunc = (
+	first: string,
+	second: string,
+) => number;
 export type BestMatchResult = {
 	ratings: [string, number][];
 	bestMatch: [string, number];
@@ -16,7 +19,10 @@ export enum StringSimilarityAlgs {
 	Trigrams = 'trigrams',
 }
 
-export const stringSimilarityAlgs: Record<StringSimilarityAlgs, StringSimilarity> = {
+export const stringSimilarityAlgs: Record<
+	StringSimilarityAlgs,
+	StringSimilarity
+> = {
 	dice_coefficient: {
 		compare: diceCoefficient,
 		bestMatch(value, targets) {
@@ -24,7 +30,10 @@ export const stringSimilarityAlgs: Record<StringSimilarityAlgs, StringSimilarity
 			let bestMatchIndex = 0;
 			for (let i = 0; i < targets.length; i++) {
 				const currentTargetString = targets[i];
-				const currentRating = diceCoefficient(value, currentTargetString);
+				const currentRating = diceCoefficient(
+					value,
+					currentTargetString,
+				);
 				ratings.push([currentTargetString, currentRating]);
 				if (currentRating > ratings[bestMatchIndex][1]) {
 					bestMatchIndex = i;
@@ -41,7 +50,10 @@ export const stringSimilarityAlgs: Record<StringSimilarityAlgs, StringSimilarity
 			let bestMatchIndex = 0;
 			for (let i = 0; i < targets.length; i++) {
 				const currentTargetString = targets[i];
-				const currentRating = trigramSimilarity(value, currentTargetString);
+				const currentRating = trigramSimilarity(
+					value,
+					currentTargetString,
+				);
 				ratings.push([currentTargetString, currentRating]);
 				if (currentRating > ratings[bestMatchIndex][1]) {
 					bestMatchIndex = i;

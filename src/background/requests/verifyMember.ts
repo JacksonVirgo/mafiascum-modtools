@@ -5,6 +5,8 @@ export async function verifyMember(username: string) {
 	const response = await fetch(fetchUrl);
 	const text = await response.text();
 	const $ = load(text);
-	const member = $('#memberlist > tbody > tr > td:nth-child(1) > a').first().text();
+	const member = $('#memberlist > tbody > tr > td:nth-child(1) > a')
+		.first()
+		.text();
 	return member === username;
 }

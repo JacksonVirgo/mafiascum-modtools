@@ -32,12 +32,17 @@ export async function createModal() {
 
 		try {
 			const parsedJSON = convertYamlToJson(yamlString);
-			if (!isGameDefinition(parsedJSON)) return console.error('Invalid game definition.');
-			if (parsedJSON.startFrom && !parsedJSON.startAt) parsedJSON.startAt = parsedJSON.startFrom;
+			if (!isGameDefinition(parsedJSON))
+				return console.error('Invalid game definition.');
+			if (parsedJSON.startFrom && !parsedJSON.startAt)
+				parsedJSON.startAt = parsedJSON.startFrom;
 
-			const startPost = parseInt($('#me_start').val() as string) ?? undefined;
+			const startPost =
+				parseInt($('#me_start').val() as string) ?? undefined;
 			const endPost = parseInt($('#me_end').val() as string) ?? undefined;
-			parsedJSON.startAt = isNaN(startPost) ? parsedJSON.startAt ?? 0 : startPost;
+			parsedJSON.startAt = isNaN(startPost)
+				? (parsedJSON.startAt ?? 0)
+				: startPost;
 			parsedJSON.endAt = isNaN(endPost) ? parsedJSON.endAt : endPost;
 
 			loadingSpinner.removeClass(CSS_HIDDEN);
@@ -56,7 +61,8 @@ export async function createModal() {
 			if (format) responseTextarea.val(format);
 			else responseTextarea.val('Error formatting vote count data.');
 		} catch (err) {
-			if (err instanceof z.ZodError) console.error('Validation errors: ', err.errors);
+			if (err instanceof z.ZodError)
+				console.error('Validation errors: ', err.errors);
 			else console.error('An unexpected error occurred: ', err);
 		}
 	});
@@ -73,7 +79,8 @@ function addVisibilityLogic(page: JQuery<HTMLElement>) {
 		if (e.target === page[0]) toggleFormVisibility('invisible');
 	});
 
-	if (exitButton) exitButton.on('click', () => toggleFormVisibility('invisible'));
+	if (exitButton)
+		exitButton.on('click', () => toggleFormVisibility('invisible'));
 }
 
 /**
@@ -109,7 +116,8 @@ function addFileUploadLogic(page: JQuery<HTMLElement>) {
 				yamlString = yaml; // Phase this out
 
 				const json = convertYamlToJson(yaml);
-				if (!isGameDefinition(json)) return console.error('Invalid game definition.');
+				if (!isGameDefinition(json))
+					return console.error('Invalid game definition.');
 
 				const startPost = (json.startAt || json.startFrom) ?? 0;
 				const endPost = json.endAt ?? undefined;

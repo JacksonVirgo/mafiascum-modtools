@@ -17,12 +17,15 @@ export async function getPageData(query: PageQuery) {
 	// reduces response payload size by over 90%!
 	// simplifies the html DOM tree
 	// removes scripts and css which we don't care about
-	params.set('view', 'print');	
+	params.set('view', 'print');
 
 	const url = BASE_THREAD_URL + params.toString();
 
 	try {
-		const pageData = await sendBackgroundRequest({ action: 'getPageData', url: url });
+		const pageData = await sendBackgroundRequest({
+			action: 'getPageData',
+			url: url,
+		});
 		if (!isPageDataResponse(pageData)) return null;
 		return pageData;
 	} catch (err) {
@@ -51,7 +54,8 @@ export async function getThreadData(threadId: string, startFrom: number) {
 		});
 
 		if (!pageData) return throwErr('Could not fetch page data.');
-		if (pageData.status != 200) return throwErr(`Page data status was ${pageData.status}.`);
+		if (pageData.status != 200)
+			return throwErr(`Page data status was ${pageData.status}.`);
 
 		totalPages = pageData.lastPage;
 		pageTitle = pageData.pageTitle;

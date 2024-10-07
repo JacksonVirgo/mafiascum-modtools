@@ -1,6 +1,8 @@
 import { AnyRequest } from '../types/backgroundRequests';
 import browser from 'webextension-polyfill';
-export async function sendBackgroundRequest(request: AnyRequest): Promise<unknown> {
+export async function sendBackgroundRequest(
+	request: AnyRequest,
+): Promise<unknown> {
 	return await browser.runtime.sendMessage(request);
 }
 

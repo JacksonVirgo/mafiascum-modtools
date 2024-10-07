@@ -14,5 +14,9 @@ export const GetHighlightQuotes = z.object({
 	action: z.literal('getHighlightQuotes'),
 });
 
-export const AnyRequestSchema = z.union([PageRequestValidator, MemberVerificationRequestValidator, GetHighlightQuotes]);
+export const AnyRequestSchema = z.union([
+	PageRequestValidator,
+	MemberVerificationRequestValidator,
+	GetHighlightQuotes,
+]);
 export type AnyRequest = z.infer<typeof AnyRequestSchema>;

@@ -1,4 +1,9 @@
-import { GameDefinition, ValidatedVote, VoteCorrection, VoteType } from '../types/gameDefinition';
+import {
+	GameDefinition,
+	ValidatedVote,
+	VoteCorrection,
+	VoteType,
+} from '../types/gameDefinition';
 import { getUrlParams } from '../utils/url';
 import { getThreadData } from './thread';
 import $ from 'jquery';
@@ -18,8 +23,12 @@ export async function validateGameDefinition(gameDefinition: GameDefinition) {
 	const playerVerification = new Map<string, boolean>();
 	for (const player of gameDefinition.players) {
 		try {
-			const verification = await sendBackgroundRequest({ action: 'verifyMember', username: player });
-			if (!isMemberVerificationResponse(verification)) playerVerification.set(player, false);
+			const verification = await sendBackgroundRequest({
+				action: 'verifyMember',
+				username: player,
+			});
+			if (!isMemberVerificationResponse(verification))
+				playerVerification.set(player, false);
 			else playerVerification.set(player, verification.verified);
 		} catch (err) {
 			console.error(err);
@@ -70,12 +79,21 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 			if (!(isAfterStart && isBeforeEnd)) return false;
 
 			// Check if author is a player
-			const isAuthorPlayer = gameDefinition?.players.some((v) => v.toLowerCase() === vote.author.toLowerCase());
+			const isAuthorPlayer = gameDefinition?.players.some(
+				(v) => v.toLowerCase() === vote.author.toLowerCase(),
+			);
 			if (!isAuthorPlayer) return false;
 
 			// Check if author is dead
 			const isAuthorDead = false;
-			for (const [key, value] of Object.entries(gameDefinition?.dead ?? {})) if (vote.author.toLowerCase() === key.toLowerCase() && value <= vote.post) return false;
+			for (const [key, value] of Object.entries(
+				gameDefinition?.dead ?? {},
+			))
+				if (
+					vote.author.toLowerCase() === key.toLowerCase() &&
+					value <= vote.post
+				)
+					return false;
 			if (isAuthorDead) return false;
 
 			return true;
@@ -114,15 +132,26 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 			}
 			const totalVotables = Array.from(aliasLegend.keys());
 			totalVotables.push(UNVOTE_TAG);
-			if (!gameDefinition.disable?.includes('No Elimination')) totalVotables.push(NO_ELIMINATION_TAG);
+			if (!gameDefinition.disable?.includes('No Elimination'))
+				totalVotables.push(NO_ELIMINATION_TAG);
 
-			const closestMatch = stringSimilarityAlgs.dice_coefficient.bestMatch(vote.target.toLowerCase(), totalVotables).bestMatch;
+			const closestMatch =
+				stringSimilarityAlgs.dice_coefficient.bestMatch(
+					vote.target.toLowerCase(),
+					totalVotables,
+				).bestMatch;
 			let validatedName = closestMatch[0];
-			if (validatedName != UNVOTE_TAG && validatedName != NO_ELIMINATION_TAG) validatedName = aliasLegend.get(validatedName) ?? validatedName;
+			if (
+				validatedName != UNVOTE_TAG &&
+				validatedName != NO_ELIMINATION_TAG
+			)
+				validatedName = aliasLegend.get(validatedName) ?? validatedName;
 			vote.target = validatedName;
 
-			if (closestMatch[1] >= CORRECTION_ACCEPT_THRESHOLD) vote.validity = VoteCorrection.ACCEPT;
-			else if (closestMatch[1] >= CORRECTION_WARN_THRESHOLD) vote.validity = VoteCorrection.WARN;
+			if (closestMatch[1] >= CORRECTION_ACCEPT_THRESHOLD)
+				vote.validity = VoteCorrection.ACCEPT;
+			else if (closestMatch[1] >= CORRECTION_WARN_THRESHOLD)
+				vote.validity = VoteCorrection.WARN;
 			else vote.validity = VoteCorrection.REJECT;
 			return vote;
 		})
@@ -150,14 +179,17 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 		let { target } = vote;
 
 		// Check if target has been replaced
-		if(target && gameDefinition.replacements?.[target]) {
+		if (target && gameDefinition.replacements?.[target]) {
 			target = gameDefinition.replacements?.[target][0];
 		}
 
 		// Check if one of the wagons has reached a majority
 		let isMajorityReached: boolean | undefined;
 		for (const [wagon, wagonVotes] of Object.entries(wagons)) {
-			const maj = wagon == NO_ELIMINATION_TAG ? Math.ceil(livingPlayers.length / 2) : majority;
+			const maj =
+				wagon == NO_ELIMINATION_TAG
+					? Math.ceil(livingPlayers.length / 2)
+					: majority;
 			if (wagonVotes.length >= maj) {
 				isMajorityReached = true;
 				break;
@@ -171,16 +203,23 @@ export async function startVoteCount(gameDefinition: GameDefinition | null) {
 
 		if (type === VoteType.UNVOTE) {
 			for (const wagon in wagons) {
-				wagons[wagon] = wagons[wagon].filter((v) => v.author !== author);
+				wagons[wagon] = wagons[wagon].filter(
+					(v) => v.author !== author,
+				);
 			}
 		} else if (type === VoteType.VOTE) {
 			if (!target) continue;
 			for (const wagon in wagons) {
-				if (wagon !== target || target == UNVOTE_TAG) wagons[wagon] = wagons[wagon].filter((v) => v.author !== author);
+				if (wagon !== target || target == UNVOTE_TAG)
+					wagons[wagon] = wagons[wagon].filter(
+						(v) => v.author !== author,
+					);
 			}
 
 			if (!wagons[target]) wagons[target] = [];
-			const alreadyExists = wagons[target].some((v) => v.author === author);
+			const alreadyExists = wagons[target].some(
+				(v) => v.author === author,
+			);
 			if (!alreadyExists) wagons[target].push(vote);
 		}
 	}
@@ -217,9 +256,14 @@ export function formatVoteCountData(voteCount: VoteCount) {
 		const wagon = voteCount.wagons[wagonHandle];
 		if (wagon.length <= 0) continue;
 
-		const calculatedMajority = wagonHandle == NO_ELIMINATION_TAG ? Math.ceil(voteCount.livingPlayers.length / 2) : voteCount.majority;
-		const wagonLength = wagonHandle == NO_ELIMINATION_TAG ? -1 : wagon.length;
-		const wagonTitle = wagonHandle == NO_ELIMINATION_TAG ? 'No Elimination' : wagonHandle;
+		const calculatedMajority =
+			wagonHandle == NO_ELIMINATION_TAG
+				? Math.ceil(voteCount.livingPlayers.length / 2)
+				: voteCount.majority;
+		const wagonLength =
+			wagonHandle == NO_ELIMINATION_TAG ? -1 : wagon.length;
+		const wagonTitle =
+			wagonHandle == NO_ELIMINATION_TAG ? 'No Elimination' : wagonHandle;
 		const wagonStr = `[b]${wagonTitle} (${wagon.length}/${calculatedMajority})[/b] -> ${wagon.map((v) => `${v.author} ([post]${v.post}[/post])`).join(', ')}`;
 		wagonStrings.push([wagonStr, wagonLength]);
 	}

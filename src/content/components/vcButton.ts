@@ -4,7 +4,9 @@ export default async () => {
 	$('.post').each((_, postElement) => {
 		const post = $(postElement);
 		const author = post.find('.author').first();
-		const button = $('<span class="mafia-engine-vc"> - <button>VC</button></span>');
+		const button = $(
+			'<span class="mafia-engine-vc"> - <button>VC</button></span>',
+		);
 
 		button
 			.find('button')

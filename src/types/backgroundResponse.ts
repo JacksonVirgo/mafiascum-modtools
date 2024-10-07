@@ -23,7 +23,9 @@ export const PageDataSchema = z.object({
 	votes: z.array(VoteSchema),
 });
 
-export function isPageDataResponse(obj: unknown): obj is z.infer<typeof PageDataSchema> {
+export function isPageDataResponse(
+	obj: unknown,
+): obj is z.infer<typeof PageDataSchema> {
 	try {
 		const parse = PageDataSchema.parse(obj);
 		if (parse) return true;
@@ -43,7 +45,9 @@ export const MemberVerification = z.object({
 	username: z.string(),
 	verified: z.boolean(),
 });
-export function isMemberVerificationResponse(obj: unknown): obj is z.infer<typeof MemberVerification> {
+export function isMemberVerificationResponse(
+	obj: unknown,
+): obj is z.infer<typeof MemberVerification> {
 	try {
 		const parse = MemberVerification.parse(obj);
 		if (parse) return true;
@@ -55,5 +59,9 @@ export function isMemberVerificationResponse(obj: unknown): obj is z.infer<typeo
 }
 //#endregion
 
-export const AnyResponseSchema = z.union([ErrorResponse, PageDataSchema, MemberVerification]);
+export const AnyResponseSchema = z.union([
+	ErrorResponse,
+	PageDataSchema,
+	MemberVerification,
+]);
 export type AnyResponse = z.infer<typeof AnyResponseSchema>;

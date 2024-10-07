@@ -88,7 +88,10 @@ function fillConfig(version) {
 							...versionFields,
 						};
 
-						fs.writeFileSync(`./${output}/${version}/manifest.json`, JSON.stringify(compiledManifest, null, 2));
+						fs.writeFileSync(
+							`./${output}/${version}/manifest.json`,
+							JSON.stringify(compiledManifest, null, 2),
+						);
 					});
 				},
 			},

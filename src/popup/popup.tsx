@@ -45,11 +45,19 @@ const MainPage = () => {
 	if (isHighlight === null) return <div>Loading...</div>;
 
 	return (
-		<div className='w-96 h-96 bg-slate-700 flex flex-col justify-start items-start p-5 text-white'>
-			<h1 className='text-white text-2xl underline font-extrabold pb-3'>Config</h1>
-			<div className='flex flex-row justify-start'>
-				<input type='checkbox' id='highlight' name='highlight' checked={isHighlight} onChange={handleCheckboxChange} />
-				<label htmlFor='highlight'>Highlight Quotes</label>
+		<div className="w-96 h-96 bg-slate-700 flex flex-col justify-start items-start p-5 text-white">
+			<h1 className="text-white text-2xl underline font-extrabold pb-3">
+				Config
+			</h1>
+			<div className="flex flex-row justify-start">
+				<input
+					type="checkbox"
+					id="highlight"
+					name="highlight"
+					checked={isHighlight}
+					onChange={handleCheckboxChange}
+				/>
+				<label htmlFor="highlight">Highlight Quotes</label>
 			</div>
 
 			<div>{isHighlight}</div>
