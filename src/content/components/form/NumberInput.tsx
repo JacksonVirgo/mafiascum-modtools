@@ -13,8 +13,10 @@ export default function NumberInput({
 	onChange,
 }: NumberInputProps) {
 	return (
-		<div>
-			<label htmlFor={name}>{label}</label>
+		<div className="flex flex-col">
+			<label htmlFor={name} className="text-base">
+				{label}
+			</label>
 			<input
 				type="number"
 				id={name}
