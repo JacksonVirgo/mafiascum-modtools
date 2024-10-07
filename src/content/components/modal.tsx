@@ -1,6 +1,7 @@
 import React, {
 	createRef,
 	forwardRef,
+	useEffect,
 	useImperativeHandle,
 	useState,
 } from 'react';
@@ -32,6 +33,8 @@ enum ModalState {
 interface ModalHandle {
 	show: () => void;
 	hide: () => void;
+	setLoading: () => void;
+	setResponse: (res: string) => void;
 }
 const modalRef = createRef<ModalHandle>();
 export const modalManager = {
@@ -45,17 +48,27 @@ export const modalManager = {
 			modalRef.current.hide();
 		}
 	},
+	setLoading: () => {
+		if (modalRef.current) {
+			modalRef.current.setLoading();
+		}
+	},
+	setResponse: (res: string) => {
+		if (modalRef.current) {
+			modalRef.current.setResponse(res);
+		}
+	},
 };
 
 export const Modal = forwardRef((_props, ref) => {
 	const [isVisible, setIsVisible] = useState(false);
-	const [currentState, _] = useState(ModalState.Form);
+	const [currentState, setCurrentState] = useState(ModalState.Form);
 
 	useImperativeHandle(ref, () => ({
-		show: () => {
-			setIsVisible(true);
-		},
+		show: () => setIsVisible(true),
 		hide: () => setIsVisible(false),
+		setLoading: () => setCurrentState(ModalState.Loading),
+		setResponse: (_: string) => setCurrentState(ModalState.Response),
 	}));
 
 	return (
@@ -96,8 +109,13 @@ export const ModalForm = () => {
 	const [startNumber, setStartNumber] = useState<number | undefined>();
 	const [endNumber, setEndNumber] = useState<number | undefined>();
 
+	useEffect(() => {
+		console.log('CHANGED', yamlStr);
+	}, [yamlStr]);
+
 	const onSubmit = async (e: React.FormEvent<HTMLFormElement>) => {
 		e.preventDefault();
+		console.log('Here at form submit', yamlStr, startNumber, endNumber);
 		if (!yamlStr) return;
 
 		try {
@@ -109,14 +127,14 @@ export const ModalForm = () => {
 			json.startAt = startNumber ? startNumber : json.startAt ?? 0;
 			json.endAt = endNumber ? endNumber : json.endAt ?? undefined;
 
-			// Change modal state to loading
+			modalManager.setLoading();
 
 			const vc = await startVoteCount(json);
 			console.log('Calculated Votes', vc);
 			if (!vc) return console.error('Failed to calculate votes');
 			const format = formatVoteCountData(vc);
 
-			// Change modal state to response
+			modalManager.setResponse(format);
 
 			if (format) console.log('Set response', format);
 			else console.error('Set response to show it failed');
@@ -145,7 +163,10 @@ export const ModalForm = () => {
 						name="me_game_def"
 						label="Import Definition File:"
 						accept=".yaml,.yml"
-						onChange={setYamlStr}
+						onChange={(val) => {
+							console.log('Changed', val);
+							setYamlStr(val);
+						}}
 					/>
 
 					<NumberInput
@@ -164,7 +185,7 @@ export const ModalForm = () => {
 				</section>
 
 				<div className="shrink">
-					<button>Generate Votecount</button>
+					<input type="submit" value={'Generate Votecount'} />
 				</div>
 			</div>
 		</form>

@@ -25,9 +25,9 @@ export function FileInput({ name, label, accept, onChange }: FileInputProps) {
 					reader.onloadend = () => {
 						if (!reader.result) return;
 						response = reader.result.toString();
+						onChange(response);
 					};
 					reader.readAsText(file);
-					onChange(response);
 				}}
 			/>
 		</div>
