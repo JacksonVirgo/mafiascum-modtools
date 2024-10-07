@@ -122,10 +122,13 @@ export const ModalForm = () => {
 			const json = convertYamlToJson(yamlStr);
 			if (!isGameDefinition(json))
 				return console.error('Invalid game definition.');
-			if (!json.startAt && !json.startFrom) json.startAt = json.startFrom;
 
-			json.startAt = startNumber ? startNumber : json.startAt ?? 0;
+			json.startAt = startNumber
+				? startNumber
+				: json.startAt ?? json.startFrom ?? 0;
 			json.endAt = endNumber ? endNumber : json.endAt ?? undefined;
+
+			console.log(json.startAt);
 
 			modalManager.setLoading();
 
