@@ -3,19 +3,20 @@ const MiniCssExtractPlugin = require('mini-css-extract-plugin');
 const HtmlPlugin = require('html-webpack-plugin');
 const tailwindcss = require('tailwindcss');
 const autoprefixer = require('autoprefixer');
-
 const fs = require('fs');
 const path = require('path');
 const output = 'dist';
 const json = require('./manifest.json');
 
+// Entry points
 const entryPoints = {
 	main: [path.resolve(__dirname, 'src', 'content', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
 	styling: path.resolve(__dirname, 'src', 'styles', '_main.scss'),
-	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'),
+	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'), // React component
 };
 
+// Function to fill configuration for v2 and v3
 function fillConfig(version) {
 	return {
 		entry: entryPoints,
@@ -25,13 +26,13 @@ function fillConfig(version) {
 			filename: '[name].js',
 		},
 		resolve: {
-			extensions: ['.ts', '.js'],
+			extensions: ['.ts', '.tsx', '.js', '.jsx'], // Add .tsx and .jsx extensions
 		},
 		module: {
 			rules: [
 				{
-					test: /\.tsx?$/,
-					loader: 'ts-loader',
+					test: /\.tsx?$/, // Handle TypeScript and TSX files
+					use: 'ts-loader',
 					exclude: /node_modules/,
 				},
 				{
@@ -41,11 +42,10 @@ function fillConfig(version) {
 				{
 					test: /\.(s[ac]ss|css)$/i,
 					use: [
-						// 'style-loader', // Injects CSS into the DOM
 						MiniCssExtractPlugin.loader,
-						'css-loader', // Translates CSS into CommonJS
+						'css-loader',
 						{
-							loader: 'postcss-loader', // postcss loader needed for tailwindcss
+							loader: 'postcss-loader',
 							options: {
 								postcssOptions: {
 									ident: 'postcss',
@@ -53,7 +53,7 @@ function fillConfig(version) {
 								},
 							},
 						},
-						'sass-loader', // Compiles Sass to CSS,
+						'sass-loader',
 					],
 				},
 			],
@@ -75,7 +75,7 @@ function fillConfig(version) {
 			new HtmlPlugin({
 				title: 'Mafia Engine',
 				filename: 'popup.html',
-				chunks: ['popup'],
+				chunks: ['popup'], // Include React popup
 			}),
 			{
 				apply(compiler) {
