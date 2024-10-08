@@ -1,7 +1,6 @@
 import React, {
 	createRef,
 	forwardRef,
-	useEffect,
 	useImperativeHandle,
 	useState,
 } from 'react';
