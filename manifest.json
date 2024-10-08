@@ -25,6 +25,7 @@
 		"permissions": [
 			"activeTab",
 			"storage",
+			"unlimitedStorage",
 			"https://forum.mafiascum.net/*"
 		],
 		"browser_action": {
