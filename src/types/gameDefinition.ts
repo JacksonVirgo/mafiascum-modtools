@@ -1,5 +1,8 @@
 import { z } from 'zod';
 
+// Older Deprecated Types Below
+// Remove when no longer needed
+// The new types are in newGameDefinition.ts
 export const GameDefinitionSchema = z.object({
 	players: z.array(z.string()),
 	aliases: z.record(z.array(z.string())).optional(),
