@@ -32,20 +32,17 @@ export function vcFormReducer(state: GameDefinition, action: GameAction) {
 	switch (action.type) {
 		case 'ADD_DAY':
 			return { ...state, days: [...state.days, action.day] };
-		case 'UPDATE_DAY': {
-			const newDays = state.days.map((day) => {
-				if (day.dayNumber !== action.dayNumber) return day;
-				return {
-					...day,
-					...action.day,
-				};
-			});
-
+		case 'UPDATE_DAY':
 			return {
 				...state,
-				days: newDays,
+				days: state.days.map((day) => {
+					if (day.dayNumber !== action.dayNumber) return day;
+					return {
+						...day,
+						...action.day,
+					};
+				}),
 			};
-		}
 		case 'REMOVE_DAY':
 			return {
 				...state,
