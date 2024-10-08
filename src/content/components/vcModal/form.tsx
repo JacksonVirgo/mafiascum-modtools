@@ -1,4 +1,4 @@
-import React, { useReducer, useState } from 'react';
+import React, { useEffect, useReducer, useState } from 'react';
 import { z } from 'zod';
 import { isGameDefinition } from '../../../types/gameDefinition';
 import { convertYamlToJson } from '../../../utils/file';
@@ -18,7 +18,11 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 	const [startNumber, setStartNumber] = useState<number | undefined>();
 	const [endNumber, setEndNumber] = useState<number | undefined>();
 
-	const [_state, _dispatch] = useReducer(vcFormReducer, initialFormState);
+	const [state, _dispatch] = useReducer(vcFormReducer, initialFormState);
+
+	useEffect(() => {
+		// Save form state to api.storage
+	}, [state]);
 
 	const onSubmit = async () => {
 		if (!yamlStr) return;
