@@ -1,7 +1,7 @@
 import React from 'react';
 import $ from 'jquery';
 import { renderReact } from '../../utils/react';
-import { modalManager } from './modal';
+import { modalManager } from './vcModal/modal';
 
 export default async () => {
 	$('.post').each((_, postElement) => {

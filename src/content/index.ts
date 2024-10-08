@@ -1,5 +1,5 @@
 import $ from 'jquery';
-import { createModal } from './components/modal';
+import { createModal } from './components/vcModal/modal';
 
 import loadVcButtons from './components/vcButton';
 import loadMultiIso from './components/multiISO';

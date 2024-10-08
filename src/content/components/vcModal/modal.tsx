@@ -7,15 +7,15 @@ import React, {
 } from 'react';
 
 import $ from 'jquery';
-import { convertYamlToJson } from '../../utils/file';
-import { isGameDefinition } from '../../types/gameDefinition';
-import { formatVoteCountData, startVoteCount } from '../votecount';
+import { convertYamlToJson } from '../../../utils/file';
+import { isGameDefinition } from '../../../types/gameDefinition';
+import { formatVoteCountData, startVoteCount } from '../../votecount';
 import { z } from 'zod';
-import { FileInput } from './form/FileInput';
-import NumberInput from './form/NumberInput';
-import LoadingSpinner from './indicators/LoadingSpinner';
-import { renderReact } from '../../utils/react';
-import Button from './buttons/button';
+import { FileInput } from '../form/FileInput';
+import NumberInput from '../form/NumberInput';
+import LoadingSpinner from '../indicators/LoadingSpinner';
+import { renderReact } from '../../../utils/react';
+import Button from '../buttons/button';
 
 export const CSS_HIDDEN = 'me_hidden';
 
