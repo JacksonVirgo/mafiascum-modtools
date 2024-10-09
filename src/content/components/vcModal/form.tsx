@@ -16,6 +16,11 @@ import {
 import $ from 'jquery';
 import LoadingSpinner from '../indicators/LoadingSpinner';
 
+interface ReducerProps {
+	state: typeof initialFormState;
+	dispatch: React.Dispatch<GameAction>;
+}
+
 interface ModalFormProps {
 	onResponse: (res: string) => void;
 }
@@ -141,18 +146,33 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 				</div>
 			)}
 			{loadState == ModalLoadingState.EMPTY && (
-				<div className="grow flex flex-col justify-center items-center">
-					<span className="text-red-500">No Game Definition</span>
-				</div>
+				<NewGameDef
+					state={state}
+					dispatch={dispatch}
+					setLoadState={setLoadState}
+				/>
 			)}
 		</form>
 	);
 };
 
-interface FormInnerProps {
-	state: typeof initialFormState;
-	dispatch: React.Dispatch<GameAction>;
+interface NewGameDefProps extends ReducerProps {
+	setLoadState: React.Dispatch<React.SetStateAction<ModalLoadingState>>;
 }
+
+export const NewGameDef = ({
+	state,
+	dispatch,
+	setLoadState,
+}: NewGameDefProps) => {
+	return (
+		<div className="grow flex flex-col justify-center items-center">
+			<span className="text-red-500">No Game Definition</span>
+		</div>
+	);
+};
+
+interface FormInnerProps extends ReducerProps {}
 
 export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 	return (
