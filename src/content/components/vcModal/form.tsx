@@ -41,9 +41,13 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
 
 	const saveGameDef = async () => {
-		let threadRelativeUrl = $('h2').first().find('a').first().attr('href');
+		const threadRelativeUrl = $('h2')
+			.first()
+			.find('a')
+			.first()
+			.attr('href');
 		if (!threadRelativeUrl) return;
-		let regex = /t=([0-9]+)/;
+		const regex = /t=([0-9]+)/;
 
 		const tVal = threadRelativeUrl.match(regex);
 		if (!tVal) return;
@@ -62,10 +66,14 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 	};
 
 	const loadGameDef = async () => {
-		let threadRelativeUrl = $('h2').first().find('a').first().attr('href');
+		const threadRelativeUrl = $('h2')
+			.first()
+			.find('a')
+			.first()
+			.attr('href');
 		if (!threadRelativeUrl) return setLoadState(ModalLoadingState.ERROR);
 
-		let regex = /t=([0-9]+)/;
+		const regex = /t=([0-9]+)/;
 
 		const tVal = threadRelativeUrl.match(regex);
 		if (!tVal) return setLoadState(ModalLoadingState.ERROR);
