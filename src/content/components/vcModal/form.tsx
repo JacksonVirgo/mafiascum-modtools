@@ -15,8 +15,11 @@ import {
 } from '../../../types/backgroundResponse';
 import $ from 'jquery';
 import LoadingSpinner from '../indicators/LoadingSpinner';
+import { DaysTab } from './form/days';
+import { PlayersTab } from './form/players';
+import { VotesTab } from './form/votes';
 
-interface ReducerProps {
+export interface ReducerProps {
 	state: typeof initialFormState;
 	dispatch: React.Dispatch<GameAction>;
 }
@@ -275,33 +278,17 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 			</nav>
 
 			<div className="flex flex-col gap-0 grow justify-center p-4">
-				<section
-					data-section="general"
-					className="focused grow w-full gap-2 flex flex-col"
-				>
-					<FileInput
-						name="me_game_def"
-						label="Import Definition File:"
-						accept=".yaml,.yml"
-						onChange={(val) => {
-							console.log('Changed', val);
-						}}
-					/>
+				{activeSection == FormSection.DAYS && (
+					<DaysTab state={state} dispatch={dispatch} />
+				)}
 
-					<NumberInput
-						name="me_start"
-						label="Start from Post #"
-						placeholder="Default = 0"
-						onChange={() => {}}
-					/>
+				{activeSection == FormSection.PLAYERS && (
+					<PlayersTab state={state} dispatch={dispatch} />
+				)}
 
-					<NumberInput
-						name="me_end"
-						label="End at Post #"
-						placeholder="Default = none"
-						onChange={() => {}}
-					/>
-				</section>
+				{activeSection == FormSection.VOTES && (
+					<VotesTab state={state} dispatch={dispatch} />
+				)}
 
 				<div className="shrink flex flex-row items-center justify-center">
 					<Button label="Generate Votecount" onClick={() => {}} />
