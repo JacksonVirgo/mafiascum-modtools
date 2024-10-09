@@ -1,12 +1,5 @@
 import React, { useEffect, useReducer, useState } from 'react';
-import { z } from 'zod';
-import { isGameDefinition } from '../../../types/gameDefinition';
-import { convertYamlToJson } from '../../../utils/file';
-import { startVoteCount, formatVoteCountData } from '../../votecount';
 import Button from '../buttons/button';
-import { FileInput } from '../form/FileInput';
-import NumberInput from '../form/NumberInput';
-import { modalManager } from './modal';
 import { GameAction, initialFormState, vcFormReducer } from './formReducer';
 import { sendBackgroundRequest } from '../../request';
 import {
@@ -35,38 +28,9 @@ enum ModalLoadingState {
 	ERROR,
 }
 
-export const ModalForm = ({ onResponse }: ModalFormProps) => {
-	const [yamlStr, setYamlStr] = useState<string | undefined>();
-	const [startNumber, setStartNumber] = useState<number | undefined>();
-	const [endNumber, setEndNumber] = useState<number | undefined>();
-
+export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
 	const [loadState, setLoadState] = useState(ModalLoadingState.LOADING);
 	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
-
-	const saveGameDef = async () => {
-		const threadRelativeUrl = $('h2')
-			.first()
-			.find('a')
-			.first()
-			.attr('href');
-		if (!threadRelativeUrl) return;
-		const regex = /t=([0-9]+)/;
-
-		const tVal = threadRelativeUrl.match(regex);
-		if (!tVal) return;
-
-		const threadId = tVal[1];
-		if (!threadId) return;
-
-		const res = await sendBackgroundRequest({
-			action: 'saveGameDef',
-			gameId: threadId,
-			gameDef: state,
-		});
-
-		if (!isSaveGameDefResponse(res)) return;
-		if (!res.savedGameDef) return;
-	};
 
 	const loadGameDef = async () => {
 		const threadRelativeUrl = $('h2')
@@ -105,36 +69,6 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 		loadGameDef();
 	}, []);
 
-	const onSubmit = async () => {
-		if (!yamlStr) return;
-
-		try {
-			const json = convertYamlToJson(yamlStr);
-			if (!isGameDefinition(json))
-				return console.error('Invalid game definition.');
-
-			json.startAt = startNumber
-				? startNumber
-				: json.startAt ?? json.startFrom ?? 0;
-			json.endAt = endNumber ? endNumber : json.endAt ?? undefined;
-
-			modalManager.setLoading();
-
-			const vc = await startVoteCount(json);
-			console.log('Calculated Votes', vc);
-			if (!vc) return console.error('Failed to calculate votes');
-			const format = formatVoteCountData(vc);
-
-			modalManager.setResponse(format);
-
-			if (format) onResponse(format);
-			else console.error('Set response to show it failed');
-		} catch (err) {
-			if (err instanceof z.ZodError)
-				console.error('Validation errors: ', err);
-			else console.error('An unexpected error occurred: ', err);
-		}
-	};
 	return (
 		<form
 			className="border-2 border-white grow w-full flex flex-row"
@@ -172,7 +106,7 @@ interface NewGameDefProps extends ReducerProps {
 }
 
 export const NewGameDef = ({
-	state,
+	state: _state,
 	dispatch,
 	setLoadState,
 }: NewGameDefProps) => {
@@ -255,6 +189,10 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 		setActiveSection(section);
 	};
 
+	const onSubmit = async () => {
+		console.log('Submitting', state);
+	};
+
 	return (
 		<>
 			<nav className="bg-primary-lighter p-4 rounded-sm">
@@ -291,7 +229,7 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 				)}
 
 				<div className="shrink flex flex-row items-center justify-center">
-					<Button label="Generate Votecount" onClick={() => {}} />
+					<Button label="Generate Votecount" onClick={onSubmit} />
 				</div>
 			</div>
 		</>
