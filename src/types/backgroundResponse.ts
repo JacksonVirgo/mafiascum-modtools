@@ -1,4 +1,5 @@
 import { z } from 'zod';
+import { GameDefinitionSchema } from './newGameDefinition';
 
 export const ErrorResponse = z.object({
 	status: z.union([z.literal(400), z.literal(500)]),
@@ -59,9 +60,57 @@ export function isMemberVerificationResponse(
 }
 //#endregion
 
+//#region GET SAVED GAME DEF
+
+export const GetSavedGameDef = z.object({
+	action: z.literal('getSavedGameDef'),
+	status: z.literal(200),
+	savedGameDef: GameDefinitionSchema,
+});
+
+export function isGetSavedGameDefResponse(
+	obj: unknown,
+): obj is z.infer<typeof GetSavedGameDef> {
+	try {
+		const parse = GetSavedGameDef.parse(obj);
+		if (parse) return true;
+		return false;
+	} catch (err) {
+		console.log(err);
+		return false;
+	}
+}
+
+//#endregion
+
+//#region SAVE GAME DEF
+
+export const SaveGameDef = z.object({
+	action: z.literal('saveGameDef'),
+	status: z.literal(200),
+	savedGameDef: GameDefinitionSchema,
+});
+
+export function isSaveGameDefResponse(
+	obj: unknown,
+): obj is z.infer<typeof SaveGameDef> {
+	try {
+		const parse = SaveGameDef.parse(obj);
+		if (parse) return true;
+		return false;
+	} catch (err) {
+		console.log(err);
+		return false;
+	}
+}
+
+//#endregion
+
 export const AnyResponseSchema = z.union([
 	ErrorResponse,
 	PageDataSchema,
 	MemberVerification,
+	GetSavedGameDef,
+	SaveGameDef,
 ]);
 export type AnyResponse = z.infer<typeof AnyResponseSchema>;

@@ -7,6 +7,8 @@ import {
 	PageRequestValidator,
 } from '../types/backgroundRequests';
 import { ZodError } from 'zod';
+import { loadGameDef, saveGameDef } from './requests/gameDefinition';
+import { GameDefinitionSchema } from '../types/newGameDefinition';
 
 function sendResponse(response: AnyResponse) {
 	return Promise.resolve(response);
@@ -67,6 +69,47 @@ browser.runtime.onMessage.addListener(async (request) => {
 			});
 
 			return highlight;
+		} else if (action == 'getSavedGameDef') {
+			const { gameId } = request;
+			const gameDefRaw = await loadGameDef(gameId);
+			if (!gameDefRaw)
+				return sendResponse({
+					status: 400,
+					message: 'Game definition not found',
+				});
+
+			try {
+				const parsed = GameDefinitionSchema.parse(gameDefRaw);
+				if (!parsed)
+					return sendResponse({
+						status: 400,
+						message: 'Invalid game definition',
+					});
+				return sendResponse({
+					action: 'getSavedGameDef',
+					status: 200,
+					savedGameDef: parsed,
+				});
+			} catch (err) {
+				return sendResponse({
+					status: 400,
+					message: 'Invalid game definition',
+				});
+			}
+		} else if (action == 'saveGameDef') {
+			const { gameId, gameDef } = request;
+			const saved = await saveGameDef(gameId, gameDef);
+			if (!saved) {
+				return sendResponse({
+					status: 500,
+					message: 'Could not save game definition',
+				});
+			}
+			return sendResponse({
+				action: 'saveGameDef',
+				status: 200,
+				savedGameDef: gameDef,
+			});
 		} else {
 			return sendResponse({
 				status: 400,

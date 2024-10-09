@@ -6,6 +6,11 @@ export const initialFormState: GameDefinition = {
 	votes: [],
 };
 
+type SetFullGameDef = {
+	type: 'SET_FULL_GAME_DEF';
+	gameDef: GameDefinition;
+};
+
 type AddDay = {
 	type: 'ADD_DAY';
 	day: { dayNumber: number; startPost: number; endPost?: number };
@@ -26,10 +31,12 @@ type RemoveDay = {
 	dayNumber: number;
 };
 
-type GameAction = AddDay | UpdateDay | RemoveDay;
+export type GameAction = SetFullGameDef | AddDay | UpdateDay | RemoveDay;
 
 export function vcFormReducer(state: GameDefinition, action: GameAction) {
 	switch (action.type) {
+		case 'SET_FULL_GAME_DEF':
+			return action.gameDef;
 		case 'ADD_DAY':
 			return { ...state, days: [...state.days, action.day] };
 		case 'UPDATE_DAY':

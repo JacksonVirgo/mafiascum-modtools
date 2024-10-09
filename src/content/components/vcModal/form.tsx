@@ -7,10 +7,24 @@ import Button from '../buttons/button';
 import { FileInput } from '../form/FileInput';
 import NumberInput from '../form/NumberInput';
 import { modalManager } from './modal';
-import { initialFormState, vcFormReducer } from './formReducer';
+import { GameAction, initialFormState, vcFormReducer } from './formReducer';
+import { sendBackgroundRequest } from '../../request';
+import {
+	isGetSavedGameDefResponse,
+	isSaveGameDefResponse,
+} from '../../../types/backgroundResponse';
+import $ from 'jquery';
+import LoadingSpinner from '../indicators/LoadingSpinner';
 
 interface ModalFormProps {
 	onResponse: (res: string) => void;
+}
+
+enum ModalLoadingState {
+	LOADING,
+	LOADED,
+	EMPTY, // for when there is no game definition
+	ERROR,
 }
 
 export const ModalForm = ({ onResponse }: ModalFormProps) => {
@@ -18,11 +32,62 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 	const [startNumber, setStartNumber] = useState<number | undefined>();
 	const [endNumber, setEndNumber] = useState<number | undefined>();
 
-	const [state, _dispatch] = useReducer(vcFormReducer, initialFormState);
+	const [loadState, setLoadState] = useState(ModalLoadingState.LOADING);
+	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
+
+	const saveGameDef = async () => {
+		let threadRelativeUrl = $('h2').first().find('a').first().attr('href');
+		if (!threadRelativeUrl) return;
+		let regex = /t=([0-9]+)/;
+
+		const tVal = threadRelativeUrl.match(regex);
+		if (!tVal) return;
+
+		const threadId = tVal[1];
+		if (!threadId) return;
+
+		const res = await sendBackgroundRequest({
+			action: 'saveGameDef',
+			gameId: threadId,
+			gameDef: state,
+		});
+
+		if (!isSaveGameDefResponse(res)) return;
+		if (!res.savedGameDef) return;
+	};
+
+	const loadGameDef = async () => {
+		let threadRelativeUrl = $('h2').first().find('a').first().attr('href');
+		if (!threadRelativeUrl) return setLoadState(ModalLoadingState.ERROR);
+
+		let regex = /t=([0-9]+)/;
+
+		const tVal = threadRelativeUrl.match(regex);
+		if (!tVal) return setLoadState(ModalLoadingState.ERROR);
+
+		const threadId = tVal[1];
+		if (!threadId) return setLoadState(ModalLoadingState.ERROR);
+
+		const res = await sendBackgroundRequest({
+			action: 'getSavedGameDef',
+			gameId: threadId,
+		});
+
+		if (!isGetSavedGameDefResponse(res) || !res.savedGameDef)
+			return setLoadState(ModalLoadingState.EMPTY);
+
+		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res.savedGameDef });
+		setLoadState(ModalLoadingState.LOADED);
+	};
 
 	useEffect(() => {
-		// Save form state to api.storage
+		saveGameDef();
 	}, [state]);
+
+	useEffect(() => {
+		loadGameDef();
+		console.log('Form Loaded');
+	}, []);
 
 	const onSubmit = async () => {
 		if (!yamlStr) return;
@@ -59,6 +124,39 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 			className="border-2 border-white grow w-full flex flex-row"
 			onSubmit={(e) => e.preventDefault()}
 		>
+			{loadState == ModalLoadingState.LOADING && (
+				<div className="grow flex flex-col justify-center items-center">
+					<LoadingSpinner />
+				</div>
+			)}
+			{loadState == ModalLoadingState.LOADED && (
+				<FormInner state={state} dispatch={dispatch} />
+			)}
+
+			{loadState == ModalLoadingState.ERROR && (
+				<div className="grow flex flex-col justify-center items-center">
+					<span className="text-red-500">
+						Error Loading Game Definition
+					</span>
+				</div>
+			)}
+			{loadState == ModalLoadingState.EMPTY && (
+				<div className="grow flex flex-col justify-center items-center">
+					<span className="text-red-500">No Game Definition</span>
+				</div>
+			)}
+		</form>
+	);
+};
+
+interface FormInnerProps {
+	state: typeof initialFormState;
+	dispatch: React.Dispatch<GameAction>;
+}
+
+export const FormInner = ({ state, dispatch }: FormInnerProps) => {
+	return (
+		<>
 			<nav className="bg-primary-lighter p-4 rounded-sm">
 				<ul className="list-none">
 					<li className="focused" data-section="general">
@@ -78,7 +176,6 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 						accept=".yaml,.yml"
 						onChange={(val) => {
 							console.log('Changed', val);
-							setYamlStr(val);
 						}}
 					/>
 
@@ -86,21 +183,21 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 						name="me_start"
 						label="Start from Post #"
 						placeholder="Default = 0"
-						onChange={setStartNumber}
+						onChange={() => {}}
 					/>
 
 					<NumberInput
 						name="me_end"
 						label="End at Post #"
 						placeholder="Default = none"
-						onChange={setEndNumber}
+						onChange={() => {}}
 					/>
 				</section>
 
 				<div className="shrink flex flex-row items-center justify-center">
-					<Button label="Generate Votecount" onClick={onSubmit} />
+					<Button label="Generate Votecount" onClick={() => {}} />
 				</div>
 			</div>
-		</form>
+		</>
 	);
 };
