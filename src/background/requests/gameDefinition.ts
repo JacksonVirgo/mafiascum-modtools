@@ -1,4 +1,7 @@
-import { GameDefinition } from '../../types/newGameDefinition';
+import {
+	GameDefinition,
+	isGameDefinition,
+} from '../../types/newGameDefinition';
 import browser from 'webextension-polyfill';
 
 const TAG_PREFIX = 'gameDef-';
@@ -13,11 +16,14 @@ export function parseTag(tag: string) {
 }
 
 export async function saveGameDef(gameId: string, gameDef: GameDefinition) {
-	const tag = `gameDef-${gameId}`;
 	try {
 		await browser.storage.local.set({
-			[tag]: gameDef,
+			[generateTag(gameId)]: gameDef,
 		});
+
+		const val = await browser.storage.local.get(generateTag(gameId));
+		console.log(val);
+
 		return true;
 	} catch (err) {
 		return false;
@@ -25,9 +31,13 @@ export async function saveGameDef(gameId: string, gameDef: GameDefinition) {
 }
 
 export async function loadGameDef(gameId: string) {
+	const tag = generateTag(gameId);
 	try {
-		const gameDef = await browser.storage.local.get(gameId);
-		return gameDef[gameId];
+		const gameDef = await browser.storage.local.get(tag);
+		const response = gameDef[tag];
+		if (!response) return null;
+		if (!isGameDefinition(response)) return null;
+		return response;
 	} catch (err) {
 		return null;
 	}

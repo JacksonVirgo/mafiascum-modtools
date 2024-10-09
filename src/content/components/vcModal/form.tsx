@@ -86,7 +86,8 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 			gameId: threadId,
 		});
 
-		if (!isGetSavedGameDefResponse(res) || !res.savedGameDef)
+		console.log('Loaded Game Def', threadId, res);
+		if (!isGetSavedGameDefResponse(res))
 			return setLoadState(ModalLoadingState.EMPTY);
 
 		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res.savedGameDef });
@@ -94,12 +95,11 @@ export const ModalForm = ({ onResponse }: ModalFormProps) => {
 	};
 
 	useEffect(() => {
-		saveGameDef();
+		console.log('State Changed', state);
 	}, [state]);
 
 	useEffect(() => {
 		loadGameDef();
-		console.log('Form Loaded');
 	}, []);
 
 	const onSubmit = async () => {
@@ -173,9 +173,45 @@ export const NewGameDef = ({
 	dispatch,
 	setLoadState,
 }: NewGameDefProps) => {
+	const createNewGameDef = async () => {
+		setLoadState(ModalLoadingState.LOADING);
+		const threadRelativeUrl = $('h2')
+			.first()
+			.find('a')
+			.first()
+			.attr('href');
+		if (!threadRelativeUrl) return setLoadState(ModalLoadingState.ERROR);
+
+		const regex = /t=([0-9]+)/;
+
+		const tVal = threadRelativeUrl.match(regex);
+		if (!tVal) return setLoadState(ModalLoadingState.ERROR);
+
+		const threadId = tVal[1];
+		if (!threadId) return setLoadState(ModalLoadingState.ERROR);
+
+		const res = await sendBackgroundRequest({
+			action: 'saveGameDef',
+			gameId: threadId,
+			gameDef: {
+				days: [],
+				players: [],
+				votes: [],
+			},
+		});
+
+		if (!isSaveGameDefResponse(res) || !res.savedGameDef)
+			return setLoadState(ModalLoadingState.ERROR);
+
+		console.log('SAVED', res.savedGameDef);
+
+		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res.savedGameDef });
+		setLoadState(ModalLoadingState.LOADED);
+	};
 	return (
-		<div className="grow flex flex-col justify-center items-center">
-			<span className="text-red-500">No Game Definition</span>
+		<div className="grow flex flex-col justify-center items-center gap-2">
+			<div className="text-red-500">No Game Definition Found</div>
+			<Button label="Create One" onClick={createNewGameDef} />
 		</div>
 	);
 };
