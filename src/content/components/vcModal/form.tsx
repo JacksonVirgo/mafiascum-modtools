@@ -218,14 +218,59 @@ export const NewGameDef = ({
 
 interface FormInnerProps extends ReducerProps {}
 
+enum FormSection {
+	DAYS = 'Days',
+	PLAYERS = 'Players',
+	VOTES = 'Votes',
+}
+
+interface SectionProps {
+	focused?: boolean;
+	onClick?: (section: FormSection) => void;
+	section: FormSection;
+}
+
 export const FormInner = ({ state, dispatch }: FormInnerProps) => {
+	const [activeSection, setActiveSection] = useState(FormSection.DAYS);
+
+	const Section = ({ section, focused, onClick }: SectionProps) => {
+		return (
+			<li
+				className={`${
+					focused ? 'bg-secondary-color text-primary-color' : ''
+				} w-full rounded-md p-2 hover:cursor-pointer`}
+				onClick={() => {
+					if (onClick) onClick(section);
+				}}
+			>
+				{section}
+			</li>
+		);
+	};
+
+	const sectionChange = (section: FormSection) => {
+		setActiveSection(section);
+	};
+
 	return (
 		<>
 			<nav className="bg-primary-lighter p-4 rounded-sm">
-				<ul className="list-none">
-					<li className="focused" data-section="general">
-						General
-					</li>
+				<ul className="list-none flex flex-col justify-center items-center gap-2">
+					<Section
+						section={FormSection.DAYS}
+						focused={activeSection == FormSection.DAYS}
+						onClick={sectionChange}
+					/>
+					<Section
+						section={FormSection.PLAYERS}
+						focused={activeSection == FormSection.PLAYERS}
+						onClick={sectionChange}
+					/>
+					<Section
+						section={FormSection.VOTES}
+						focused={activeSection == FormSection.VOTES}
+						onClick={sectionChange}
+					/>
 				</ul>
 			</nav>
 
