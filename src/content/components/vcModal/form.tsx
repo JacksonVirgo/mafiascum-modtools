@@ -24,7 +24,7 @@ interface ModalFormProps {
 enum ModalLoadingState {
 	LOADING,
 	LOADED,
-	EMPTY, // for when there is no game definition
+	NO_GAME_DEF, // for when there is no game definition
 	ERROR,
 }
 
@@ -55,7 +55,7 @@ export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
 
 		console.log('Loaded Game Def', threadId, res);
 		if (!isGetSavedGameDefResponse(res))
-			return setLoadState(ModalLoadingState.EMPTY);
+			return setLoadState(ModalLoadingState.NO_GAME_DEF);
 
 		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res.savedGameDef });
 		setLoadState(ModalLoadingState.LOADED);
@@ -90,7 +90,7 @@ export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
 					</span>
 				</div>
 			)}
-			{loadState == ModalLoadingState.EMPTY && (
+			{loadState == ModalLoadingState.NO_GAME_DEF && (
 				<NewGameDef
 					state={state}
 					dispatch={dispatch}
