@@ -1,17 +1,111 @@
-import React from 'react';
+import React, { useState } from 'react';
 import { ReducerProps } from '../form';
 import Button from '../../buttons/button';
 import { Day } from '../../../../types/newGameDefinition';
+import NumberInput from '../../form/NumberInput';
 
 export function DaysTab({ state, dispatch }: ReducerProps) {
+	const [currentEdit, setCurrentEdit] = useState<Day | null>(null);
+	const setEdit = (day: Day) => {
+		setCurrentEdit(day);
+	};
+
 	return (
 		<section className="grow w-full gap-2 flex flex-col">
-			<DayTableView state={state} dispatch={dispatch} />
+			{!currentEdit && (
+				<DayTableView
+					state={state}
+					dispatch={dispatch}
+					setEdit={setEdit}
+				/>
+			)}
+
+			{currentEdit && (
+				<EditDay
+					state={state}
+					dispatch={dispatch}
+					day={currentEdit}
+					setCurrentEdit={setCurrentEdit}
+				/>
+			)}
 		</section>
 	);
 }
 
-function DayTableView({ state, dispatch }: ReducerProps) {
+interface EditDayProps extends ReducerProps {
+	day: Day;
+	setCurrentEdit: (day: Day | null) => void;
+}
+
+function EditDay({ state, dispatch, day, setCurrentEdit }: EditDayProps) {
+	const [dayNumber, setDayNumber] = useState(day.dayNumber);
+	const [startPost, setStartPost] = useState(day.startPost);
+	const [endPost, setEndPost] = useState(day.endPost);
+
+	return (
+		<div className="flex flex-col gap-2">
+			<NumberInput
+				name="dayNumber"
+				label="Day Number"
+				defaultValue={day.dayNumber}
+				onChange={(value) => setDayNumber(value)}
+			/>
+			<NumberInput
+				name="startPost"
+				label="Start Post Number"
+				defaultValue={day.startPost}
+				onChange={(value) => setStartPost(value)}
+			/>
+			<NumberInput
+				name="endPost"
+				label="End Post Number"
+				defaultValue={day.endPost}
+				onChange={(value) => setEndPost(value)}
+			/>
+
+			<br />
+
+			<div className="flex flex-row justify-center gap-2">
+				<Button
+					label="Save"
+					onClick={() => {
+						dispatch({
+							type: 'UPDATE_DAY',
+							dayNumber: day.dayNumber,
+							day: {
+								dayNumber,
+								startPost,
+								endPost,
+							},
+						});
+
+						setCurrentEdit(null);
+					}}
+				/>
+				<Button
+					label="Discard Changes"
+					onClick={() => setCurrentEdit(null)}
+				/>
+				<Button
+					label="Delete"
+					onClick={() => {
+						dispatch({
+							type: 'REMOVE_DAY',
+							dayNumber: day.dayNumber,
+						});
+
+						setCurrentEdit(null);
+					}}
+				/>
+			</div>
+		</div>
+	);
+}
+
+interface DayTableViewProps extends ReducerProps {
+	setEdit: (day: Day) => void;
+}
+function DayTableView({ state, dispatch, setEdit }: DayTableViewProps) {
 	const columns = ['Day', 'Start Post #', 'End Post #'];
 	return (
 		<>
@@ -26,8 +120,8 @@ function DayTableView({ state, dispatch }: ReducerProps) {
 									(max, day) => Math.max(max, day.dayNumber),
 									0,
 								) + 1,
-							startPost: -1,
-							endPost: -1,
+							startPost: undefined,
+							endPost: undefined,
 						},
 					});
 				}}
@@ -36,7 +130,7 @@ function DayTableView({ state, dispatch }: ReducerProps) {
 				data={state.days.map((day) => day)}
 				columns={columns}
 				editRow={(day) => {
-					console.log('Editing', day);
+					setEdit(day);
 				}}
 			/>
 		</>

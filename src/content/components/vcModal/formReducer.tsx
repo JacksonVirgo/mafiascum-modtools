@@ -13,7 +13,7 @@ type SetFullGameDef = {
 
 type AddDay = {
 	type: 'ADD_DAY';
-	day: { dayNumber: number; startPost: number; endPost?: number };
+	day: { dayNumber: number; startPost?: number; endPost?: number };
 };
 
 type UpdateDay = {
@@ -21,7 +21,7 @@ type UpdateDay = {
 	dayNumber: number;
 	day: Partial<{
 		dayNumber: number;
-		startPost: number;
+		startPost?: number;
 		endPost?: number;
 	}>;
 };

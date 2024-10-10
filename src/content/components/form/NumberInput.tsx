@@ -4,12 +4,14 @@ interface NumberInputProps {
 	name: string;
 	label: string;
 	placeholder?: string;
+	defaultValue?: number;
 	onChange?: (value: number) => void;
 }
 export default function NumberInput({
 	name,
 	label,
 	placeholder,
+	defaultValue,
 	onChange,
 }: NumberInputProps) {
 	return (
@@ -22,6 +24,7 @@ export default function NumberInput({
 				id={name}
 				name={name}
 				placeholder={placeholder}
+				defaultValue={defaultValue}
 				onChange={(e) => {
 					if (!onChange) return;
 					const value = Number(e.target.value);
