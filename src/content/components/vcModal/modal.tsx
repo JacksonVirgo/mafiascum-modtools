@@ -1,6 +1,7 @@
 import React, {
 	createRef,
 	forwardRef,
+	useEffect,
 	useImperativeHandle,
 	useState,
 } from 'react';
@@ -73,6 +74,10 @@ export const Modal = forwardRef((_props, ref) => {
 		setLoading: () => setCurrentState(ModalState.Loading),
 		setResponse: (_: string) => setCurrentState(ModalState.Response),
 	}));
+
+	useEffect(() => {
+		document.body.style.overflow = isVisible ? 'hidden' : 'auto';
+	}, [isVisible]);
 
 	const onResponse = (res: string) => {
 		setResponse(res);
