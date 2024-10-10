@@ -167,7 +167,6 @@ interface EditPlayerProps extends ReducerProps {
 }
 
 export function EditPlayer({
-	state,
 	dispatch,
 	player,
 	setCurrentEdit,
