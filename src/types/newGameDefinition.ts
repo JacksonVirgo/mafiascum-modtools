@@ -111,3 +111,27 @@ export function isGameDefinition(obj: unknown): obj is GameDefinition {
 		return false;
 	}
 }
+
+// Semantic Types
+type Username = string;
+type PostNumber = number;
+
+export enum VoteType {
+	VOTE,
+	UNVOTE,
+}
+
+export enum VoteCorrection {
+	ACCEPT,
+	WARN,
+	REJECT,
+}
+
+export type ValidatedVote = {
+	type: VoteType;
+	author: Username;
+	post: PostNumber;
+	target?: Username;
+	rawTarget?: string;
+	validity: VoteCorrection;
+};

@@ -13,6 +13,7 @@ import { PlayersTab } from './form/players';
 import { VotesTab } from './form/votes';
 import { ExportTab } from './form/export';
 import { ImportTab } from './form/import';
+import { formatVoteCountData, modalManager, startVoteCount } from './modal';
 
 export interface ReducerProps {
 	state: typeof initialFormState;
@@ -226,7 +227,13 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 	};
 
 	const onSubmit = async () => {
-		console.log('Submitting', state);
+		modalManager.setLoading();
+		const vcData = await startVoteCount(state);
+		if (!vcData) return;
+		const format = formatVoteCountData(vcData);
+
+		console.log(format);
+		modalManager.setResponse(format);
 	};
 
 	return (
