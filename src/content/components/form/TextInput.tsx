@@ -33,6 +33,7 @@ export default function TextInput({
 				name={name}
 				placeholder={placeholder}
 				defaultValue={defaultValue}
+				autoComplete="off"
 				className="p-2 !bg-primary-lighter text-white rounded-sm border border-primary-lightest hover:!border-primary-lightest focus:!border-secondary-color focus:outline-none"
 				onChange={(e) => {
 					if (!onChange) return;
