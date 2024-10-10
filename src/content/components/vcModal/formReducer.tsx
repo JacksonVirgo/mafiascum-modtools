@@ -1,4 +1,4 @@
-import { GameDefinition, Player } from '../../../types/newGameDefinition';
+import { GameDefinition, Player, Vote } from '../../../types/newGameDefinition';
 
 export const initialFormState: GameDefinition = {
 	days: [],
@@ -47,6 +47,22 @@ type RemovePlayer = {
 	username: string;
 };
 
+type AddVote = {
+	type: 'ADD_VOTE';
+	postNumber: number;
+};
+
+type UpdateVote = {
+	type: 'UPDATE_VOTE';
+	postNumber: number;
+	vote: Vote;
+};
+
+type RemoveVote = {
+	type: 'REMOVE_VOTE';
+	postNumber: number;
+};
+
 export type GameAction =
 	| SetFullGameDef
 	| AddDay
@@ -54,7 +70,10 @@ export type GameAction =
 	| RemoveDay
 	| AddPlayer
 	| UpdatePlayer
-	| RemovePlayer;
+	| RemovePlayer
+	| AddVote
+	| UpdateVote
+	| RemoveVote;
 
 export function vcFormReducer(
 	state: GameDefinition,
@@ -104,6 +123,27 @@ export function vcFormReducer(
 				...state,
 				players: state.players.filter(
 					(player) => player.current !== action.username,
+				),
+			};
+		case 'ADD_VOTE':
+			return {
+				...state,
+				votes: [...state.votes, { postNumber: action.postNumber }],
+			};
+		case 'UPDATE_VOTE':
+			return {
+				...state,
+				votes: state.votes.map((vote) => {
+					if (vote.postNumber !== action.postNumber) return vote;
+					return action.vote;
+				}),
+			};
+
+		case 'REMOVE_VOTE':
+			return {
+				...state,
+				votes: state.votes.filter(
+					(vote) => vote.postNumber !== action.postNumber,
 				),
 			};
 		default:
