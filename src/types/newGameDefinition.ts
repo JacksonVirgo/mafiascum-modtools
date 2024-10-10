@@ -96,6 +96,9 @@ export const GameDefinitionSchema = z.object({
 });
 
 export type GameDefinition = z.infer<typeof GameDefinitionSchema>;
+export type Day = z.infer<typeof DaySchema>;
+export type Player = z.infer<typeof PlayerSchema>;
+export type Vote = z.infer<typeof VoteSchema>;
 
 export function isGameDefinition(obj: unknown): obj is GameDefinition {
 	try {
