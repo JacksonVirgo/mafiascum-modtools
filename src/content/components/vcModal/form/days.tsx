@@ -107,25 +107,37 @@ interface DayTableViewProps extends ReducerProps {
 }
 function DayTableView({ state, dispatch, setEdit }: DayTableViewProps) {
 	const columns = ['Day', 'Start Post #', 'End Post #'];
+	const [newDay, setNewDay] = useState<number>(
+		state.days.reduce((max, day) => Math.max(max, day.dayNumber), 0) + 1,
+	);
+
 	return (
 		<>
-			<Button
-				label="Add Day"
-				onClick={() => {
-					dispatch({
-						type: 'ADD_DAY',
-						day: {
-							dayNumber:
-								state.days.reduce(
-									(max, day) => Math.max(max, day.dayNumber),
-									0,
-								) + 1,
-							startPost: undefined,
-							endPost: undefined,
-						},
-					});
-				}}
-			/>
+			<div className="flex flex-row gap-2">
+				<NumberInput
+					label="Day #"
+					name="dayNumber"
+					withoutLabel={true}
+					placeholder="New Day #"
+					className="grow"
+					defaultValue={newDay}
+					onChange={(value) => setNewDay(value)}
+				/>
+				<Button
+					label="Add Day"
+					onClick={() => {
+						dispatch({
+							type: 'ADD_DAY',
+							day: {
+								dayNumber: newDay,
+								startPost: undefined,
+								endPost: undefined,
+							},
+						});
+					}}
+				/>
+			</div>
+
 			<DayTable
 				data={state.days.map((day) => day)}
 				columns={columns}

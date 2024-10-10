@@ -6,6 +6,9 @@ interface NumberInputProps {
 	placeholder?: string;
 	defaultValue?: number;
 	onChange?: (value: number) => void;
+
+	className?: string;
+	withoutLabel?: boolean;
 }
 export default function NumberInput({
 	name,
@@ -13,12 +16,17 @@ export default function NumberInput({
 	placeholder,
 	defaultValue,
 	onChange,
+
+	className,
+	withoutLabel = false,
 }: NumberInputProps) {
 	return (
-		<div className="flex flex-col">
-			<label htmlFor={name} className="text-base">
-				{label}
-			</label>
+		<div className={`flex flex-col ${className}`}>
+			{!withoutLabel && (
+				<label htmlFor={name} className="text-base">
+					{label}
+				</label>
+			)}
 			<input
 				type="number"
 				id={name}
