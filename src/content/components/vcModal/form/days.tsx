@@ -13,9 +13,13 @@ export function DaysTab({ state, dispatch }: ReducerProps) {
 					dispatch({
 						type: 'ADD_DAY',
 						day: {
-							dayNumber: state.days.length + 1,
-							startPost: 1,
-							endPost: 1,
+							dayNumber:
+								state.days.reduce(
+									(max, day) => Math.max(max, day.dayNumber),
+									0,
+								) + 1,
+							startPost: -1,
+							endPost: -1,
 						},
 					});
 				}}
