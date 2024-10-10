@@ -91,6 +91,9 @@ export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
 	};
 
 	useEffect(() => {
+		// This currently saves a game def even on an initial load.
+		// Later make sure it only saves if an actual change has been made
+		// And not just an initial load
 		saveGameDef();
 	}, [state]);
 
