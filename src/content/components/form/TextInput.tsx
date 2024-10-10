@@ -1,26 +1,34 @@
 import React from 'react';
 
-interface NumberInputProps {
+interface TextInputProps {
 	name: string;
 	label: string;
 	placeholder?: string;
-	defaultValue?: number;
-	onChange?: (value: number) => void;
+	defaultValue?: string;
+	onChange?: (value: string) => void;
+
+	className?: string;
+	withoutLabel?: boolean;
 }
-export default function NumberInput({
+
+export default function TextInput({
 	name,
 	label,
 	placeholder,
 	defaultValue,
+	withoutLabel = false,
+	className = '',
 	onChange,
-}: NumberInputProps) {
+}: TextInputProps) {
 	return (
-		<div className="flex flex-col">
-			<label htmlFor={name} className="text-base">
-				{label}
-			</label>
+		<div className={`flex flex-col ${className}`}>
+			{!withoutLabel && (
+				<label htmlFor={name} className="text-base">
+					{label}
+				</label>
+			)}
 			<input
-				type="number"
+				type="text"
 				id={name}
 				name={name}
 				placeholder={placeholder}
@@ -28,9 +36,7 @@ export default function NumberInput({
 				className="p-2 !bg-primary-lighter text-white rounded-sm border border-primary-lightest hover:!border-primary-lightest focus:!border-secondary-color focus:outline-none"
 				onChange={(e) => {
 					if (!onChange) return;
-					const value = Number(e.target.value);
-					if (Number.isNaN(value)) return;
-					onChange(value);
+					onChange(e.target.value);
 				}}
 			/>
 		</div>
