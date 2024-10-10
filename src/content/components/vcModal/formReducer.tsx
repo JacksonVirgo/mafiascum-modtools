@@ -1,4 +1,4 @@
-import { GameDefinition } from '../../../types/newGameDefinition';
+import { GameDefinition, Player } from '../../../types/newGameDefinition';
 
 export const initialFormState: GameDefinition = {
 	days: [],
@@ -31,9 +31,35 @@ type RemoveDay = {
 	dayNumber: number;
 };
 
-export type GameAction = SetFullGameDef | AddDay | UpdateDay | RemoveDay;
+type AddPlayer = {
+	type: 'ADD_PLAYER';
+	username: string;
+};
 
-export function vcFormReducer(state: GameDefinition, action: GameAction) {
+type UpdatePlayer = {
+	type: 'UPDATE_PLAYER';
+	username: string;
+	player: Player;
+};
+
+type RemovePlayer = {
+	type: 'REMOVE_PLAYER';
+	username: string;
+};
+
+export type GameAction =
+	| SetFullGameDef
+	| AddDay
+	| UpdateDay
+	| RemoveDay
+	| AddPlayer
+	| UpdatePlayer
+	| RemovePlayer;
+
+export function vcFormReducer(
+	state: GameDefinition,
+	action: GameAction,
+): GameDefinition {
 	switch (action.type) {
 		case 'SET_FULL_GAME_DEF':
 			return action.gameDef;
@@ -57,5 +83,30 @@ export function vcFormReducer(state: GameDefinition, action: GameAction) {
 					(day) => day.dayNumber !== action.dayNumber,
 				),
 			};
+		case 'ADD_PLAYER':
+			return {
+				...state,
+				players: [
+					...state.players,
+					{ current: action.username, aliases: [], previous: [] },
+				],
+			};
+		case 'UPDATE_PLAYER':
+			return {
+				...state,
+				players: state.players.map((player) => {
+					if (player.current !== action.username) return player;
+					return action.player;
+				}),
+			};
+		case 'REMOVE_PLAYER':
+			return {
+				...state,
+				players: state.players.filter(
+					(player) => player.current !== action.username,
+				),
+			};
+		default:
+			return state;
 	}
 }
