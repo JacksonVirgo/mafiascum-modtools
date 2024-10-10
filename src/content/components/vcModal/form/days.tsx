@@ -37,7 +37,7 @@ interface EditDayProps extends ReducerProps {
 	setCurrentEdit: (day: Day | null) => void;
 }
 
-function EditDay({ state, dispatch, day, setCurrentEdit }: EditDayProps) {
+function EditDay({ dispatch, day, setCurrentEdit }: EditDayProps) {
 	const [dayNumber, setDayNumber] = useState(day.dayNumber);
 	const [startPost, setStartPost] = useState(day.startPost);
 	const [endPost, setEndPost] = useState(day.endPost);
