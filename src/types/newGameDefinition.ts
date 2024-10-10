@@ -4,7 +4,7 @@ import { z } from 'zod';
 
 export const DaySchema = z.object({
 	dayNumber: z.number(),
-	startPost: z.number(),
+	startPost: z.number().optional(),
 	endPost: z.number().optional(),
 });
 

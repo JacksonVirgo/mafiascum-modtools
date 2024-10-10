@@ -4,9 +4,17 @@ import Button from '../../buttons/button';
 import { Day } from '../../../../types/newGameDefinition';
 
 export function DaysTab({ state, dispatch }: ReducerProps) {
-	const columns = ['Day', 'Start Post #', 'End Post #'];
 	return (
 		<section className="grow w-full gap-2 flex flex-col">
+			<DayTableView state={state} dispatch={dispatch} />
+		</section>
+	);
+}
+
+function DayTableView({ state, dispatch }: ReducerProps) {
+	const columns = ['Day', 'Start Post #', 'End Post #'];
+	return (
+		<>
 			<Button
 				label="Add Day"
 				onClick={() => {
@@ -31,7 +39,7 @@ export function DaysTab({ state, dispatch }: ReducerProps) {
 					console.log('Editing', day);
 				}}
 			/>
-		</section>
+		</>
 	);
 }
 
@@ -88,13 +96,17 @@ export default function DayTable({ data, columns, editRow }: TableProps) {
 										key={`${day.dayNumber}-sp`}
 										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
 									>
-										{day.startPost}
+										{day.startPost == -1 || !day.startPost
+											? 'Unset'
+											: day.startPost}
 									</td>
 									<td
 										key={`${day.dayNumber}-ep`}
 										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
 									>
-										{day.endPost}
+										{day.endPost == -1 || !day.endPost
+											? 'Unset'
+											: day.endPost}
 									</td>
 								</tr>
 							))
