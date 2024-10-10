@@ -16,13 +16,17 @@ export function parseTag(tag: string) {
 }
 
 export async function saveGameDef(gameId: string, gameDef: GameDefinition) {
+	const tag = generateTag(gameId);
 	try {
-		await browser.storage.local.set({
-			[generateTag(gameId)]: gameDef,
-		});
+		const fetched = await loadGameDef(gameId);
+		if (isGameDefinition(fetched)) {
+			const isSame = JSON.stringify(fetched) === JSON.stringify(gameDef);
+			if (isSame) return true;
+		}
 
-		const val = await browser.storage.local.get(generateTag(gameId));
-		console.log(val);
+		await browser.storage.local.set({
+			[tag]: gameDef,
+		});
 
 		return true;
 	} catch (err) {
