@@ -11,6 +11,8 @@ import LoadingSpinner from '../indicators/LoadingSpinner';
 import { DaysTab } from './form/days';
 import { PlayersTab } from './form/players';
 import { VotesTab } from './form/votes';
+import { ExportTab } from './form/export';
+import { ImportTab } from './form/import';
 
 export interface ReducerProps {
 	state: typeof initialFormState;
@@ -191,6 +193,8 @@ enum FormSection {
 	DAYS = 'Days',
 	PLAYERS = 'Players',
 	VOTES = 'Votes',
+	IMPORT = 'Import',
+	EXPORT = 'Export',
 }
 
 interface SectionProps {
@@ -227,8 +231,8 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 
 	return (
 		<>
-			<nav className="bg-primary-lighter p-4 rounded-sm">
-				<ul className="list-none flex flex-col justify-center items-center gap-2">
+			<nav className="bg-primary-lighter p-4 rounded-md">
+				<ul className="list-none flex flex-col justify-center items-center gap-2 h-full">
 					<Section
 						section={FormSection.DAYS}
 						focused={activeSection == FormSection.DAYS}
@@ -242,6 +246,17 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 					<Section
 						section={FormSection.VOTES}
 						focused={activeSection == FormSection.VOTES}
+						onClick={sectionChange}
+					/>
+					<div className="grow"></div>
+					<Section
+						section={FormSection.IMPORT}
+						focused={activeSection == FormSection.IMPORT}
+						onClick={sectionChange}
+					/>
+					<Section
+						section={FormSection.EXPORT}
+						focused={activeSection == FormSection.EXPORT}
 						onClick={sectionChange}
 					/>
 				</ul>
@@ -258,6 +273,14 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 
 				{activeSection == FormSection.VOTES && (
 					<VotesTab state={state} dispatch={dispatch} />
+				)}
+
+				{activeSection == FormSection.IMPORT && (
+					<ImportTab state={state} dispatch={dispatch} />
+				)}
+
+				{activeSection == FormSection.EXPORT && (
+					<ExportTab state={state} dispatch={dispatch} />
 				)}
 
 				<div className="shrink flex flex-row items-center justify-center">
