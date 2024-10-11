@@ -48,7 +48,7 @@ function EditVote({ dispatch, vote, setCurrentEdit }: EditVoteProps) {
 		<div className="flex flex-col gap-2">
 			<NumberInput
 				name="voteNumber"
-				label="Vote Number"
+				label="Post Number"
 				defaultValue={vote.postNumber}
 				onChange={(value) => setPostNumber(value)}
 			/>
