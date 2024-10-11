@@ -1,4 +1,4 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { ReducerProps } from '../form';
 import Button from '../../buttons/button';
 import { Day } from '../../../../types/newGameDefinition';
@@ -41,6 +41,10 @@ function EditDay({ dispatch, day, setCurrentEdit }: EditDayProps) {
 	const [dayNumber, setDayNumber] = useState(day.dayNumber);
 	const [startPost, setStartPost] = useState(day.startPost);
 	const [endPost, setEndPost] = useState(day.endPost);
+
+	useEffect(() => {
+		console.log(dayNumber, startPost, endPost);
+	});
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -184,38 +188,49 @@ export default function DayTable({ data, columns, editRow }: TableProps) {
 					) : (
 						data
 							.sort((a, b) => b.dayNumber - a.dayNumber)
-							.map((day, idx) => (
-								<tr
-									key={idx}
-									className="hover:bg-primary-lightest transition-colors duration-200 hover:cursor-pointer"
-									onClick={() => {
-										if (editRow) editRow(day);
-									}}
-								>
-									<td
-										key={`${day.dayNumber}-dn`}
-										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
+							.map((day, idx) => {
+								console.log(day);
+
+								const dayStartExists =
+									day.startPost !== undefined &&
+									day.startPost >= 0;
+								const dayEndExists =
+									day.endPost !== undefined &&
+									day.endPost >= 0;
+
+								return (
+									<tr
+										key={idx}
+										className="hover:bg-primary-lightest transition-colors duration-200 hover:cursor-pointer"
+										onClick={() => {
+											if (editRow) editRow(day);
+										}}
 									>
-										{day.dayNumber}
-									</td>
-									<td
-										key={`${day.dayNumber}-sp`}
-										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
-									>
-										{day.startPost == -1 || !day.startPost
-											? 'Unset'
-											: day.startPost}
-									</td>
-									<td
-										key={`${day.dayNumber}-ep`}
-										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
-									>
-										{day.endPost == -1 || !day.endPost
-											? 'Unset'
-											: day.endPost}
-									</td>
-								</tr>
-							))
+										<td
+											key={`${day.dayNumber}-dn`}
+											className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
+										>
+											{day.dayNumber}
+										</td>
+										<td
+											key={`${day.dayNumber}-sp`}
+											className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
+										>
+											{!dayStartExists
+												? 'Unset'
+												: day.startPost}
+										</td>
+										<td
+											key={`${day.dayNumber}-ep`}
+											className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
+										>
+											{!dayEndExists
+												? 'Unset'
+												: day.endPost}
+										</td>
+									</tr>
+								);
+							})
 					)}
 				</tbody>
 			</table>
