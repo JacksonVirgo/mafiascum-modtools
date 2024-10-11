@@ -123,7 +123,6 @@ function VoteTableView({ state, dispatch, setEdit }: VoteTableViewProps) {
 					withoutLabel={true}
 					placeholder="New Vote #"
 					className="grow"
-					defaultValue={newVote}
 					onChange={(value) => setNewVote(value)}
 				/>
 				<Button
