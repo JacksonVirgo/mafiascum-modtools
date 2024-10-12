@@ -1,10 +1,7 @@
-import React, { useEffect, useState } from 'react';
+import React, { useState } from 'react';
 import Button from '../buttons/button';
 import { sendBackgroundRequest } from '../../request';
-import {
-	isGetSavedGameDefResponse,
-	isSaveGameDefResponse,
-} from '../../../types/backgroundResponse';
+import { isSaveGameDefResponse } from '../../../types/backgroundResponse';
 import $ from 'jquery';
 import LoadingSpinner from '../indicators/LoadingSpinner';
 import { DaysTab } from './form/days';

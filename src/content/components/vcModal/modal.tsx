@@ -260,8 +260,6 @@ interface ModalResponseProps extends ReducerProps {
 export const ModalResponse = ({
 	format,
 	flaggedVotes: flagged,
-	state,
-	dispatch,
 }: ModalResponseProps) => {
 	const [flaggedVotes, setFlaggedVotes] = useState<ValidatedVote[]>([]);
 
