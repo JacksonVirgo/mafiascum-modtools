@@ -6,7 +6,7 @@ import {
 	VoteCorrection,
 	VoteType,
 } from '../types/gameDefinition';
-import { trigramsFindBestMatch } from './stringSimilarity/trigrams';
+import { trigramsFindBestMatch } from './trigramsSimilarity';
 
 const CORRECTION_ERROR_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
