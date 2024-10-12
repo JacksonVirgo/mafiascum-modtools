@@ -175,8 +175,6 @@ export const Modal = forwardRef((_props, ref) => {
 		console.log('Saved Game Def', threadId, res);
 		if (!isSaveGameDefResponse(res))
 			return setCurrentState(ModalState.Error);
-
-		setCurrentState(ModalState.Form);
 	};
 
 	useEffect(() => {

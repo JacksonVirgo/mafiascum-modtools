@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ReducerProps, FlaggedVotes } from './modal';
+import { ReducerProps, FlaggedVotes, modalManager } from './modal';
 import {
 	ValidatedVote,
 	VoteCorrection,
@@ -39,16 +39,37 @@ export default function ResolveVotes(props: ResolveVotes) {
 
 interface ResolveVoteTableProps extends ReducerProps {
 	flaggedVotes: FlaggedVotes;
-	setEdit: (vote: ValidatedVote) => void;
+	setEdit: (vote: ValidatedVote | null) => void;
 }
 
-function ResolveVoteTable({ flaggedVotes, setEdit }: ResolveVoteTableProps) {
+function ResolveVoteTable({
+	flaggedVotes,
+	state,
+	setEdit,
+}: ResolveVoteTableProps) {
 	const columns = ['Post #', 'Target', 'Corrected', 'Validity'];
 
 	const [allProblemVotes, setAllProblemVoves] = useState<ValidatedVote[]>([]);
 	useEffect(() => {
-		setAllProblemVoves([...flaggedVotes.errors, ...flaggedVotes.warnings]);
+		updateProblemVotes();
 	}, [flaggedVotes]);
+
+	useEffect(() => {
+		updateProblemVotes();
+	}, [state]);
+
+	const updateProblemVotes = () => {
+		const votes = [...flaggedVotes.errors, ...flaggedVotes.warnings].filter(
+			(v) => {
+				const corrected = state.votes.find(
+					(vote) => vote.postNumber === v.post,
+				);
+				return !corrected;
+			},
+		);
+
+		setAllProblemVoves(votes);
+	};
 
 	return (
 		<div className="overflow-auto max-h-96 border !border-secondary-dark text-gray-200 rounded-md">
@@ -140,6 +161,15 @@ function ResolveVoteTable({ flaggedVotes, setEdit }: ResolveVoteTableProps) {
 					)}
 				</tbody>
 			</table>
+
+			<br />
+
+			<div className="flex flex-row justify-center gap-2">
+				<Button
+					label="Go Back"
+					onClick={() => modalManager.setForm()}
+				/>
+			</div>
 		</div>
 	);
 }
@@ -152,7 +182,7 @@ function EditVote({ state, dispatch, vote, setEdit }: EditVoteProps) {
 	const [target, setTarget] = useState(vote.target ?? '');
 
 	return (
-		<div className="flex flex-col gap-2 items-center">
+		<div className="flex flex-col gap-2">
 			<ValidatedVoteTable vote={vote} />
 
 			<TextInput
