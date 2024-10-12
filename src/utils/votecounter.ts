@@ -7,13 +7,14 @@ import {
 	VoteType,
 } from '../types/gameDefinition';
 import { trigramsFindBestMatch } from './trigramsSimilarity';
+import $ from 'jquery';
 
 const CORRECTION_ERROR_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
 const THREAD_ID_REGEX = /t=([0-9]+)/;
 
-const UNVOTE = 'UNVOTE';
-const UNVOTE_TAG = `${UNVOTE}:`;
+const UNVOTE = 'unvote';
+const UNVOTE_TAG = 'UNVOTE:';
 const VOTE_TAG = 'VOTE:';
 
 export async function startVoteCount(gameDefinition: GameDefinition) {
@@ -27,6 +28,8 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 		const lastDay = getLastDay(gameDefinition);
 		const startPost = lastDay?.startPost ?? 0;
 		const endPost = lastDay?.endPost;
+
+		console.log(threadId, startPost, endPost);
 
 		const threadData = await getThreadData(threadId, startPost);
 		if (!threadData) throw new Error('Could not fetch thread data.');
@@ -73,7 +76,9 @@ function fetchRelativeUrl() {
 function getThreadFromRelativeUrl(relativeUrl: string) {
 	const t = relativeUrl.match(THREAD_ID_REGEX);
 	if (!t) return null;
-	return t.shift() ?? null;
+	const withoutPrefix = t.shift()?.slice('t='.length).trim();
+	if (!withoutPrefix) return null;
+	return withoutPrefix;
 }
 
 function getLastDay(gameDefinition: GameDefinition) {
@@ -95,7 +100,7 @@ function isVoteValid(vote: Vote, data: GameData) {
 	if (vote.post === undefined) return false;
 	const isAfterStart = vote.post >= data.start;
 	const isBeforeEnd = !data.end || vote.post <= data.end;
-	if (!(isAfterStart && !isBeforeEnd)) return false;
+	if (!(isAfterStart && isBeforeEnd)) return false;
 
 	const author = data.gameDefinition.players.find(
 		(p) => p.current.toLowerCase() == vote.author.toLowerCase(),
@@ -193,6 +198,8 @@ function countVotes(
 						(v) => v.author !== author,
 					);
 			}
+
+			if (target.toLowerCase() == UNVOTE.toLowerCase()) continue;
 
 			if (!wagons[target]) wagons[target] = [];
 			const alreadyExists = wagons[target].some(
