@@ -12,7 +12,7 @@ const json = require('./manifest.json');
 const entryPoints = {
 	main: [path.resolve(__dirname, 'src', 'content', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
-	styling: path.resolve(__dirname, 'src', 'styles', '_main.scss'),
+	styling: path.resolve(__dirname, 'src', 'styles', 'main.css'),
 	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'), // React component
 };
 
@@ -40,7 +40,7 @@ function fillConfig(version) {
 					use: 'url-loader?limit=1024',
 				},
 				{
-					test: /\.(s[ac]ss|css)$/i,
+					test: /\.(css)$/i,
 					use: [
 						MiniCssExtractPlugin.loader,
 						'css-loader',
@@ -53,7 +53,6 @@ function fillConfig(version) {
 								},
 							},
 						},
-						'sass-loader',
 					],
 				},
 			],

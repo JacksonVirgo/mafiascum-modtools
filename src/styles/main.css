@@ -1,0 +1,16 @@
+/* Tailwind */
+@tailwind base;
+@tailwind components;
+@tailwind utilities;
+
+/* Other */
+@import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Raleway:wght@400;900&family=Roboto&display=swap');
+
+.mafia-engine-react-wrapper {
+	margin: 0;
+	padding: 0;
+	display: contents;
+	overflow: hidden;
+	background: transparent;
+	border: none;
+}
