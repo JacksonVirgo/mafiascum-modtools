@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
-import { ReducerProps } from '../form';
 import Button from '../../buttons/button';
 import { Vote } from '../../../../types/newGameDefinition';
 import NumberInput from '../../form/NumberInput';
 import TextInput from '../../form/TextInput';
 import Checkbox from '../../form/Checkbox';
+import { ReducerProps } from '../modal';
 
 export function VotesTab({ state, dispatch }: ReducerProps) {
 	const [currentEdit, setCurrentEdit] = useState<Vote | null>(null);

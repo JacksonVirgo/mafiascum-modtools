@@ -1,6 +1,5 @@
-import React, { useEffect, useReducer, useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import Button from '../buttons/button';
-import { GameAction, initialFormState, vcFormReducer } from './formReducer';
 import { sendBackgroundRequest } from '../../request';
 import {
 	isGetSavedGameDefResponse,
@@ -13,14 +12,14 @@ import { PlayersTab } from './form/players';
 import { VotesTab } from './form/votes';
 import { ExportTab } from './form/export';
 import { ImportTab } from './form/import';
-import { formatVoteCountData, modalManager, startVoteCount } from './modal';
+import {
+	formatVoteCountData,
+	modalManager,
+	ReducerProps,
+	startVoteCount,
+} from './modal';
 
-export interface ReducerProps {
-	state: typeof initialFormState;
-	dispatch: React.Dispatch<GameAction>;
-}
-
-interface ModalFormProps {
+interface ModalFormProps extends ReducerProps {
 	onResponse: (res: string) => void;
 }
 
@@ -31,9 +30,12 @@ enum ModalLoadingState {
 	ERROR,
 }
 
-export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
+export const ModalForm = ({
+	onResponse: _onResponse,
+	state,
+	dispatch,
+}: ModalFormProps) => {
 	const [loadState, setLoadState] = useState(ModalLoadingState.LOADING);
-	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
 
 	const loadGameDef = async () => {
 		const threadRelativeUrl = $('h2')
@@ -231,9 +233,7 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 		const vcData = await startVoteCount(state);
 		if (!vcData) return;
 		const format = formatVoteCountData(vcData);
-
-		console.log(format);
-		modalManager.setResponse(format);
+		modalManager.setResponse(format, vcData.logs);
 	};
 
 	return (

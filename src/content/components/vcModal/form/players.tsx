@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ReducerProps } from '../form';
+import { ReducerProps } from '../modal';
 import { Player } from '../../../../types/newGameDefinition';
 import Button from '../../buttons/button';
 import TextInput from '../../form/TextInput';

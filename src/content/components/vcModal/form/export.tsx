@@ -1,5 +1,5 @@
 import React from 'react';
-import { ReducerProps } from '../form';
+import { ReducerProps } from '../modal';
 import Button from '../../buttons/button';
 
 export function ExportTab({ state }: ReducerProps) {

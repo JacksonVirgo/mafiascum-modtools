@@ -1,5 +1,5 @@
 import React, { useState } from 'react';
-import { ReducerProps } from '../form';
+import { ReducerProps } from '../modal';
 import Button from '../../buttons/button';
 import { FileInput } from '../../form/FileInput';
 import {

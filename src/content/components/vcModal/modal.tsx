@@ -3,6 +3,7 @@ import React, {
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
+	useReducer,
 	useState,
 } from 'react';
 
@@ -20,6 +21,9 @@ import {
 } from '../../../types/newGameDefinition';
 import { getThreadData } from '../../thread';
 import { stringSimilarityAlgs } from '../../../utils/stringCorrection';
+import TextArea from '../form/TextArea';
+import { vcFormReducer, initialFormState, GameAction } from './formReducer';
+import ResolveVotes from './resolveVotes';
 
 export const CSS_HIDDEN = 'me_hidden';
 
@@ -33,14 +37,21 @@ enum ModalState {
 	Form,
 	Loading,
 	Response,
+	ResolvingVotes,
 }
+
+export type FlaggedVotes = {
+	warnings: ValidatedVote[];
+	errors: ValidatedVote[];
+};
 
 interface ModalHandle {
 	show: () => void;
 	hide: () => void;
 	setForm: () => void;
 	setLoading: () => void;
-	setResponse: (res: string) => void;
+	setResponse: (res: string, logs: FlaggedVotes) => void;
+	setResolvingVotes: (logs: FlaggedVotes) => void;
 }
 const modalRef = createRef<ModalHandle>();
 export const modalManager = {
@@ -64,26 +75,47 @@ export const modalManager = {
 			modalRef.current.setLoading();
 		}
 	},
-	setResponse: (res: string) => {
+	setResponse: (res: string, logs: FlaggedVotes) => {
 		if (modalRef.current) {
-			modalRef.current.setResponse(res);
+			modalRef.current.setResponse(res, logs);
+		}
+	},
+	setResolvingVotes: (logs: FlaggedVotes) => {
+		if (modalRef.current) {
+			modalRef.current.setResolvingVotes(logs);
 		}
 	},
 };
+
+export interface ReducerProps {
+	state: typeof initialFormState;
+	dispatch: React.Dispatch<GameAction>;
+}
 
 export const Modal = forwardRef((_props, ref) => {
 	const [isVisible, setIsVisible] = useState(false);
 	const [currentState, setCurrentState] = useState(ModalState.Form);
 	const [response, setResponse] = useState<string | undefined>();
+	const [flaggedVotes, setFlaggedVotes] = useState<FlaggedVotes>({
+		warnings: [],
+		errors: [],
+	});
+
+	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
 
 	useImperativeHandle(ref, () => ({
 		show: () => setIsVisible(true),
 		hide: () => setIsVisible(false),
 		setForm: () => setCurrentState(ModalState.Form),
 		setLoading: () => setCurrentState(ModalState.Loading),
-		setResponse: (str: string) => {
+		setResponse: (str: string, logs: FlaggedVotes) => {
 			setResponse(str);
+			setFlaggedVotes(logs);
 			setCurrentState(ModalState.Response);
+		},
+		setResolvingVotes: (logs: FlaggedVotes) => {
+			setFlaggedVotes(logs);
+			setCurrentState(ModalState.ResolvingVotes);
 		},
 	}));
 
@@ -130,20 +162,44 @@ export const Modal = forwardRef((_props, ref) => {
 					</div>
 				)}
 				{currentState == ModalState.Form && (
-					<ModalForm onResponse={onResponse} />
+					<ModalForm
+						onResponse={onResponse}
+						state={state}
+						dispatch={dispatch}
+					/>
 				)}
 				{currentState == ModalState.Response && (
-					<ModalResponse format={response} />
+					<ModalResponse
+						format={response}
+						flaggedVotes={flaggedVotes}
+						state={state}
+						dispatch={dispatch}
+					/>
+				)}
+				{currentState == ModalState.ResolvingVotes && (
+					<ResolveVotes
+						flaggedVotes={flaggedVotes}
+						state={state}
+						dispatch={dispatch}
+					/>
 				)}
 			</div>
 		</div>
 	);
 });
 
-interface ModalResponseProps {
+interface ModalResponseProps extends ReducerProps {
 	format?: string;
+	flaggedVotes?: FlaggedVotes;
 }
-export const ModalResponse = ({ format }: ModalResponseProps) => {
+export const ModalResponse = ({
+	format,
+	flaggedVotes: flagged,
+	state,
+	dispatch,
+}: ModalResponseProps) => {
+	const [flaggedVotes, setFlaggedVotes] = useState<ValidatedVote[]>([]);
+
 	const copyToClipboard = () => {
 		if (!format) return;
 		navigator.clipboard.writeText(format);
@@ -153,13 +209,40 @@ export const ModalResponse = ({ format }: ModalResponseProps) => {
 		modalManager.setForm();
 	};
 
+	useEffect(() => {
+		if (!flagged) return;
+		setFlaggedVotes([...flagged.warnings, ...flagged.errors]);
+	}, [flagged]);
+
 	return (
 		<div className="border-2 border-white grow w-full flex flex-col gap-2">
-			<textarea
+			{flaggedVotes.length > 0 && (
+				<div>
+					<div className="text-base text-red-400 font-bold">
+						{flaggedVotes.length > 1 &&
+							`There are ${flaggedVotes.length} flagged votes:`}
+						{flaggedVotes.length == 1 &&
+							`There is ${flaggedVotes.length} flagged vote:`}
+					</div>
+					<div className="flex flex-row">
+						<Button
+							label="Resolve Issues"
+							onClick={() => {
+								if (!flagged) return;
+								modalManager.setResolvingVotes(flagged);
+							}}
+						/>
+					</div>
+				</div>
+			)}
+
+			<TextArea
+				label="Formatted Output"
+				defaultValue={format}
+				name="format"
 				className="grow h-full w-full resize-none"
-				readOnly
-				value={format}
-			></textarea>
+				readOnly={true}
+			/>
 
 			<div className="shrink flex flex-row items-center justify-center gap-2">
 				<Button label="Go back" onClick={goBack} />
@@ -263,6 +346,8 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 			}
 			if (vote.target === undefined) return vote;
 
+			vote.rawTarget = vote.target;
+
 			const totalVotable = Array.from(aliasLegend.keys());
 			totalVotable.push('unvote');
 
@@ -282,8 +367,6 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 				vote.validity = VoteCorrection.WARN;
 			else vote.validity = VoteCorrection.REJECT;
 
-			console.log(vote);
-
 			return vote;
 		})
 		.sort((a, b) => a.post - b.post);
@@ -294,11 +377,11 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 
 	const majority = Math.floor(livingPlayers.length / 2) + 1;
 
-	const warnings: number[] = [];
-	const errors: number[] = [];
+	const warnings: ValidatedVote[] = [];
+	const errors: ValidatedVote[] = [];
 
 	for (const vote of currentVotes) {
-		const { author, post, type, validity } = vote;
+		const { author, type, validity } = vote;
 		let { target } = vote;
 
 		console.log(
@@ -317,8 +400,8 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 		}
 		if (isMajorityReached) break;
 
-		if (validity === VoteCorrection.WARN) warnings.push(post);
-		if (validity === VoteCorrection.REJECT) errors.push(post);
+		if (validity === VoteCorrection.WARN) warnings.push(vote);
+		if (validity === VoteCorrection.REJECT) errors.push(vote);
 
 		if (type === VoteType.UNVOTE) {
 			for (const wagon in wagons) {

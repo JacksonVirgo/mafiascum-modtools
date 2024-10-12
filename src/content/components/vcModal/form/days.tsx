@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ReducerProps } from '../form';
+import { ReducerProps } from '../modal';
 import Button from '../../buttons/button';
 import { Day } from '../../../../types/newGameDefinition';
 import NumberInput from '../../form/NumberInput';
