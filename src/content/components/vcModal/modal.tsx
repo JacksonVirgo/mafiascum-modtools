@@ -18,7 +18,7 @@ import {
 	ValidatedVote,
 	VoteCorrection,
 	VoteType,
-} from '../../../types/newGameDefinition';
+} from '../../../types/gameDefinition';
 import { getThreadData } from '../../thread';
 import { stringSimilarityAlgs } from '../../../utils/stringCorrection';
 import TextArea from '../form/TextArea';

@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import Button from '../../buttons/button';
-import { Vote } from '../../../../types/newGameDefinition';
+import { Vote } from '../../../../types/gameDefinition';
 import NumberInput from '../../form/NumberInput';
 import TextInput from '../../form/TextInput';
 import Checkbox from '../../form/Checkbox';

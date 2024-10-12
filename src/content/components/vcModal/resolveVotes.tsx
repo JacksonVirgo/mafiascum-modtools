@@ -1,9 +1,6 @@
 import React, { useEffect, useState } from 'react';
 import { ReducerProps, FlaggedVotes } from './modal';
-import {
-	ValidatedVote,
-	VoteCorrection,
-} from '../../../types/newGameDefinition';
+import { ValidatedVote, VoteCorrection } from '../../../types/gameDefinition';
 
 interface ResolveVotes extends ReducerProps {
 	flaggedVotes: FlaggedVotes;

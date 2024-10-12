@@ -1,7 +1,4 @@
-import {
-	GameDefinition,
-	isGameDefinition,
-} from '../../types/newGameDefinition';
+import { GameDefinition, isGameDefinition } from '../../types/gameDefinition';
 import browser from 'webextension-polyfill';
 
 const TAG_PREFIX = 'gameDef-';

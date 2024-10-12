@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GameDefinitionSchema } from './newGameDefinition';
+import { GameDefinitionSchema } from './gameDefinition';
 
 export const PageRequestValidator = z.object({
 	action: z.literal('getPageData'),

@@ -1,4 +1,4 @@
-import { GameDefinition, Player, Vote } from '../../../types/newGameDefinition';
+import { GameDefinition, Player, Vote } from '../../../types/gameDefinition';
 
 export const initialFormState: GameDefinition = {
 	days: [],

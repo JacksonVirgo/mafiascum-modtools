@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { ReducerProps } from '../modal';
-import { Player } from '../../../../types/newGameDefinition';
+import { Player } from '../../../../types/gameDefinition';
 import Button from '../../buttons/button';
 import TextInput from '../../form/TextInput';
 import NumberInput from '../../form/NumberInput';

@@ -1,5 +1,5 @@
 import { z } from 'zod';
-import { GameDefinitionSchema } from './newGameDefinition';
+import { GameDefinitionSchema } from './gameDefinition';
 
 export const ErrorResponse = z.object({
 	status: z.union([z.literal(400), z.literal(500)]),

@@ -8,7 +8,7 @@ import {
 } from '../types/backgroundRequests';
 import { ZodError } from 'zod';
 import { loadGameDef, saveGameDef } from './requests/gameDefinition';
-import { GameDefinitionSchema } from '../types/newGameDefinition';
+import { GameDefinitionSchema } from '../types/gameDefinition';
 
 function sendResponse(response: AnyResponse) {
 	return Promise.resolve(response);

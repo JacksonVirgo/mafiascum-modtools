@@ -5,7 +5,7 @@ import { FileInput } from '../../form/FileInput';
 import {
 	GameDefinition,
 	isGameDefinition,
-} from '../../../../types/newGameDefinition';
+} from '../../../../types/gameDefinition';
 
 export function ImportTab({ dispatch }: ReducerProps) {
 	const [uploadedFile, setUploadedFile] = useState<GameDefinition | null>(

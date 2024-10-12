@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react';
 import { ReducerProps } from '../modal';
 import Button from '../../buttons/button';
-import { Day } from '../../../../types/newGameDefinition';
+import { Day } from '../../../../types/gameDefinition';
 import NumberInput from '../../form/NumberInput';
 
 export function DaysTab({ state, dispatch }: ReducerProps) {
