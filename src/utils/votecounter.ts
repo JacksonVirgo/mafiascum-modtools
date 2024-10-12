@@ -110,7 +110,10 @@ function isVoteValid(vote: Vote, data: GameData) {
 	return true;
 }
 
-function validateVote(v: Vote, { aliasLegend }: GameData): ValidatedVote {
+function validateVote(
+	v: Vote,
+	{ aliasLegend, gameDefinition }: GameData,
+): ValidatedVote {
 	const vote: ValidatedVote = {
 		type: VoteType.VOTE,
 		author: v.author,
@@ -118,6 +121,10 @@ function validateVote(v: Vote, { aliasLegend }: GameData): ValidatedVote {
 		post: v.post,
 		validity: VoteCorrection.REJECT,
 	};
+
+	const manualCorrection = gameDefinition.votes.find((v) => {
+		return v.postNumber == v.postNumber;
+	});
 
 	if (vote.target?.startsWith(UNVOTE_TAG)) {
 		vote.type = VoteType.UNVOTE;
@@ -127,6 +134,9 @@ function validateVote(v: Vote, { aliasLegend }: GameData): ValidatedVote {
 		vote.target = vote.target.replace(VOTE_TAG, '').trim();
 	} else if (vote.target === undefined) return vote;
 	vote.rawTarget = vote.target;
+
+	if (manualCorrection) vote.target = manualCorrection.target ?? undefined;
+	if (vote.target === undefined) return vote;
 
 	const allVotableTargets = Array.from(aliasLegend.keys());
 	allVotableTargets.push(UNVOTE.toLowerCase());
@@ -139,9 +149,9 @@ function validateVote(v: Vote, { aliasLegend }: GameData): ValidatedVote {
 	const match = closestMatchedTarget.bestMatch;
 
 	vote.target = match.value;
-	if (match.rating <= CORRECTION_ERROR_THRESHOLD)
+	if (!manualCorrection || match.rating <= CORRECTION_ERROR_THRESHOLD)
 		vote.validity = VoteCorrection.REJECT;
-	else if (match.rating <= CORRECTION_WARN_THRESHOLD)
+	else if (!manualCorrection || match.rating <= CORRECTION_WARN_THRESHOLD)
 		vote.validity = VoteCorrection.WARN;
 	else vote.validity = VoteCorrection.ACCEPT;
 
