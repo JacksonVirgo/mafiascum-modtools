@@ -133,5 +133,6 @@ export type ValidatedVote = {
 	post: PostNumber;
 	target?: Username;
 	rawTarget?: string;
+	ignore?: boolean;
 	validity: VoteCorrection;
 };

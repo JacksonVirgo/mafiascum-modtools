@@ -127,6 +127,8 @@ function validateVote(
 		return v.post == vArr.postNumber;
 	});
 
+	vote.ignore = manualCorrection?.ignore ?? false;
+
 	if (vote.target?.startsWith(UNVOTE_TAG)) {
 		vote.type = VoteType.UNVOTE;
 		vote.target = vote.target.replace(UNVOTE_TAG, '').trim();
@@ -181,8 +183,10 @@ function countVotes(
 	const errors: ValidatedVote[] = [];
 
 	for (const vote of votes) {
-		const { author, type, validity } = vote;
+		const { author, type, validity, ignore } = vote;
 		let { target } = vote;
+
+		if (ignore) continue;
 
 		if (target) target = aliasLegend.get(target.toLowerCase()) ?? target;
 		let isMajorityReached: boolean | undefined;
