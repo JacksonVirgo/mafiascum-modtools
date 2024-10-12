@@ -30,6 +30,7 @@ browser.runtime.onMessage.addListener(async (request) => {
 		} else if (action == 'getPageData') {
 			const { url } = PageRequestValidator.parse(request);
 			const pageData = await getPageData(url);
+			console.log(pageData);
 			if (!pageData)
 				return sendResponse({
 					status: 500,

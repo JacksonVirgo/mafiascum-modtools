@@ -227,7 +227,10 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 	const onSubmit = async () => {
 		modalManager.setLoading();
 		const vcData = await startVoteCount(state);
-		if (!vcData) return;
+		if (!vcData) {
+			modalManager.setForm(); // TODO: Add an error page to redirect to
+			return;
+		}
 		modalManager.setResponse(vcData.formatted, vcData.votecount.logs);
 	};
 
