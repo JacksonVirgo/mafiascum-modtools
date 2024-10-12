@@ -31,7 +31,6 @@
 		"mini-css-extract-plugin": "^2.7.6",
 		"postcss": "^8.4.32",
 		"postcss-loader": "^7.3.4",
-		"sass-loader": "^13.3.2",
 		"style-loader": "^3.3.3",
 		"tailwindcss": "^3.4.1",
 		"ts-loader": "^9.3.1",
