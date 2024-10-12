@@ -11,3 +11,12 @@ $(async function () {
 	loadMultiIso();
 	mountHighlightedQuotes();
 });
+
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function testPostAutoFooter() {
+	const postForm = $('#qr_postform');
+	const textarea = postForm.find('textarea.inputbox');
+	postForm.on('submit', () => {
+		textarea.val(textarea.val() + '\nTest');
+	});
+}
