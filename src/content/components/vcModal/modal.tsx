@@ -16,6 +16,11 @@ import { ValidatedVote } from '../../../types/gameDefinition';
 import TextArea from '../form/TextArea';
 import { vcFormReducer, initialFormState, GameAction } from './formReducer';
 import ResolveVotes from './resolveVotes';
+import {
+	isGetSavedGameDefResponse,
+	isSaveGameDefResponse,
+} from '../../../types/backgroundResponse';
+import { sendBackgroundRequest } from '../../request';
 
 export const CSS_HIDDEN = 'me_hidden';
 
@@ -30,6 +35,7 @@ enum ModalState {
 	Loading,
 	Response,
 	ResolvingVotes,
+	Error,
 }
 
 export type FlaggedVotes = {
@@ -114,6 +120,75 @@ export const Modal = forwardRef((_props, ref) => {
 	useEffect(() => {
 		document.body.style.overflow = isVisible ? 'hidden' : 'auto';
 	}, [isVisible]);
+
+	const loadGameDef = async () => {
+		const threadRelativeUrl = $('h2')
+			.first()
+			.find('a')
+			.first()
+			.attr('href');
+		if (!threadRelativeUrl) return setCurrentState(ModalState.Error);
+
+		const regex = /t=([0-9]+)/;
+
+		const tVal = threadRelativeUrl.match(regex);
+		if (!tVal) return setCurrentState(ModalState.Error);
+
+		const threadId = tVal[1];
+		if (!threadId) return setCurrentState(ModalState.Error);
+
+		const res = await sendBackgroundRequest({
+			action: 'getSavedGameDef',
+			gameId: threadId,
+		});
+
+		console.log('Loaded Game Def', threadId, res);
+		if (!isGetSavedGameDefResponse(res))
+			return setCurrentState(ModalState.Error);
+
+		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res.savedGameDef });
+		setCurrentState(ModalState.Form);
+	};
+
+	const saveGameDef = async () => {
+		const threadRelativeUrl = $('h2')
+			.first()
+			.find('a')
+			.first()
+			.attr('href');
+		if (!threadRelativeUrl) return setCurrentState(ModalState.Error);
+
+		const regex = /t=([0-9]+)/;
+
+		const tVal = threadRelativeUrl.match(regex);
+		if (!tVal) return setCurrentState(ModalState.Error);
+
+		const threadId = tVal[1];
+		if (!threadId) return setCurrentState(ModalState.Error);
+
+		const res = await sendBackgroundRequest({
+			action: 'saveGameDef',
+			gameId: threadId,
+			gameDef: state,
+		});
+
+		console.log('Saved Game Def', threadId, res);
+		if (!isSaveGameDefResponse(res))
+			return setCurrentState(ModalState.Error);
+
+		setCurrentState(ModalState.Form);
+	};
+
+	useEffect(() => {
+		// This currently saves a game def even on an initial load.
+		// Later make sure it only saves if an actual change has been made
+		// And not just an initial load
+		saveGameDef();
+	}, [state]);
+
+	useEffect(() => {
+		loadGameDef();
+	}, []);
 
 	const onResponse = (res: string) => {
 		setResponse(res);

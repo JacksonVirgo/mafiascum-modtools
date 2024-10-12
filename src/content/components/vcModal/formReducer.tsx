@@ -50,6 +50,7 @@ type RemovePlayer = {
 type AddVote = {
 	type: 'ADD_VOTE';
 	postNumber: number;
+	vote?: Vote;
 };
 
 type UpdateVote = {
@@ -128,7 +129,14 @@ export function vcFormReducer(
 		case 'ADD_VOTE':
 			return {
 				...state,
-				votes: [...state.votes, { postNumber: action.postNumber }],
+				votes: [
+					...state.votes,
+					{
+						postNumber: action.postNumber,
+						target: action.vote?.target,
+						ignore: action.vote?.ignore,
+					},
+				],
 			};
 		case 'UPDATE_VOTE':
 			return {

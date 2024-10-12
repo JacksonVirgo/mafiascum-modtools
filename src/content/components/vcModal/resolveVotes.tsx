@@ -1,6 +1,12 @@
 import React, { useEffect, useState } from 'react';
 import { ReducerProps, FlaggedVotes } from './modal';
-import { ValidatedVote, VoteCorrection } from '../../../types/gameDefinition';
+import {
+	ValidatedVote,
+	VoteCorrection,
+	VoteType,
+} from '../../../types/gameDefinition';
+import TextInput from '../form/TextInput';
+import Button from '../buttons/button';
 
 interface ResolveVotes extends ReducerProps {
 	flaggedVotes: FlaggedVotes;
@@ -16,6 +22,15 @@ export default function ResolveVotes(props: ResolveVotes) {
 					setEdit={setCurrentEdit}
 					state={props.state}
 					dispatch={props.dispatch}
+				/>
+			)}
+
+			{currentEdit && (
+				<EditVote
+					state={props.state}
+					dispatch={props.dispatch}
+					vote={currentEdit}
+					setEdit={setCurrentEdit}
 				/>
 			)}
 		</div>
@@ -131,9 +146,124 @@ function ResolveVoteTable({ flaggedVotes, setEdit }: ResolveVoteTableProps) {
 
 interface EditVoteProps extends ReducerProps {
 	vote: ValidatedVote;
-	setEdit: (vote: ValidatedVote) => void;
+	setEdit: (vote: ValidatedVote | null) => void;
 }
-function EditVote({ dispatch, vote }: EditVoteProps) {
+function EditVote({ state, dispatch, vote, setEdit }: EditVoteProps) {
 	const [target, setTarget] = useState(vote.target ?? '');
-	return <div className="flex flex-col gap-2"></div>;
+
+	return (
+		<div className="flex flex-col gap-2 items-center">
+			<ValidatedVoteTable vote={vote} />
+
+			<TextInput
+				name={'corrected-target'}
+				label="Corrected Target"
+				defaultValue={target}
+				onChange={(value) => setTarget(value)}
+			/>
+
+			<br />
+
+			<div className="flex flex-row justify-center gap-2">
+				<Button
+					label="Save"
+					onClick={() => {
+						const fetchedVote = state.votes.find(
+							(v) => v.postNumber === vote.post,
+						);
+
+						const newVote = {
+							postNumber: vote.post,
+							target: target ?? undefined,
+							ignore: fetchedVote?.ignore ?? false,
+						};
+
+						console.log(newVote);
+
+						if (fetchedVote) {
+							dispatch({
+								type: 'UPDATE_VOTE',
+								postNumber: vote.post,
+								vote: newVote,
+							});
+						} else {
+							dispatch({
+								type: 'ADD_VOTE',
+								postNumber: vote.post,
+								vote: newVote,
+							});
+						}
+
+						setEdit(null);
+					}}
+				/>
+				<Button label="Discard Changes" onClick={() => setEdit(null)} />
+				<Button
+					label="Delete"
+					onClick={() => {
+						dispatch({
+							type: 'REMOVE_VOTE',
+							postNumber: vote.post,
+						});
+
+						setEdit(null);
+					}}
+				/>
+			</div>
+		</div>
+	);
+}
+
+interface TableProps {
+	vote: ValidatedVote;
+}
+
+function ValidatedVoteTable({ vote }: TableProps) {
+	const { author, post, target, type, rawTarget, validity } = vote;
+
+	// prettier-ignore
+	const validityStr =
+		validity === VoteCorrection.ACCEPT
+			? 'Accepted'
+			: validity == VoteCorrection.REJECT
+				? 'Error'
+				: 'Warning';
+
+	const Row = ({
+		header,
+		data,
+	}: {
+		header: string;
+		data: string | number;
+	}) => {
+		return (
+			<tr className="!border-b !border-white last:!border-b-0">
+				<td className="px-4 py-2 whitespace-nowrap text-sm text-gray-300">
+					{header}
+					{':'}
+				</td>
+				<td className="px-4 py-2 whitespace-nowrap text-sm bg-primary-lightest text-gray-300 w-full">
+					{data}
+				</td>
+			</tr>
+		);
+	};
+
+	return (
+		<div className="overflow-auto max-h-96 border !border-secondary-dark text-gray-200 rounded-md">
+			<table className="min-w-full divide-y !divide-secondary-dark">
+				<tbody className="bg-primary-lighter divide-y divide-secondary-dark">
+					<Row header="Author" data={author} />
+					<Row header="Post" data={post} />
+					<Row
+						header="Type"
+						data={type == VoteType.UNVOTE ? 'Unvote' : 'Vote'}
+					/>
+					<Row header="Raw Target" data={rawTarget ?? 'N/A'} />
+					<Row header="Target" data={target ?? 'N/A'} />
+					<Row header="Validity" data={validityStr} />
+				</tbody>
+			</table>
+		</div>
+	);
 }

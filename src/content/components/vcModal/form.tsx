@@ -31,76 +31,7 @@ export const ModalForm = ({
 	state,
 	dispatch,
 }: ModalFormProps) => {
-	const [loadState, setLoadState] = useState(ModalLoadingState.LOADING);
-
-	const loadGameDef = async () => {
-		const threadRelativeUrl = $('h2')
-			.first()
-			.find('a')
-			.first()
-			.attr('href');
-		if (!threadRelativeUrl) return setLoadState(ModalLoadingState.ERROR);
-
-		const regex = /t=([0-9]+)/;
-
-		const tVal = threadRelativeUrl.match(regex);
-		if (!tVal) return setLoadState(ModalLoadingState.ERROR);
-
-		const threadId = tVal[1];
-		if (!threadId) return setLoadState(ModalLoadingState.ERROR);
-
-		const res = await sendBackgroundRequest({
-			action: 'getSavedGameDef',
-			gameId: threadId,
-		});
-
-		console.log('Loaded Game Def', threadId, res);
-		if (!isGetSavedGameDefResponse(res))
-			return setLoadState(ModalLoadingState.NO_GAME_DEF);
-
-		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res.savedGameDef });
-		setLoadState(ModalLoadingState.LOADED);
-	};
-
-	const saveGameDef = async () => {
-		const threadRelativeUrl = $('h2')
-			.first()
-			.find('a')
-			.first()
-			.attr('href');
-		if (!threadRelativeUrl) return setLoadState(ModalLoadingState.ERROR);
-
-		const regex = /t=([0-9]+)/;
-
-		const tVal = threadRelativeUrl.match(regex);
-		if (!tVal) return setLoadState(ModalLoadingState.ERROR);
-
-		const threadId = tVal[1];
-		if (!threadId) return setLoadState(ModalLoadingState.ERROR);
-
-		const res = await sendBackgroundRequest({
-			action: 'saveGameDef',
-			gameId: threadId,
-			gameDef: state,
-		});
-
-		console.log('Saved Game Def', threadId, res);
-		if (!isSaveGameDefResponse(res))
-			return setLoadState(ModalLoadingState.ERROR);
-
-		setLoadState(ModalLoadingState.LOADED);
-	};
-
-	useEffect(() => {
-		// This currently saves a game def even on an initial load.
-		// Later make sure it only saves if an actual change has been made
-		// And not just an initial load
-		saveGameDef();
-	}, [state]);
-
-	useEffect(() => {
-		loadGameDef();
-	}, []);
+	const [loadState, setLoadState] = useState(ModalLoadingState.LOADED);
 
 	return (
 		<form
