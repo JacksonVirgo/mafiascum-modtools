@@ -6,8 +6,8 @@ import {
 	VoteCorrection,
 	VoteType,
 } from '../types/gameDefinition';
-import { trigramsFindBestMatch } from './trigramsSimilarity';
 import $ from 'jquery';
+import { findBestMatch } from './stringSimilarity';
 
 const CORRECTION_ERROR_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
@@ -55,6 +55,7 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 			.sort((a, b) => a.post - b.post);
 
 		const votecount = countVotes(validVotes, gameData);
+		console.log(votecount);
 		const formattedVotecount = formatVotecount(votecount);
 
 		return {
@@ -122,8 +123,8 @@ function validateVote(
 		validity: VoteCorrection.REJECT,
 	};
 
-	const manualCorrection = gameDefinition.votes.find((v) => {
-		return v.postNumber == v.postNumber;
+	const manualCorrection = gameDefinition.votes.find((vArr) => {
+		return v.post == vArr.postNumber;
 	});
 
 	if (vote.target?.startsWith(UNVOTE_TAG)) {
@@ -135,25 +136,27 @@ function validateVote(
 	} else if (vote.target === undefined) return vote;
 	vote.rawTarget = vote.target;
 
+	console.log(vote.author, vote.target, manualCorrection?.target);
 	if (manualCorrection) vote.target = manualCorrection.target ?? undefined;
 	if (vote.target === undefined) return vote;
 
 	const allVotableTargets = Array.from(aliasLegend.keys());
 	allVotableTargets.push(UNVOTE.toLowerCase());
 
-	const closestMatchedTarget = trigramsFindBestMatch(
-		vote.target,
-		allVotableTargets,
-	);
+	const closestMatchedTarget = findBestMatch(vote.target, allVotableTargets);
 	if (!closestMatchedTarget) return vote;
 	const match = closestMatchedTarget.bestMatch;
 
+	console.log(`Author: ${vote.author}`, match);
+
 	vote.target = match.value;
-	if (!manualCorrection || match.rating <= CORRECTION_ERROR_THRESHOLD)
+	if (match.rating <= CORRECTION_ERROR_THRESHOLD)
 		vote.validity = VoteCorrection.REJECT;
-	else if (!manualCorrection || match.rating <= CORRECTION_WARN_THRESHOLD)
+	else if (match.rating <= CORRECTION_WARN_THRESHOLD)
 		vote.validity = VoteCorrection.WARN;
 	else vote.validity = VoteCorrection.ACCEPT;
+
+	if (manualCorrection) vote.validity = VoteCorrection.ACCEPT;
 
 	return vote;
 }
@@ -233,6 +236,7 @@ function countVotes(
 		wagons,
 		notVoting: playersNotVoting,
 		majority,
+		votes,
 		logs: {
 			warnings,
 			errors,
