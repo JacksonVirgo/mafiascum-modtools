@@ -1,14 +1,11 @@
 import { getThreadData } from '../content/thread';
 import { Vote } from '../types/backgroundResponse';
 import {
-	Day,
 	GameDefinition,
-	isVote,
 	ValidatedVote,
 	VoteCorrection,
 	VoteType,
 } from '../types/gameDefinition';
-import { stringSimilarityAlgs } from './stringCorrection';
 import { trigramsFindBestMatch } from './stringSimilarity/trigrams';
 
 const CORRECTION_ERROR_THRESHOLD = 0.88;
