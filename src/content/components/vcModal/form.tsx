@@ -12,12 +12,8 @@ import { PlayersTab } from './form/players';
 import { VotesTab } from './form/votes';
 import { ExportTab } from './form/export';
 import { ImportTab } from './form/import';
-import {
-	formatVoteCountData,
-	modalManager,
-	ReducerProps,
-	startVoteCount,
-} from './modal';
+import { startVoteCount } from '../../../utils/votecounter';
+import { ReducerProps, modalManager } from './modal';
 
 interface ModalFormProps extends ReducerProps {
 	onResponse: (res: string) => void;
@@ -232,8 +228,7 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 		modalManager.setLoading();
 		const vcData = await startVoteCount(state);
 		if (!vcData) return;
-		const format = formatVoteCountData(vcData);
-		modalManager.setResponse(format, vcData.logs);
+		modalManager.setResponse(vcData.formatted, vcData.votecount.logs);
 	};
 
 	return (

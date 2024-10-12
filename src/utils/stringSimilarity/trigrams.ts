@@ -1,13 +1,10 @@
 import { StringSimilarityCompareFunc } from '../stringCorrection';
 
-const trigramSimilarity: StringSimilarityCompareFunc = (
-	first,
-	second,
-): number => {
-	const normalize = (str: string): string => {
-		return str.toLowerCase().replace(/\s+/g, '');
-	};
+function normalizeString(str: string) {
+	return str.toLowerCase().replace(/\s+/g, '');
+}
 
+export function trigramSimilarity(a: string, b: string) {
 	const generateTrigrams = (str: string): Set<string> => {
 		const trigrams = new Set<string>();
 		for (let i = 0; i < str.length - 2; i++) {
@@ -16,8 +13,8 @@ const trigramSimilarity: StringSimilarityCompareFunc = (
 		return trigrams;
 	};
 
-	const trigrams1 = generateTrigrams(normalize(first));
-	const trigrams2 = generateTrigrams(normalize(second));
+	const trigrams1 = generateTrigrams(normalizeString(a));
+	const trigrams2 = generateTrigrams(normalizeString(b));
 
 	const intersection = new Set(
 		[...trigrams1].filter((trigram) => trigrams2.has(trigram)),
@@ -26,6 +23,23 @@ const trigramSimilarity: StringSimilarityCompareFunc = (
 		intersection.size / Math.max(trigrams1.size, trigrams2.size);
 
 	return similarity;
-};
+}
 
-export default trigramSimilarity;
+export type TrigramRating = {
+	rating: number;
+	value: string;
+};
+export function trigramsFindBestMatch(rawTarget: string, options: string[]) {
+	if (options.length === 0) return null;
+	const target = normalizeString(rawTarget);
+	const ratings: TrigramRating[] = options.map((v) => {
+		const normalized = normalizeString(v);
+		const rating = trigramSimilarity(target, normalized);
+		return {
+			rating: rating,
+			value: v,
+		};
+	});
+	const bestMatch = ratings.reduce((a, b) => (a.rating > b.rating ? a : b));
+	return { ratings: ratings, bestMatch: bestMatch };
+}
