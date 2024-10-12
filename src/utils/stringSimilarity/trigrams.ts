@@ -1,5 +1,3 @@
-import { StringSimilarityCompareFunc } from '../stringCorrection';
-
 function normalizeString(str: string) {
 	return str.toLowerCase().replace(/\s+/g, '');
 }
