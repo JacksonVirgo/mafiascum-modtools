@@ -268,7 +268,7 @@ function formatVotecount(votecount: VoteCount) {
 
 	wagonStrings.sort((a, b) => b[1] - a[1]);
 
-	return `[area=Current Votes]${wagonStrings
-		.map((v) => v[0])
-		.join('\n')}\n\n${notVotingStr}[/area]`;
+	return `[area=Current Votes]${wagonStrings.map((v) => v[0]).join('\n')}\n${
+		votecount.notVoting.length > 0 ? '\n' + notVotingStr : ''
+	}[/area]`;
 }
