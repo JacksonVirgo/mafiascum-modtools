@@ -111,7 +111,7 @@ interface VoteTableViewProps extends ReducerProps {
 	setEdit: (vote: Vote) => void;
 }
 function VoteTableView({ state, dispatch, setEdit }: VoteTableViewProps) {
-	const columns = ['Post Number', 'Ignored?', 'New Target'];
+	const columns = ['Post Number', 'New Target', 'Ignored?'];
 	const [newVote, setNewVote] = useState<number>(0);
 
 	return (
@@ -197,18 +197,18 @@ export default function VoteTable({ data, columns, editRow }: TableProps) {
 										{vote.postNumber}
 									</td>
 									<td
-										key={`${vote.postNumber}-sp`}
-										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
-									>
-										{vote.ignore ? 'Ignored' : ''}
-									</td>
-									<td
 										key={`${vote.postNumber}-ep`}
 										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
 									>
 										{vote.target
 											? vote.target
 											: 'Unchanged'}
+									</td>
+									<td
+										key={`${vote.postNumber}-sp`}
+										className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
+									>
+										{vote.ignore ? 'Ignored' : ''}
 									</td>
 								</tr>
 							))
