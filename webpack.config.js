@@ -16,7 +16,6 @@ const entryPoints = {
 	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'),
 };
 
-// Function to fill configuration for v2 and v3
 function fillConfig(version) {
 	return {
 		entry: entryPoints,
