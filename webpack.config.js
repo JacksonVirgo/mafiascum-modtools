@@ -13,7 +13,7 @@ const entryPoints = {
 	main: [path.resolve(__dirname, 'src', 'content', 'index.ts')],
 	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
 	styling: path.resolve(__dirname, 'src', 'styles', 'main.css'),
-	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'), // React component
+	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'),
 };
 
 // Function to fill configuration for v2 and v3
@@ -26,12 +26,12 @@ function fillConfig(version) {
 			filename: '[name].js',
 		},
 		resolve: {
-			extensions: ['.ts', '.tsx', '.js', '.jsx'], // Add .tsx and .jsx extensions
+			extensions: ['.ts', '.tsx', '.js', '.jsx'],
 		},
 		module: {
 			rules: [
 				{
-					test: /\.tsx?$/, // Handle TypeScript and TSX files
+					test: /\.tsx?$/,
 					use: 'ts-loader',
 					exclude: /node_modules/,
 				},
@@ -74,7 +74,7 @@ function fillConfig(version) {
 			new HtmlPlugin({
 				title: 'Mafia Engine',
 				filename: 'popup.html',
-				chunks: ['popup'], // Include React popup
+				chunks: ['popup'],
 			}),
 			{
 				apply(compiler) {
