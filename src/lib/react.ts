@@ -1,5 +1,5 @@
-import ReactDOM from 'react-dom/client'; // Import from the new react-dom/client
-import { v4 as uuid } from 'uuid'; // Ensure you import uuid for generating unique IDs
+import ReactDOM from 'react-dom/client';
+import { v4 as uuid } from 'uuid';
 import $ from 'jquery';
 
 export const renderReact = (component: React.JSX.Element) => {

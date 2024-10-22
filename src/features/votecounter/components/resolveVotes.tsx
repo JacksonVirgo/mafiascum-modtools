@@ -5,8 +5,8 @@ import {
 	VoteCorrection,
 	VoteType,
 } from '../../../types/gameDefinition';
-import TextInput from '../form/TextInput';
-import Button from '../buttons/button';
+import TextInput from '../../../components/form/TextInput';
+import Button from '../../../components/buttons/button';
 
 interface ResolveVotes extends ReducerProps {
 	flaggedVotes: FlaggedVotes;

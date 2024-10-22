@@ -1,8 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { ReducerProps } from '../modal';
-import Button from '../../buttons/button';
+import Button from '../../../../components/buttons/button';
 import { Day } from '../../../../types/gameDefinition';
-import NumberInput from '../../form/NumberInput';
+import NumberInput from '../../../../components/form/NumberInput';
 
 export function DaysTab({ state, dispatch }: ReducerProps) {
 	const [currentEdit, setCurrentEdit] = useState<Day | null>(null);

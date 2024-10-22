@@ -7,7 +7,8 @@
 		"build": "webpack --config webpack.config.js --mode production",
 		"dev": "webpack --mode development --watch",
 		"lint": "eslint .",
-		"typecheck": "tsc --noEmit"
+		"typecheck": "tsc --noEmit",
+		"format": "npx prettier . --write"
 	},
 	"author": "JacksonVirgo",
 	"license": "MIT",
@@ -27,6 +28,8 @@
 		"copy-webpack-plugin": "^11.0.0",
 		"css-loader": "^6.8.1",
 		"eslint": "^8.49.0",
+		"eslint-plugin-boundaries": "^4.2.2",
+		"eslint-plugin-import": "^2.31.0",
 		"html-webpack-plugin": "^5.6.0",
 		"mini-css-extract-plugin": "^2.7.6",
 		"postcss": "^8.4.32",

@@ -1,9 +1,8 @@
 import $ from 'jquery';
-import { getHighlight } from '../../utils/storage';
 
 export default async () => {
-	const isHighlightingQuotes = await getHighlight();
-	if (isHighlightingQuotes != 'on') return;
+	const isHighlightingActive = 'on';
+	if (isHighlightingActive != 'on') return;
 
 	const username = $('#username_logged_in .username').first().text();
 	if (!username) return;

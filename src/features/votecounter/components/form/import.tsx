@@ -1,7 +1,7 @@
 import React, { useState } from 'react';
 import { ReducerProps } from '../modal';
-import Button from '../../buttons/button';
-import { FileInput } from '../../form/FileInput';
+import Button from '../../../../components/buttons/button';
+import { FileInput } from '../../../../components/form/FileInput';
 import {
 	GameDefinition,
 	isGameDefinition,

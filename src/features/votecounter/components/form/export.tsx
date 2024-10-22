@@ -1,6 +1,6 @@
 import React from 'react';
 import { ReducerProps } from '../modal';
-import Button from '../../buttons/button';
+import Button from '../../../../components/buttons/button';
 
 export function ExportTab({ state }: ReducerProps) {
 	const exportGameDefinition = () => {

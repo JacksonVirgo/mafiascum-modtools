@@ -1,16 +1,16 @@
 import React, { useState } from 'react';
-import Button from '../buttons/button';
-import { sendBackgroundRequest } from '../../request';
+import Button from '../../../components/buttons/button';
 import { isSaveGameDefResponse } from '../../../types/backgroundResponse';
 import $ from 'jquery';
-import LoadingSpinner from '../indicators/LoadingSpinner';
+import LoadingSpinner from '../../../components/indicators/LoadingSpinner';
 import { DaysTab } from './form/days';
 import { PlayersTab } from './form/players';
 import { VotesTab } from './form/votes';
 import { ExportTab } from './form/export';
 import { ImportTab } from './form/import';
-import { startVoteCount } from '../../../utils/votecounter';
+import { startVoteCount } from '../../../features/votecounter/votecounter';
 import { ReducerProps, modalManager } from './modal';
+import { saveGameDefinition } from '../background/storage';
 
 interface ModalFormProps extends ReducerProps {
 	onResponse: (res: string) => void;
@@ -88,8 +88,7 @@ export const NewGameDef = ({
 		const threadId = tVal[1];
 		if (!threadId) return setLoadState(ModalLoadingState.ERROR);
 
-		const res = await sendBackgroundRequest({
-			action: 'saveGameDef',
+		const res = saveGameDefinition.query({
 			gameId: threadId,
 			gameDef: {
 				days: [],

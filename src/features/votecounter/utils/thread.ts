@@ -1,5 +1,5 @@
-import { Vote, isPageDataResponse } from '../types/backgroundResponse';
-import { sendBackgroundRequest } from './request';
+import { isPageDataResponse, Vote } from '../../../types/backgroundResponse';
+import fetchPageData from '../background/getPageData';
 
 export type PageQuery = {
 	threadId: string;
@@ -14,19 +14,13 @@ export async function getPageData(query: PageQuery) {
 	params.set('t', query.threadId);
 	params.set('ppp', query.take.toString());
 	params.set('start', query.skip.toString());
-	// reduces response payload size by over 90%!
-	// simplifies the html DOM tree
-	// removes scripts and css which we don't care about
 	params.set('view', 'print');
 
 	const url = BASE_THREAD_URL + params.toString();
 
 	try {
-		const pageData = await sendBackgroundRequest({
-			action: 'getPageData',
-			url: url,
-		});
-		if (!isPageDataResponse(pageData)) return null;
+		const pageData = await fetchPageData.query({ url });
+		if (!pageData) return null;
 		return pageData;
 	} catch (err) {
 		console.error(err);
@@ -54,11 +48,8 @@ export async function getThreadData(threadId: string, startFrom: number) {
 		});
 
 		if (!pageData) return throwErr('Could not fetch page data.');
-		if (pageData.status != 200)
-			return throwErr(`Page data status was ${pageData.status}.`);
-
 		totalPages = pageData.lastPage;
-		pageTitle = pageData.pageTitle;
+		pageTitle = pageData.title;
 		votes = [...votes, ...pageData.votes];
 
 		loopIndex++;

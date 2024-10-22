@@ -8,23 +8,23 @@ import React, {
 } from 'react';
 
 import $ from 'jquery';
-import LoadingSpinner from '../indicators/LoadingSpinner';
-import { renderReact } from '../../../utils/react';
-import Button from '../buttons/button';
+import LoadingSpinner from '../../../components/indicators/LoadingSpinner';
+import { renderReact } from '../../../lib/react';
+import Button from '../../../components/buttons/button';
 import { ModalForm } from './form';
 import { ValidatedVote } from '../../../types/gameDefinition';
-import TextArea from '../form/TextArea';
+import TextArea from '../../../components/form/TextArea';
 import { vcFormReducer, initialFormState, GameAction } from './formReducer';
 import ResolveVotes from './resolveVotes';
 import {
 	isGetSavedGameDefResponse,
 	isSaveGameDefResponse,
 } from '../../../types/backgroundResponse';
-import { sendBackgroundRequest } from '../../request';
+import { getGameDefinition, saveGameDefinition } from '../background/storage';
 
 export const CSS_HIDDEN = 'me_hidden';
 
-export async function createModal() {
+export function createModal() {
 	const modal = renderReact(<Modal ref={modalRef} />);
 	$('body').append(modal);
 	return modal;
@@ -137,10 +137,7 @@ export const Modal = forwardRef((_props, ref) => {
 		const threadId = tVal[1];
 		if (!threadId) return setCurrentState(ModalState.Error);
 
-		const res = await sendBackgroundRequest({
-			action: 'getSavedGameDef',
-			gameId: threadId,
-		});
+		const res = await getGameDefinition.query({ gameId: threadId });
 
 		console.log('Loaded Game Def', threadId, res);
 		if (!isGetSavedGameDefResponse(res))
@@ -166,12 +163,11 @@ export const Modal = forwardRef((_props, ref) => {
 		const threadId = tVal[1];
 		if (!threadId) return setCurrentState(ModalState.Error);
 
-		const res = await sendBackgroundRequest({
-			action: 'saveGameDef',
+		const res = await saveGameDefinition.query({
 			gameId: threadId,
 			gameDef: state,
 		});
-
+		
 		console.log('Saved Game Def', threadId, res);
 		if (!isSaveGameDefResponse(res))
 			return setCurrentState(ModalState.Error);

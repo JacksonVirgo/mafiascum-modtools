@@ -1,13 +1,13 @@
-import { getThreadData } from '../content/thread';
-import { Vote } from '../types/backgroundResponse';
+import { Vote } from '../../types/backgroundResponse';
 import {
 	GameDefinition,
 	ValidatedVote,
 	VoteCorrection,
 	VoteType,
-} from '../types/gameDefinition';
+} from '../../types/gameDefinition';
 import $ from 'jquery';
-import { findBestMatch } from './stringSimilarity';
+import { findBestMatch } from '../../lib/stringSimilarity';
+import { getThreadData } from './utils/thread';
 
 const CORRECTION_ERROR_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;

@@ -1,9 +1,9 @@
 import React, { useState } from 'react';
-import Button from '../../buttons/button';
+import Button from '../../../../components/buttons/button';
 import { Vote } from '../../../../types/gameDefinition';
-import NumberInput from '../../form/NumberInput';
-import TextInput from '../../form/TextInput';
-import Checkbox from '../../form/Checkbox';
+import NumberInput from '../../../../components/form/NumberInput';
+import TextInput from '../../../../components/form/TextInput';
+import Checkbox from '../../../../components/form/Checkbox';
 import { ReducerProps } from '../modal';
 
 export function VotesTab({ state, dispatch }: ReducerProps) {
