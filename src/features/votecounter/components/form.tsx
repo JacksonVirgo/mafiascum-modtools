@@ -1,6 +1,5 @@
 import React, { useState } from 'react';
 import Button from '../../../components/buttons/button';
-import { isSaveGameDefResponse } from '../../../types/backgroundResponse';
 import $ from 'jquery';
 import LoadingSpinner from '../../../components/indicators/LoadingSpinner';
 import { DaysTab } from './form/days';
@@ -8,7 +7,7 @@ import { PlayersTab } from './form/players';
 import { VotesTab } from './form/votes';
 import { ExportTab } from './form/export';
 import { ImportTab } from './form/import';
-import { startVoteCount } from '../../../features/votecounter/votecounter';
+import { startVoteCount } from '../utils/votecounter';
 import { ReducerProps, modalManager } from './modal';
 import { saveGameDefinition } from '../background/storage';
 
@@ -88,7 +87,7 @@ export const NewGameDef = ({
 		const threadId = tVal[1];
 		if (!threadId) return setLoadState(ModalLoadingState.ERROR);
 
-		const res = saveGameDefinition.query({
+		const res = await saveGameDefinition.query({
 			gameId: threadId,
 			gameDef: {
 				days: [],
@@ -97,8 +96,7 @@ export const NewGameDef = ({
 			},
 		});
 
-		if (!isSaveGameDefResponse(res) || !res.savedGameDef)
-			return setLoadState(ModalLoadingState.ERROR);
+		if (!res) return setLoadState(ModalLoadingState.ERROR);
 
 		console.log('SAVED', res.savedGameDef);
 

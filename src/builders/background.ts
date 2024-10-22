@@ -1,4 +1,4 @@
-import { z, ZodSchema } from 'zod';
+import { z, ZodError, ZodSchema } from 'zod';
 import browser from 'webextension-polyfill';
 import { getInstanceType, InstanceType } from '../lib/window';
 
@@ -28,44 +28,65 @@ class Inner<Req extends ZodSchema> {
 		this.name = name;
 		this.schema = schema;
 	}
-	public onQuery<R>(func: (data: z.infer<Req>) => Promise<R>) {
-		if (getInstanceType() != InstanceType.Background)
-			throw new Error('onQuery can only be set in background scripts');
-
-		return new ScriptHandler<Req, R>(this.name, this.schema, func);
+	public output<Schema extends ZodSchema>(schema: Schema) {
+		return new NextInner<Req, Schema>(this.name, this.schema, schema);
 	}
 }
 
-class ScriptHandler<Req extends ZodSchema, Res> {
+class NextInner<Req extends ZodSchema, Res extends ZodSchema> {
+	private name: string;
+	private inputSchema: Req;
+	private outputSchema: Res;
+	constructor(name: string, inputSchema: Req, outputSchema: Res) {
+		this.name = name;
+		this.inputSchema = inputSchema;
+		this.outputSchema = outputSchema;
+	}
+	public onQuery(func: (data: z.infer<Req>) => Promise<z.infer<Res>>) {
+		return new ScriptHandler<Req, Res>(
+			this.name,
+			this.inputSchema,
+			this.outputSchema,
+			func,
+		);
+	}
+}
+
+class ScriptHandler<Req extends ZodSchema, Res extends ZodSchema> {
 	// eslint-disable-next-line @typescript-eslint/no-explicit-any
 	public static scripts: Map<string, ScriptHandler<any, any>> = new Map();
 
 	private name: string;
-	private schema: Req;
+	private inputSchema: Req;
+	private outputSchema: Res;
 	private queryFunc: (data: z.infer<Req>) => Promise<Res>;
 
 	constructor(
 		name: string,
-		schema: Req,
+		inputSchema: Req,
+		outputSchema: Res,
 		queryFunc: (data: z.infer<Req>) => Promise<Res>,
 	) {
 		this.name = name;
-		this.schema = schema;
+		this.inputSchema = inputSchema;
+		this.outputSchema = outputSchema;
 		this.queryFunc = queryFunc;
 
 		ScriptHandler.scripts.set(this.name, this);
 		console.log(`[BG Script] Registered ${this.name}.`);
 	}
 
-	public async query(data: z.infer<Req>): Promise<Res | null> {
-		const isContentScript =
-			typeof browser !== 'undefined' &&
-			browser.runtime &&
-			browser.runtime.id;
-		const isBackgroundScript = typeof window === 'undefined';
+	public ensureLoaded() {
+		return this;
+	}
 
-		if (isContentScript) return this.runAsContent(data);
-		else if (isBackgroundScript) return this.runAsBackground(data);
+	public async query(data: z.infer<Req>): Promise<z.infer<Res> | null> {
+		const instanceType = getInstanceType();
+		console.log('Instance Type: ', instanceType);
+		if (instanceType == InstanceType.Content)
+			return this.runAsContent(data);
+		else if (instanceType == InstanceType.Background)
+			return this.runAsBackground(data);
 		else throw new Error('Unknown environment');
 	}
 
@@ -74,10 +95,15 @@ class ScriptHandler<Req extends ZodSchema, Res> {
 		return fullResponse;
 	}
 
-	private async runAsContent(data: z.infer<Req>): Promise<Res | null> {
+	private async runAsContent(
+		data: z.infer<Req>,
+	): Promise<z.infer<Res> | null> {
 		try {
-			const response: unknown = await browser.runtime.sendMessage(data);
-			const parsed = this.schema.parse(response);
+			const response: unknown = await browser.runtime.sendMessage({
+				mafiaEngineAction: this.name,
+				...data,
+			});
+			const parsed = this.outputSchema.parse(response);
 			return parsed;
 		} catch (err) {
 			console.log(err);

@@ -2,7 +2,7 @@ import { BackgroundScript } from '../../../builders/background';
 import { z } from 'zod';
 import { load } from 'cheerio';
 
-interface Vote {
+export interface Vote {
 	author: string;
 	post: number;
 	index: number;
@@ -14,6 +14,23 @@ export default new BackgroundScript('getPageData')
 		z.object({
 			url: z.string().url(),
 		}),
+	)
+	.output(
+		z
+			.object({
+				title: z.string(),
+				lastPage: z.number(),
+				currentPage: z.number(),
+				votes: z.array(
+					z.object({
+						author: z.string(),
+						post: z.number(),
+						index: z.number(),
+						vote: z.string(),
+					}),
+				),
+			})
+			.nullable(),
 	)
 	.onQuery(async ({ url }) => {
 		try {

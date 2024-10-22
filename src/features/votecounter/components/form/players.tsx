@@ -1,10 +1,10 @@
 import React, { useState } from 'react';
 import { ReducerProps } from '../modal';
 import { Player } from '../../../../types/gameDefinition';
-import Button from '../../buttons/button';
-import TextInput from '../../form/TextInput';
-import NumberInput from '../../form/NumberInput';
-import TextArea from '../../form/TextArea';
+import Button from '../../../../components/buttons/button';
+import NumberInput from '../../../../components/form/NumberInput';
+import TextArea from '../../../../components/form/TextArea';
+import TextInput from '../../../../components/form/TextInput';
 
 export function PlayersTab({
 	state: _state,

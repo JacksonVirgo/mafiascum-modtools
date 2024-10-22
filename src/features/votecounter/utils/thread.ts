@@ -1,5 +1,4 @@
-import { isPageDataResponse, Vote } from '../../../types/backgroundResponse';
-import fetchPageData from '../background/getPageData';
+import fetchPageData, { Vote } from '../background/getPageData';
 
 export type PageQuery = {
 	threadId: string;
@@ -43,11 +42,11 @@ export async function getThreadData(threadId: string, startFrom: number) {
 		const pageData = await getPageData({
 			threadId,
 			take: 200,
-			// skips fetching posts we don't need to parse
 			skip: loopIndex * 200 + startFrom,
 		});
 
 		if (!pageData) return throwErr('Could not fetch page data.');
+
 		totalPages = pageData.lastPage;
 		pageTitle = pageData.title;
 		votes = [...votes, ...pageData.votes];

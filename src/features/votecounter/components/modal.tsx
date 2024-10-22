@@ -16,10 +16,6 @@ import { ValidatedVote } from '../../../types/gameDefinition';
 import TextArea from '../../../components/form/TextArea';
 import { vcFormReducer, initialFormState, GameAction } from './formReducer';
 import ResolveVotes from './resolveVotes';
-import {
-	isGetSavedGameDefResponse,
-	isSaveGameDefResponse,
-} from '../../../types/backgroundResponse';
 import { getGameDefinition, saveGameDefinition } from '../background/storage';
 
 export const CSS_HIDDEN = 'me_hidden';
@@ -138,12 +134,13 @@ export const Modal = forwardRef((_props, ref) => {
 		if (!threadId) return setCurrentState(ModalState.Error);
 
 		const res = await getGameDefinition.query({ gameId: threadId });
+		if (!res){
+			return await saveGameDef();
+		}
 
 		console.log('Loaded Game Def', threadId, res);
-		if (!isGetSavedGameDefResponse(res))
-			return setCurrentState(ModalState.Error);
 
-		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res.savedGameDef });
+		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res });
 		setCurrentState(ModalState.Form);
 	};
 
@@ -169,8 +166,7 @@ export const Modal = forwardRef((_props, ref) => {
 		});
 		
 		console.log('Saved Game Def', threadId, res);
-		if (!isSaveGameDefResponse(res))
-			return setCurrentState(ModalState.Error);
+		if (!res) return setCurrentState(ModalState.Error);
 	};
 
 	useEffect(() => {
@@ -243,6 +239,13 @@ export const Modal = forwardRef((_props, ref) => {
 						state={state}
 						dispatch={dispatch}
 					/>
+				)}
+				{currentState == ModalState.Error && (
+					<div className="grow flex flex-col justify-center items-center">
+						<span className="text-red-500">
+							Error Loading Game Definition
+						</span>
+					</div>
 				)}
 			</div>
 		</div>

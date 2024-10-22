@@ -14,6 +14,7 @@ export const getGameDefinition = new BackgroundScript('getGameDefinition')
 			gameId: z.string(),
 		}),
 	)
+	.output(GameDefinitionSchema.nullable())
 	.onQuery(async ({ gameId }) => {
 		try {
 			const tag = TAG_PREFIX + gameId;
@@ -23,6 +24,7 @@ export const getGameDefinition = new BackgroundScript('getGameDefinition')
 			if (!isGameDefinition(response)) return null;
 			return response;
 		} catch (err) {
+			console.log(err);
 			return null;
 		}
 	});
@@ -34,20 +36,38 @@ export const saveGameDefinition = new BackgroundScript('saveGameDefinition')
 			gameDef: GameDefinitionSchema,
 		}),
 	)
+	.output(
+		z
+			.object({
+				savedGameDef: GameDefinitionSchema,
+				isSame: z.boolean(),
+			})
+			.nullable(),
+	)
 	.onQuery(async ({ gameId, gameDef }) => {
+		console.log('Saving Game Def', gameId, gameDef);
 		try {
 			const tag = TAG_PREFIX + gameId;
 			const fetched = await getGameDefinition.query({ gameId });
+			console.log('FETCHED', fetched);
 			if (isGameDefinition(fetched)) {
 				const isSame =
 					JSON.stringify(fetched) === JSON.stringify(gameDef);
-				if (isSame) return true;
+				if (isSame)
+					return {
+						savedGameDef: gameDef,
+						isSame: true,
+					};
 			}
 			await browser.storage.local.set({
 				[tag]: gameDef,
 			});
-			return true;
+			return {
+				savedGameDef: gameDef,
+				isSame: false,
+			};
 		} catch (err) {
-			return false;
+			console.log(err);
+			return null;
 		}
 	});

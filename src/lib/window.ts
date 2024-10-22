@@ -1,17 +1,16 @@
 import browser from 'webextension-polyfill';
 
 export enum InstanceType {
-	Background,
-	Popup,
-	Content,
+	Background = 'background',
+	Popup = 'popup',
+	Content = 'content',
 }
 
 export function getInstanceType() {
-	if (typeof browser !== 'undefined' && browser.runtime) {
-		return InstanceType.Content;
-	} else if (typeof window !== 'undefined' && window.top) {
-		return InstanceType.Popup;
-	} else {
-		return InstanceType.Background;
-	}
+	if (isBackground()) return InstanceType.Background;
+	return InstanceType.Content;
 }
+
+// Rough band-aid solution, should be removed in the future as popups
+// are seen as a bg script in this instance
+const isBackground = () => location.protocol === 'chrome-extension:';
