@@ -10,10 +10,16 @@ const json = require('./manifest.json');
 
 // Entry points
 const entryPoints = {
-	main: [path.resolve(__dirname, 'src', 'content', 'index.ts')],
-	background: path.resolve(__dirname, 'src', 'background', 'background.ts'),
-	styling: path.resolve(__dirname, 'src', 'styles', 'main.css'),
-	popup: path.resolve(__dirname, 'src', 'popup', 'popup.tsx'),
+	main: [path.resolve(__dirname, 'src', 'app', 'content', 'content.ts')],
+	background: path.resolve(
+		__dirname,
+		'src',
+		'app',
+		'background',
+		'background.ts',
+	),
+	styling: path.resolve(__dirname, 'src', 'app', 'main.css'),
+	popup: path.resolve(__dirname, 'src', 'features', 'popup', 'popup.tsx'),
 };
 
 function fillConfig(version) {
