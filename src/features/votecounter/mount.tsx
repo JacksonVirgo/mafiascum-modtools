@@ -10,9 +10,9 @@ export default async () => {
 		$('.post').each((_, postElement) => {
 			const post = $(postElement);
 			const author = post.find('.author').first();
-			author.find('a:nth-child(3)').after(renderReact(<VcButton onClick={() => {
-				modalManager.show
-			}} />));
+			const targetElement = author.find('a:nth-child(3)');
+			if (targetElement.length <= 0) return;
+			targetElement.after(renderReact(<VcButton onClick={modalManager.show} />));
 		});
 	}
 };
