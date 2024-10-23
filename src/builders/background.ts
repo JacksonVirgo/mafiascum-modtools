@@ -1,4 +1,4 @@
-import { z, ZodError, ZodSchema } from 'zod';
+import { z, ZodSchema } from 'zod';
 import browser from 'webextension-polyfill';
 import { getInstanceType, InstanceType } from '../lib/window';
 

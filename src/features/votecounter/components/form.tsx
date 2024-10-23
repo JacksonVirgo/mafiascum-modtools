@@ -8,10 +8,11 @@ import { VotesTab } from './form/votes';
 import { ExportTab } from './form/export';
 import { ImportTab } from './form/import';
 import { startVoteCount } from '../utils/votecounter';
-import { ReducerProps, modalManager } from './modal';
+import { modalManager } from './modal';
 import { saveGameDefinition } from '../background/storage';
+import { useGameDefinition } from '../context';
 
-interface ModalFormProps extends ReducerProps {
+interface ModalFormProps {
 	onResponse: (res: string) => void;
 }
 
@@ -24,8 +25,6 @@ enum ModalLoadingState {
 
 export const ModalForm = ({
 	onResponse: _onResponse,
-	state,
-	dispatch,
 }: ModalFormProps) => {
 	const [loadState, setLoadState] = useState(ModalLoadingState.LOADED);
 
@@ -40,7 +39,7 @@ export const ModalForm = ({
 				</div>
 			)}
 			{loadState == ModalLoadingState.LOADED && (
-				<FormInner state={state} dispatch={dispatch} />
+				<FormInner />
 			)}
 
 			{loadState == ModalLoadingState.ERROR && (
@@ -52,8 +51,6 @@ export const ModalForm = ({
 			)}
 			{loadState == ModalLoadingState.NO_GAME_DEF && (
 				<NewGameDef
-					state={state}
-					dispatch={dispatch}
 					setLoadState={setLoadState}
 				/>
 			)}
@@ -61,15 +58,15 @@ export const ModalForm = ({
 	);
 };
 
-interface NewGameDefProps extends ReducerProps {
+interface NewGameDefProps {
 	setLoadState: React.Dispatch<React.SetStateAction<ModalLoadingState>>;
 }
 
 export const NewGameDef = ({
-	state: _state,
-	dispatch,
 	setLoadState,
 }: NewGameDefProps) => {
+	const [_state, dispatch] = useGameDefinition();
+
 	const createNewGameDef = async () => {
 		setLoadState(ModalLoadingState.LOADING);
 		const threadRelativeUrl = $('h2')
@@ -111,8 +108,6 @@ export const NewGameDef = ({
 	);
 };
 
-interface FormInnerProps extends ReducerProps {}
-
 enum FormSection {
 	DAYS = 'Days',
 	PLAYERS = 'Players',
@@ -127,8 +122,9 @@ interface SectionProps {
 	section: FormSection;
 }
 
-export const FormInner = ({ state, dispatch }: FormInnerProps) => {
+export const FormInner = () => {
 	const [activeSection, setActiveSection] = useState(FormSection.DAYS);
+	const [state] = useGameDefinition();
 
 	const Section = ({ section, focused, onClick }: SectionProps) => {
 		return (
@@ -194,23 +190,23 @@ export const FormInner = ({ state, dispatch }: FormInnerProps) => {
 
 			<div className="flex flex-col gap-0 grow justify-center p-4">
 				{activeSection == FormSection.DAYS && (
-					<DaysTab state={state} dispatch={dispatch} />
+					<DaysTab />
 				)}
 
 				{activeSection == FormSection.PLAYERS && (
-					<PlayersTab state={state} dispatch={dispatch} />
+					<PlayersTab/>
 				)}
 
 				{activeSection == FormSection.VOTES && (
-					<VotesTab state={state} dispatch={dispatch} />
+					<VotesTab  />
 				)}
 
 				{activeSection == FormSection.IMPORT && (
-					<ImportTab state={state} dispatch={dispatch} />
+					<ImportTab  />
 				)}
 
 				{activeSection == FormSection.EXPORT && (
-					<ExportTab state={state} dispatch={dispatch} />
+					<ExportTab  />
 				)}
 
 				<div className="shrink flex flex-row items-center justify-center">

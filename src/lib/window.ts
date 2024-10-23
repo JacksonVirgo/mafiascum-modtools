@@ -1,5 +1,3 @@
-import browser from 'webextension-polyfill';
-
 export enum InstanceType {
 	Background = 'background',
 	Popup = 'popup',

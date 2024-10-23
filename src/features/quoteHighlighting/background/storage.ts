@@ -1,9 +1,5 @@
 import { BackgroundScript } from '../../../builders/background';
 import { z } from 'zod';
-import {
-	GameDefinitionSchema,
-	isGameDefinition,
-} from '../../votecounter/types/gameDefinition';
 import browser from 'webextension-polyfill';
 
 const TAG = 'quoteHighlighting';
@@ -21,5 +17,3 @@ export const getQuoteHighlighting = new BackgroundScript('getHighlightQuotes')
 			return false;
 		}
 	});
-
-const d = getQuoteHighlighting.query({});

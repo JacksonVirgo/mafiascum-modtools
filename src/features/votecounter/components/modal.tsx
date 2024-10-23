@@ -3,7 +3,6 @@ import React, {
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
-	useReducer,
 	useState,
 } from 'react';
 
@@ -14,14 +13,14 @@ import Button from '../../../components/buttons/button';
 import { ModalForm } from './form';
 import { ValidatedVote } from '../types/gameDefinition';
 import TextArea from '../../../components/form/TextArea';
-import { vcFormReducer, initialFormState, GameAction } from './formReducer';
 import ResolveVotes from './resolveVotes';
 import { getGameDefinition, saveGameDefinition } from '../background/storage';
+import GameDefinitionContext, { useGameDefinition } from '../context';
 
 export const CSS_HIDDEN = 'me_hidden';
 
 export function createModal() {
-	const modal = renderReact(<Modal ref={modalRef} />);
+	const modal = renderReact(<Modal />);
 	$('body').append(modal);
 	return modal;
 }
@@ -81,12 +80,14 @@ export const modalManager = {
 	},
 };
 
-export interface ReducerProps {
-	state: typeof initialFormState;
-	dispatch: React.Dispatch<GameAction>;
-}
 
-export const Modal = forwardRef((_props, ref) => {
+export const Modal = () => {
+	return <GameDefinitionContext>
+		<ModalInner ref={modalRef} />
+	</GameDefinitionContext>;
+};
+
+export const ModalInner = forwardRef((_props, ref) => {
 	const [isVisible, setIsVisible] = useState(false);
 	const [currentState, setCurrentState] = useState(ModalState.Form);
 	const [response, setResponse] = useState<string | undefined>();
@@ -95,7 +96,7 @@ export const Modal = forwardRef((_props, ref) => {
 		errors: [],
 	});
 
-	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
+	const [state, dispatch] = useGameDefinition();
 
 	useImperativeHandle(ref, () => ({
 		show: () => setIsVisible(true),
@@ -185,74 +186,70 @@ export const Modal = forwardRef((_props, ref) => {
 	};
 
 	return (
-		<div
-			id="me_votecount"
-			className={`fixed top-0 left-0 w-screen h-screen bg-[rgba(0, 0, 0, 0.3)] backdrop-blur-sm z-[50] flex flex-col justify-center items-center ${
-				isVisible ? '' : '!hidden'
-			}`}
-			onClick={(e) => {
-				if (e.target === e.currentTarget) {
-					setIsVisible(false);
-				}
-			}}
-		>
-			<div className="aspect-[3/2] h-1/2 max-h-1/2 flex flex-col bg-primary-color rounded-[15px] border-2 border-white justify-center items-center p-4">
-				<div className="w-full shrink flex flex-row items-center align-middle justify-center border-b-2 border-white">
-					<span className="grow text-white text-lg font-bold">
-						Votecounter
-					</span>
-					<div className="text-right">
-						<span
-							className="hover:cursor-pointer"
-							onClick={() => setIsVisible(false)}
-						>
-							❌
+		<GameDefinitionContext>
+			<div
+				id="me_votecount"
+				className={`fixed top-0 left-0 w-screen h-screen bg-[rgba(0, 0, 0, 0.3)] backdrop-blur-sm z-[50] flex flex-col justify-center items-center ${
+					isVisible ? '' : '!hidden'
+				}`}
+				onClick={(e) => {
+					if (e.target === e.currentTarget) {
+						setIsVisible(false);
+					}
+				}}
+			>
+				<div className="aspect-[3/2] h-1/2 max-h-1/2 flex flex-col bg-primary-color rounded-[15px] border-2 border-white justify-center items-center p-4">
+					<div className="w-full shrink flex flex-row items-center align-middle justify-center border-b-2 border-white">
+						<span className="grow text-white text-lg font-bold">
+							Votecounter
 						</span>
+						<div className="text-right">
+							<span
+								className="hover:cursor-pointer"
+								onClick={() => setIsVisible(false)}
+							>
+								❌
+							</span>
+						</div>
 					</div>
+
+					<hr className="w-full" />
+
+					{currentState == ModalState.Loading && (
+						<div className="grow flex flex-col justify-center items-center">
+							<LoadingSpinner />
+						</div>
+					)}
+					{currentState == ModalState.Form && (
+						<ModalForm
+							onResponse={onResponse}
+						/>
+					)}
+					{currentState == ModalState.Response && (
+						<ModalResponse
+							format={response}
+							flaggedVotes={flaggedVotes}
+						/>
+					)}
+					{currentState == ModalState.ResolvingVotes && (
+						<ResolveVotes
+							flaggedVotes={flaggedVotes}
+						/>
+					)}
+					{currentState == ModalState.Error && (
+						<div className="grow flex flex-col justify-center items-center">
+							<span className="text-red-500">
+								Error Loading Game Definition
+							</span>
+						</div>
+					)}
 				</div>
-
-				<hr className="w-full" />
-
-				{currentState == ModalState.Loading && (
-					<div className="grow flex flex-col justify-center items-center">
-						<LoadingSpinner />
-					</div>
-				)}
-				{currentState == ModalState.Form && (
-					<ModalForm
-						onResponse={onResponse}
-						state={state}
-						dispatch={dispatch}
-					/>
-				)}
-				{currentState == ModalState.Response && (
-					<ModalResponse
-						format={response}
-						flaggedVotes={flaggedVotes}
-						state={state}
-						dispatch={dispatch}
-					/>
-				)}
-				{currentState == ModalState.ResolvingVotes && (
-					<ResolveVotes
-						flaggedVotes={flaggedVotes}
-						state={state}
-						dispatch={dispatch}
-					/>
-				)}
-				{currentState == ModalState.Error && (
-					<div className="grow flex flex-col justify-center items-center">
-						<span className="text-red-500">
-							Error Loading Game Definition
-						</span>
-					</div>
-				)}
 			</div>
-		</div>
+		</GameDefinitionContext>
 	);
 });
 
-interface ModalResponseProps extends ReducerProps {
+interface ModalResponseProps {
 	format?: string;
 	flaggedVotes?: FlaggedVotes;
 }

@@ -1,13 +1,15 @@
 import React, { useState } from 'react';
-import { ReducerProps } from '../modal';
 import Button from '../../../../components/buttons/button';
 import { FileInput } from '../../../../components/form/FileInput';
 import {
 	GameDefinition,
 	isGameDefinition,
 } from '../../types/gameDefinition';
+import { useGameDefinition } from '../../context';
 
-export function ImportTab({ dispatch }: ReducerProps) {
+export function ImportTab() {
+	const [_state, dispatch] = useGameDefinition();
+
 	const [uploadedFile, setUploadedFile] = useState<GameDefinition | null>(
 		null,
 	);

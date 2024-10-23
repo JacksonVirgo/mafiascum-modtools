@@ -4,9 +4,9 @@ import { Vote } from '../../types/gameDefinition';
 import NumberInput from '../../../../components/form/NumberInput';
 import TextInput from '../../../../components/form/TextInput';
 import Checkbox from '../../../../components/form/Checkbox';
-import { ReducerProps } from '../modal';
+import { useGameDefinition } from '../../context';
 
-export function VotesTab({ state, dispatch }: ReducerProps) {
+export function VotesTab() {
 	const [currentEdit, setCurrentEdit] = useState<Vote | null>(null);
 	const setEdit = (vote: Vote) => {
 		setCurrentEdit(vote);
@@ -16,16 +16,12 @@ export function VotesTab({ state, dispatch }: ReducerProps) {
 		<section className="grow w-full gap-2 flex flex-col">
 			{!currentEdit && (
 				<VoteTableView
-					state={state}
-					dispatch={dispatch}
 					setEdit={setEdit}
 				/>
 			)}
 
 			{currentEdit && (
 				<EditVote
-					state={state}
-					dispatch={dispatch}
 					vote={currentEdit}
 					setCurrentEdit={setCurrentEdit}
 				/>
@@ -34,15 +30,16 @@ export function VotesTab({ state, dispatch }: ReducerProps) {
 	);
 }
 
-interface EditVoteProps extends ReducerProps {
+interface EditVoteProps {
 	vote: Vote;
 	setCurrentEdit: (vote: Vote | null) => void;
 }
 
-function EditVote({ dispatch, vote, setCurrentEdit }: EditVoteProps) {
+function EditVote({ vote, setCurrentEdit }: EditVoteProps) {
 	const [postNumber, setPostNumber] = useState(vote.postNumber);
 	const [ignore, setIgnore] = useState(vote.ignore);
 	const [target, setTarget] = useState(vote.target);
+	const [_state, dispatch] = useGameDefinition();
 
 	return (
 		<div className="flex flex-col gap-2">
@@ -107,12 +104,13 @@ function EditVote({ dispatch, vote, setCurrentEdit }: EditVoteProps) {
 	);
 }
 
-interface VoteTableViewProps extends ReducerProps {
+interface VoteTableViewProps {
 	setEdit: (vote: Vote) => void;
 }
-function VoteTableView({ state, dispatch, setEdit }: VoteTableViewProps) {
+function VoteTableView({ setEdit }: VoteTableViewProps) {
 	const columns = ['Post Number', 'New Target', 'Ignored?'];
 	const [newVote, setNewVote] = useState<number>(0);
+	const [state, dispatch] = useGameDefinition();
 
 	return (
 		<>

@@ -1,15 +1,12 @@
 import React, { useState } from 'react';
-import { ReducerProps } from '../modal';
 import { Player } from '../../types/gameDefinition';
 import Button from '../../../../components/buttons/button';
 import NumberInput from '../../../../components/form/NumberInput';
 import TextArea from '../../../../components/form/TextArea';
 import TextInput from '../../../../components/form/TextInput';
+import { useGameDefinition } from '../../context';
 
-export function PlayersTab({
-	state: _state,
-	dispatch: _dispatch,
-}: ReducerProps) {
+export function PlayersTab() {
 	const [currentEdit, setCurrentEdit] = useState<Player | null>(null);
 	const setEdit = (player: Player) => {
 		setCurrentEdit(player);
@@ -18,16 +15,12 @@ export function PlayersTab({
 		<section className="grow w-full gap-2 flex flex-col">
 			{!currentEdit && (
 				<PlayerTableView
-					state={_state}
-					dispatch={_dispatch}
 					setEdit={setEdit}
 				/>
 			)}
 
 			{currentEdit && (
 				<EditPlayer
-					state={_state}
-					dispatch={_dispatch}
 					player={currentEdit}
 					setCurrentEdit={setCurrentEdit}
 				/>
@@ -36,15 +29,14 @@ export function PlayersTab({
 	);
 }
 
-interface PlayerTableViewProps extends ReducerProps {
+interface PlayerTableViewProps {
 	setEdit: (player: Player) => void;
 }
 
 export function PlayerTableView({
-	state,
-	dispatch,
 	setEdit,
 }: PlayerTableViewProps) {
+	const [state, dispatch] = useGameDefinition();
 	const [newUsername, setNewUsername] = useState<string>('');
 	return (
 		<section className="grow w-full gap-2 flex flex-col">
@@ -161,16 +153,17 @@ export default function PlayerTable({ data, columns, editRow }: TableProps) {
 	);
 }
 
-interface EditPlayerProps extends ReducerProps {
+interface EditPlayerProps {
 	player: Player;
 	setCurrentEdit: (player: Player | null) => void;
 }
 
 export function EditPlayer({
-	dispatch,
 	player,
 	setCurrentEdit,
 }: EditPlayerProps) {
+	const [_state, dispatch] = useGameDefinition();
+
 	const [username, setUsername] = useState(player.current);
 	const [aliases, setAliases] = useState(player.aliases);
 	const [previous, setPrevious] = useState(player.previous);

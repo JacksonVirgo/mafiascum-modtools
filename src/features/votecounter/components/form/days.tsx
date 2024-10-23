@@ -1,10 +1,10 @@
 import React, { useEffect, useState } from 'react';
-import { ReducerProps } from '../modal';
 import Button from '../../../../components/buttons/button';
 import { Day } from '../../types/gameDefinition';
 import NumberInput from '../../../../components/form/NumberInput';
+import { useGameDefinition } from '../../context';
 
-export function DaysTab({ state, dispatch }: ReducerProps) {
+export function DaysTab() {
 	const [currentEdit, setCurrentEdit] = useState<Day | null>(null);
 	const setEdit = (day: Day) => {
 		setCurrentEdit(day);
@@ -14,16 +14,12 @@ export function DaysTab({ state, dispatch }: ReducerProps) {
 		<section className="grow w-full gap-2 flex flex-col">
 			{!currentEdit && (
 				<DayTableView
-					state={state}
-					dispatch={dispatch}
 					setEdit={setEdit}
 				/>
 			)}
 
 			{currentEdit && (
 				<EditDay
-					state={state}
-					dispatch={dispatch}
 					day={currentEdit}
 					setCurrentEdit={setCurrentEdit}
 				/>
@@ -32,15 +28,18 @@ export function DaysTab({ state, dispatch }: ReducerProps) {
 	);
 }
 
-interface EditDayProps extends ReducerProps {
+interface EditDayProps {
 	day: Day;
 	setCurrentEdit: (day: Day | null) => void;
 }
 
-function EditDay({ dispatch, day, setCurrentEdit }: EditDayProps) {
+function EditDay({day, setCurrentEdit }: EditDayProps) {
 	const [dayNumber, setDayNumber] = useState(day.dayNumber);
 	const [startPost, setStartPost] = useState(day.startPost);
 	const [endPost, setEndPost] = useState(day.endPost);
+
+	const [_state, dispatch] = useGameDefinition();
+
 
 	useEffect(() => {
 		console.log(dayNumber, startPost, endPost);
@@ -106,10 +105,12 @@ function EditDay({ dispatch, day, setCurrentEdit }: EditDayProps) {
 	);
 }
 
-interface DayTableViewProps extends ReducerProps {
+interface DayTableViewProps {
 	setEdit: (day: Day) => void;
 }
-function DayTableView({ state, dispatch, setEdit }: DayTableViewProps) {
+function DayTableView({  setEdit }: DayTableViewProps) {
+	const [state, dispatch] = useGameDefinition();
+
 	const columns = ['Day', 'Start Post #', 'End Post #'];
 	const [newDay, setNewDay] = useState<number>(
 		state.days.reduce((max, day) => Math.max(max, day.dayNumber), 0) + 1,

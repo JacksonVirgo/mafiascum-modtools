@@ -1,8 +1,10 @@
 import React from 'react';
-import { ReducerProps } from '../modal';
 import Button from '../../../../components/buttons/button';
+import { useGameDefinition } from '../../context';
 
-export function ExportTab({ state }: ReducerProps) {
+export function ExportTab() {
+	const [state] = useGameDefinition();
+
 	const exportGameDefinition = () => {
 		const gameDefinition = JSON.stringify(state);
 		const blob = new Blob([gameDefinition], { type: 'text/plain' });
