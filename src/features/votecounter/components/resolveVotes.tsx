@@ -4,7 +4,7 @@ import {
 	ValidatedVote,
 	VoteCorrection,
 	VoteType,
-} from '../../../types/gameDefinition';
+} from '../types/gameDefinition';
 import TextInput from '../../../components/form/TextInput';
 import Button from '../../../components/buttons/button';
 

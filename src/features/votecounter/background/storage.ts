@@ -3,7 +3,7 @@ import { z } from 'zod';
 import {
 	GameDefinitionSchema,
 	isGameDefinition,
-} from '../../../types/gameDefinition';
+} from '../types/gameDefinition';
 import browser from 'webextension-polyfill';
 
 const TAG_PREFIX = 'gameDef-';

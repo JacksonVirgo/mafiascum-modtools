@@ -3,7 +3,7 @@ import { z } from 'zod';
 import {
 	GameDefinitionSchema,
 	isGameDefinition,
-} from '../../../types/gameDefinition';
+} from '../../votecounter/types/gameDefinition';
 import browser from 'webextension-polyfill';
 
 const TAG = 'quoteHighlighting';

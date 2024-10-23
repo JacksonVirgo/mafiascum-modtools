@@ -3,7 +3,7 @@ import {
 	ValidatedVote,
 	VoteCorrection,
 	VoteType,
-} from '../../../types/gameDefinition';
+} from '../types/gameDefinition';
 import $ from 'jquery';
 import { findBestMatch } from '../../../lib/stringSimilarity';
 import { getThreadData } from './thread';

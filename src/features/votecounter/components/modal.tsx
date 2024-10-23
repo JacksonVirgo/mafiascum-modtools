@@ -12,7 +12,7 @@ import LoadingSpinner from '../../../components/indicators/LoadingSpinner';
 import { renderReact } from '../../../lib/react';
 import Button from '../../../components/buttons/button';
 import { ModalForm } from './form';
-import { ValidatedVote } from '../../../types/gameDefinition';
+import { ValidatedVote } from '../types/gameDefinition';
 import TextArea from '../../../components/form/TextArea';
 import { vcFormReducer, initialFormState, GameAction } from './formReducer';
 import ResolveVotes from './resolveVotes';
