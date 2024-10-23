@@ -20,6 +20,10 @@ export const getGameDefinition = new BackgroundScript('getGameDefinition')
 			const tag = TAG_PREFIX + gameId;
 			const gameDef = await browser.storage.local.get(tag);
 			const response = gameDef[tag];
+
+			console.log('Of', gameDef);
+			console.log('Loaded', response);
+
 			if (!response) return null;
 			if (!isGameDefinition(response)) return null;
 			return response;

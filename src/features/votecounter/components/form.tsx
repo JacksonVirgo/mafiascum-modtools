@@ -8,9 +8,8 @@ import { VotesTab } from './form/votes';
 import { ExportTab } from './form/export';
 import { ImportTab } from './form/import';
 import { startVoteCount } from '../utils/votecounter';
-import { modalManager } from './modal';
 import { saveGameDefinition } from '../background/storage';
-import { useGameDefinition } from '../context';
+import { useGameDefinition, useVoteCountStateManager } from '../context';
 
 interface ModalFormProps {
 	onResponse: (res: string) => void;
@@ -117,6 +116,7 @@ interface SectionProps {
 export const FormInner = () => {
 	const [activeSection, setActiveSection] = useState(FormSection.DAYS);
 	const [state] = useGameDefinition();
+	const stateManager = useVoteCountStateManager();
 
 	const Section = ({ section, focused, onClick }: SectionProps) => {
 		return (
@@ -138,13 +138,13 @@ export const FormInner = () => {
 	};
 
 	const onSubmit = async () => {
-		modalManager.setLoading();
+		stateManager.setLoading();
 		const vcData = await startVoteCount(state);
 		if (!vcData) {
-			modalManager.setForm(); // TODO: Add an error page to redirect to
+			stateManager.setForm(); // TODO: Add an error page to redirect to
 			return;
 		}
-		modalManager.setResponse(vcData.formatted, vcData.votecount.logs);
+		stateManager.setResponse(vcData.formatted, vcData.votecount.logs);
 	};
 
 	return (

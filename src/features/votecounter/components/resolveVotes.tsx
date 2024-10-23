@@ -1,5 +1,5 @@
 import React, { useEffect, useState } from 'react';
-import { ReducerProps, FlaggedVotes, modalManager } from './modal';
+import { FlaggedVotes } from './modal';
 import {
 	ValidatedVote,
 	VoteCorrection,
@@ -7,8 +7,9 @@ import {
 } from '../types/gameDefinition';
 import TextInput from '../../../components/form/TextInput';
 import Button from '../../../components/buttons/button';
+import { useGameDefinition, useVoteCountStateManager } from '../context';
 
-interface ResolveVotes extends ReducerProps {
+interface ResolveVotes {
 	flaggedVotes: FlaggedVotes;
 }
 
@@ -20,15 +21,11 @@ export default function ResolveVotes(props: ResolveVotes) {
 				<ResolveVoteTable
 					flaggedVotes={props.flaggedVotes}
 					setEdit={setCurrentEdit}
-					state={props.state}
-					dispatch={props.dispatch}
 				/>
 			)}
 
 			{currentEdit && (
 				<EditVote
-					state={props.state}
-					dispatch={props.dispatch}
 					vote={currentEdit}
 					setEdit={setCurrentEdit}
 				/>
@@ -37,17 +34,18 @@ export default function ResolveVotes(props: ResolveVotes) {
 	);
 }
 
-interface ResolveVoteTableProps extends ReducerProps {
+interface ResolveVoteTableProps {
 	flaggedVotes: FlaggedVotes;
 	setEdit: (vote: ValidatedVote | null) => void;
 }
 
 function ResolveVoteTable({
 	flaggedVotes,
-	state,
 	setEdit,
 }: ResolveVoteTableProps) {
 	const columns = ['Post #', 'Target', 'Corrected', 'Validity'];
+	const [state] = useGameDefinition();
+	const stateManager = useVoteCountStateManager();
 
 	const [allProblemVotes, setAllProblemVoves] = useState<ValidatedVote[]>([]);
 	useEffect(() => {
@@ -167,20 +165,20 @@ function ResolveVoteTable({
 			<div className="flex flex-row justify-center gap-2">
 				<Button
 					label="Go Back"
-					onClick={() => modalManager.setForm()}
+					onClick={() => stateManager.setForm()}
 				/>
 			</div>
 		</div>
 	);
 }
 
-interface EditVoteProps extends ReducerProps {
+interface EditVoteProps {
 	vote: ValidatedVote;
 	setEdit: (vote: ValidatedVote | null) => void;
 }
-function EditVote({ state, dispatch, vote, setEdit }: EditVoteProps) {
+function EditVote({  vote, setEdit }: EditVoteProps) {
 	const [target, setTarget] = useState(vote.target ?? '');
-
+	const [state, dispatch] = useGameDefinition();
 	return (
 		<div className="flex flex-col gap-2">
 			<ValidatedVoteTable vote={vote} />

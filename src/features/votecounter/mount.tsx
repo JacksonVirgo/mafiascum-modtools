@@ -2,7 +2,8 @@ import React from 'react';
 import $ from 'jquery';
 import { renderReact } from '../../lib/react';
 import VcButton from './components/VcButton';
-import { createModal, modalManager } from './components/modal';
+import { createModal } from './components/modal';
+import { stateManager } from './context';
 
 export default async () => {
 	const modal = createModal();
@@ -13,7 +14,7 @@ export default async () => {
 			const targetElement = author.find('a:nth-child(3)');
 			if (targetElement.length <= 0) return;
 			targetElement.after(
-				renderReact(<VcButton onClick={modalManager.show} />),
+				renderReact(<VcButton onClick={stateManager.show} />),
 			);
 		});
 	}
