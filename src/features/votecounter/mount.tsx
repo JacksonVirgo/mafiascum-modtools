@@ -12,7 +12,9 @@ export default async () => {
 			const author = post.find('.author').first();
 			const targetElement = author.find('a:nth-child(3)');
 			if (targetElement.length <= 0) return;
-			targetElement.after(renderReact(<VcButton onClick={modalManager.show} />));
+			targetElement.after(
+				renderReact(<VcButton onClick={modalManager.show} />),
+			);
 		});
 	}
 };

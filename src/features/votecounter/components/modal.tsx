@@ -134,7 +134,7 @@ export const Modal = forwardRef((_props, ref) => {
 		if (!threadId) return setCurrentState(ModalState.Error);
 
 		const res = await getGameDefinition.query({ gameId: threadId });
-		if (!res){
+		if (!res) {
 			return await saveGameDef();
 		}
 
@@ -164,7 +164,7 @@ export const Modal = forwardRef((_props, ref) => {
 			gameId: threadId,
 			gameDef: state,
 		});
-		
+
 		console.log('Saved Game Def', threadId, res);
 		if (!res) return setCurrentState(ModalState.Error);
 	};
