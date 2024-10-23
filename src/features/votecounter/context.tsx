@@ -5,13 +5,15 @@ import { GameAction, initialFormState, vcFormReducer } from './reducer';
 const VoteCountContext = createContext<GameDefinition>(initialFormState);
 const VoteCountDispatch = createContext<Dispatch<GameAction>>(() => {});
 
-
 export function useGameDefinition(): [GameDefinition, Dispatch<GameAction>] {
-	return [React.useContext(VoteCountContext), React.useContext(VoteCountDispatch)];
+	return [
+		React.useContext(VoteCountContext),
+		React.useContext(VoteCountDispatch),
+	];
 }
 
 interface ContextProps {
-    children: React.ReactNode;
+	children: React.ReactNode;
 }
 
 export default function GameDefinitionContext({ children }: ContextProps) {

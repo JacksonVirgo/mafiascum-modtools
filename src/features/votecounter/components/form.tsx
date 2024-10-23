@@ -23,9 +23,7 @@ enum ModalLoadingState {
 	ERROR,
 }
 
-export const ModalForm = ({
-	onResponse: _onResponse,
-}: ModalFormProps) => {
+export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
 	const [loadState, setLoadState] = useState(ModalLoadingState.LOADED);
 
 	return (
@@ -38,9 +36,7 @@ export const ModalForm = ({
 					<LoadingSpinner />
 				</div>
 			)}
-			{loadState == ModalLoadingState.LOADED && (
-				<FormInner />
-			)}
+			{loadState == ModalLoadingState.LOADED && <FormInner />}
 
 			{loadState == ModalLoadingState.ERROR && (
 				<div className="grow flex flex-col justify-center items-center">
@@ -50,9 +46,7 @@ export const ModalForm = ({
 				</div>
 			)}
 			{loadState == ModalLoadingState.NO_GAME_DEF && (
-				<NewGameDef
-					setLoadState={setLoadState}
-				/>
+				<NewGameDef setLoadState={setLoadState} />
 			)}
 		</form>
 	);
@@ -62,9 +56,7 @@ interface NewGameDefProps {
 	setLoadState: React.Dispatch<React.SetStateAction<ModalLoadingState>>;
 }
 
-export const NewGameDef = ({
-	setLoadState,
-}: NewGameDefProps) => {
+export const NewGameDef = ({ setLoadState }: NewGameDefProps) => {
 	const [_state, dispatch] = useGameDefinition();
 
 	const createNewGameDef = async () => {
@@ -189,25 +181,15 @@ export const FormInner = () => {
 			</nav>
 
 			<div className="flex flex-col gap-0 grow justify-center p-4">
-				{activeSection == FormSection.DAYS && (
-					<DaysTab />
-				)}
+				{activeSection == FormSection.DAYS && <DaysTab />}
 
-				{activeSection == FormSection.PLAYERS && (
-					<PlayersTab/>
-				)}
+				{activeSection == FormSection.PLAYERS && <PlayersTab />}
 
-				{activeSection == FormSection.VOTES && (
-					<VotesTab  />
-				)}
+				{activeSection == FormSection.VOTES && <VotesTab />}
 
-				{activeSection == FormSection.IMPORT && (
-					<ImportTab  />
-				)}
+				{activeSection == FormSection.IMPORT && <ImportTab />}
 
-				{activeSection == FormSection.EXPORT && (
-					<ExportTab  />
-				)}
+				{activeSection == FormSection.EXPORT && <ExportTab />}
 
 				<div className="shrink flex flex-row items-center justify-center">
 					<Button label="Generate Votecount" onClick={onSubmit} />

@@ -80,11 +80,12 @@ export const modalManager = {
 	},
 };
 
-
 export const Modal = () => {
-	return <GameDefinitionContext>
-		<ModalInner ref={modalRef} />
-	</GameDefinitionContext>;
+	return (
+		<GameDefinitionContext>
+			<ModalInner ref={modalRef} />
+		</GameDefinitionContext>
+	);
 };
 
 export const ModalInner = forwardRef((_props, ref) => {
@@ -221,9 +222,7 @@ export const ModalInner = forwardRef((_props, ref) => {
 						</div>
 					)}
 					{currentState == ModalState.Form && (
-						<ModalForm
-							onResponse={onResponse}
-						/>
+						<ModalForm onResponse={onResponse} />
 					)}
 					{currentState == ModalState.Response && (
 						<ModalResponse
@@ -232,9 +231,7 @@ export const ModalInner = forwardRef((_props, ref) => {
 						/>
 					)}
 					{currentState == ModalState.ResolvingVotes && (
-						<ResolveVotes
-							flaggedVotes={flaggedVotes}
-						/>
+						<ResolveVotes flaggedVotes={flaggedVotes} />
 					)}
 					{currentState == ModalState.Error && (
 						<div className="grow flex flex-col justify-center items-center">

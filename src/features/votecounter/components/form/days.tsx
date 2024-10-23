@@ -12,17 +12,10 @@ export function DaysTab() {
 
 	return (
 		<section className="grow w-full gap-2 flex flex-col">
-			{!currentEdit && (
-				<DayTableView
-					setEdit={setEdit}
-				/>
-			)}
+			{!currentEdit && <DayTableView setEdit={setEdit} />}
 
 			{currentEdit && (
-				<EditDay
-					day={currentEdit}
-					setCurrentEdit={setCurrentEdit}
-				/>
+				<EditDay day={currentEdit} setCurrentEdit={setCurrentEdit} />
 			)}
 		</section>
 	);
@@ -33,13 +26,12 @@ interface EditDayProps {
 	setCurrentEdit: (day: Day | null) => void;
 }
 
-function EditDay({day, setCurrentEdit }: EditDayProps) {
+function EditDay({ day, setCurrentEdit }: EditDayProps) {
 	const [dayNumber, setDayNumber] = useState(day.dayNumber);
 	const [startPost, setStartPost] = useState(day.startPost);
 	const [endPost, setEndPost] = useState(day.endPost);
 
 	const [_state, dispatch] = useGameDefinition();
-
 
 	useEffect(() => {
 		console.log(dayNumber, startPost, endPost);
@@ -108,7 +100,7 @@ function EditDay({day, setCurrentEdit }: EditDayProps) {
 interface DayTableViewProps {
 	setEdit: (day: Day) => void;
 }
-function DayTableView({  setEdit }: DayTableViewProps) {
+function DayTableView({ setEdit }: DayTableViewProps) {
 	const [state, dispatch] = useGameDefinition();
 
 	const columns = ['Day', 'Start Post #', 'End Post #'];

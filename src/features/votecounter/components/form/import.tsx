@@ -1,10 +1,7 @@
 import React, { useState } from 'react';
 import Button from '../../../../components/buttons/button';
 import { FileInput } from '../../../../components/form/FileInput';
-import {
-	GameDefinition,
-	isGameDefinition,
-} from '../../types/gameDefinition';
+import { GameDefinition, isGameDefinition } from '../../types/gameDefinition';
 import { useGameDefinition } from '../../context';
 
 export function ImportTab() {

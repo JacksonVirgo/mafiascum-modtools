@@ -14,17 +14,10 @@ export function VotesTab() {
 
 	return (
 		<section className="grow w-full gap-2 flex flex-col">
-			{!currentEdit && (
-				<VoteTableView
-					setEdit={setEdit}
-				/>
-			)}
+			{!currentEdit && <VoteTableView setEdit={setEdit} />}
 
 			{currentEdit && (
-				<EditVote
-					vote={currentEdit}
-					setCurrentEdit={setCurrentEdit}
-				/>
+				<EditVote vote={currentEdit} setCurrentEdit={setCurrentEdit} />
 			)}
 		</section>
 	);

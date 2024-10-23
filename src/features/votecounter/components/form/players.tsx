@@ -13,11 +13,7 @@ export function PlayersTab() {
 	};
 	return (
 		<section className="grow w-full gap-2 flex flex-col">
-			{!currentEdit && (
-				<PlayerTableView
-					setEdit={setEdit}
-				/>
-			)}
+			{!currentEdit && <PlayerTableView setEdit={setEdit} />}
 
 			{currentEdit && (
 				<EditPlayer
@@ -33,9 +29,7 @@ interface PlayerTableViewProps {
 	setEdit: (player: Player) => void;
 }
 
-export function PlayerTableView({
-	setEdit,
-}: PlayerTableViewProps) {
+export function PlayerTableView({ setEdit }: PlayerTableViewProps) {
 	const [state, dispatch] = useGameDefinition();
 	const [newUsername, setNewUsername] = useState<string>('');
 	return (
@@ -158,10 +152,7 @@ interface EditPlayerProps {
 	setCurrentEdit: (player: Player | null) => void;
 }
 
-export function EditPlayer({
-	player,
-	setCurrentEdit,
-}: EditPlayerProps) {
+export function EditPlayer({ player, setCurrentEdit }: EditPlayerProps) {
 	const [_state, dispatch] = useGameDefinition();
 
 	const [username, setUsername] = useState(player.current);
