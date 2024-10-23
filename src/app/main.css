@@ -1,7 +1,7 @@
 /* Tailwind */
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+@import 'tailwindcss/base';
+@import 'tailwindcss/components';
+@import 'tailwindcss/utilities';
 
 /* Other */
 @import url('https://fonts.googleapis.com/css2?family=Arvo:wght@400;700&family=Raleway:wght@400;900&family=Roboto&display=swap');

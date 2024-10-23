@@ -19,7 +19,7 @@ const entryPoints = {
 		'background.ts',
 	),
 	styling: path.resolve(__dirname, 'src', 'app', 'main.css'),
-	popup: path.resolve(__dirname, 'src', 'features', 'popup', 'popup.tsx'),
+	popup: path.resolve(__dirname, 'src', 'app', 'popup', 'popup.tsx'),
 };
 
 function fillConfig(version) {
