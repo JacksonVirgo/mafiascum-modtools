@@ -25,10 +25,7 @@ export default function ResolveVotes(props: ResolveVotes) {
 			)}
 
 			{currentEdit && (
-				<EditVote
-					vote={currentEdit}
-					setEdit={setCurrentEdit}
-				/>
+				<EditVote vote={currentEdit} setEdit={setCurrentEdit} />
 			)}
 		</div>
 	);
@@ -39,10 +36,7 @@ interface ResolveVoteTableProps {
 	setEdit: (vote: ValidatedVote | null) => void;
 }
 
-function ResolveVoteTable({
-	flaggedVotes,
-	setEdit,
-}: ResolveVoteTableProps) {
+function ResolveVoteTable({ flaggedVotes, setEdit }: ResolveVoteTableProps) {
 	const columns = ['Post #', 'Target', 'Corrected', 'Validity'];
 	const [state] = useGameDefinition();
 	const stateManager = useVoteCountStateManager();
@@ -176,7 +170,7 @@ interface EditVoteProps {
 	vote: ValidatedVote;
 	setEdit: (vote: ValidatedVote | null) => void;
 }
-function EditVote({  vote, setEdit }: EditVoteProps) {
+function EditVote({ vote, setEdit }: EditVoteProps) {
 	const [target, setTarget] = useState(vote.target ?? '');
 	const [state, dispatch] = useGameDefinition();
 	return (

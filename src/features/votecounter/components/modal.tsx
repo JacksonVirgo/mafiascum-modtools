@@ -1,5 +1,4 @@
 import React, {
-	createRef,
 	forwardRef,
 	useEffect,
 	useImperativeHandle,
@@ -14,8 +13,11 @@ import { ModalForm } from './form';
 import { ValidatedVote } from '../types/gameDefinition';
 import TextArea from '../../../components/form/TextArea';
 import ResolveVotes from './resolveVotes';
-import { getGameDefinition, saveGameDefinition } from '../background/storage';
-import GameDefinitionContext, { modalRef, stateManager, useGameDefinition, useVoteCountStateManager } from '../context';
+import GameDefinitionContext, {
+	modalRef,
+	stateManager,
+	useVoteCountStateManager,
+} from '../context';
 
 export const CSS_HIDDEN = 'me_hidden';
 
@@ -133,11 +135,12 @@ export const ModalInner = forwardRef((_props, ref) => {
 					)}
 					{currentState == ModalState.Error && (
 						<div className="grow flex flex-col justify-center items-center">
-							<span className="text-red-500">
-								Error: {error}
-							</span>
+							<span className="text-red-500">Error: {error}</span>
 
-							<Button  label='Go Home' onClick={() => stateManager.setForm()} />
+							<Button
+								label="Go Home"
+								onClick={() => stateManager.setForm()}
+							/>
 						</div>
 					)}
 				</div>
