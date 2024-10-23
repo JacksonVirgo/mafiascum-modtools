@@ -7,8 +7,10 @@
 		"build": "webpack --config webpack.config.js --mode production",
 		"dev": "webpack --mode development --watch",
 		"lint": "eslint .",
+		"force-lint": "eslint . --fix",
 		"typecheck": "tsc --noEmit",
-		"format": "npx prettier . --write"
+		"format": "npx prettier . --write",
+		"format-lint": "npm run format && npm run force-lint"
 	},
 	"author": "JacksonVirgo",
 	"license": "MIT",
