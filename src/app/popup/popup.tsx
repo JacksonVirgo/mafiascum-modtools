@@ -2,6 +2,8 @@ import React from 'react';
 import { createRoot } from 'react-dom/client';
 import '../main.css';
 
+import QuoteHighlighting from '../../features/quoteHighlighting/mountPopup'
+
 const MainPage = () => {
 	return (
 		<div className="w-96 h-96 bg-slate-700 flex flex-col justify-start items-start p-5 text-white">
@@ -9,7 +11,7 @@ const MainPage = () => {
 				Config
 			</h1>
 			<div className="flex flex-row justify-start">
-				<span>No Options</span>
+				<QuoteHighlighting />
 			</div>
 		</div>
 	);
