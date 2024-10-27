@@ -36,7 +36,48 @@ export default function mountFeature() {
 <details>
 <summary>First steps with a feature</summary>
 
-TBA
+There are a few important sections to a feature.
+
+-   The entrypoint `mount.ts`
+-   The `/background` folder
+
+The `mount.ts` folder is used to initialise the feature. Any file within this feature folder _must_ be a content script (aka running on the site itself). If you're mounting react, you can also use `mount.tsx` as the folder name
+
+Any script you wish to run in a background process must be both within a `/background` subfolder.
+
+When manipulating the DOM, you are welcome to use vanilla JS but I recommend using jQuery as it is available within the repository.
+
+```typescript
+// features/newfeature/mount.ts
+import $ from 'jquery';
+```
+
+ReactJS is also available if you want to inject HTML into the page.
+
+React must be in a `.tsx` file, and you must import React in every file you're using any react code.
+
+To inject a react component into the page with jQuery, use the helper function I have made in `/lib/react` as shown below. You only have to use this function when using jQuery to import, you don't have to use it when using a react component in another react component.
+
+```typescript
+// features/newfeature/mount.tsx
+import React from 'react';
+import $ from 'jquery';
+import { renderReact } from '../../lib/react';
+
+// This function is called on initialisation
+export default function mountNewFeature() {
+	// Append the new component to the page body
+	$('body').append(renderReact(<ReactComponent />));
+}
+
+function ReactComponent() {
+	return (
+		<div>
+			<span>This is a component</span>
+		</div>
+	);
+}
+```
 
 </details>
 
