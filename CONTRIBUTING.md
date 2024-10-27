@@ -17,7 +17,19 @@ There's a few guidelines I wish to impose on people contributing to this project
 <details>
 <summary>Adding a new feature</summary>
 
-TBA
+1. Create a new folder within `/src/features`. Make sure it is descriptive of what the feature is so it is understood at a single glance.
+
+2. Create a `mount.ts` file directly within that folder, example boilerplate for that file is here
+
+```typescript
+export default function mountFeature() {
+	// Your code here
+}
+```
+
+3. In `/src/app/content/content.ts` there is a `mountFeatures` function. Import the file you had created, and call that mount function in this one.
+
+4. The feature now gets initialised when the extension does. Check simple features like `/features/quoteHighlighting` to see how you can advance from here.
 
 </details>
 
