@@ -84,7 +84,65 @@ function ReactComponent() {
 <details>
 <summary>Interacting with background scripts</summary>
 
-TBA
+Background scripts are within the `/background` folder in a feature. You cannot call these functions directly, as they do not run on the same process as content scripts.
+
+But don't stress! I've created a simple builder to set these scripts up in both processes and an easy way to call them. The builder is in `/src/builders/background.ts`.
+
+In your features `/background` folder, you may have a file with the following:
+
+```typescript
+// features/newfeature/background/ping.ts
+import { BackgroundScript } from '../../../builders/background';
+import { z } from 'zod';
+
+export const pingBackgroundScript = new BackgroundScript('pingBackgroundScript')
+	// Define what you need to call the function
+	.input(
+		z.object({
+			message: z.string(),
+		}),
+	)
+	// Define what the function returns
+	.output(
+		z.object({
+			message: z.string(),
+		}),
+	)
+	// Define what the function does
+	.onQuery(async ({ message }) => {
+		// This runs on a background process
+		console.log(message);
+		return {
+			message,
+		};
+	});
+```
+
+As you can see, I use zod for validation. You can read more about zod schemas [here](https://zod.dev/?id=basic-usage). They're painfull simple, so don't worry!
+
+On the consumers end, you can import that builder and run `x.query()`. Under the hood, it sends a request to the background and waits for the response to send back to you. All the complexity is hidden from you.
+
+Make sure you're not calling any functions from `/background` outside of that folder except these types of queries.
+
+```typescript
+// features/newfeature/consumer.ts
+import { pingBackgroundScript } from './background/ping.ts';
+
+async function exampleFunction() {
+	const response = await pingBackgroundScript.query({
+		message: 'Hello world!',
+	});
+
+	console.log(response);
+
+	/* 
+    RESPONSE:
+    {
+        message: 'Hello world!'
+    }
+    */
+}
+```
 
 </details>
 
