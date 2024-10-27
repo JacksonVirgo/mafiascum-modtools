@@ -52,7 +52,7 @@ When manipulating the DOM, you are welcome to use vanilla JS but I recommend usi
 import $ from 'jquery';
 ```
 
-ReactJS is also available if you want to inject HTML into the page.
+ReactJS is also available if you want to inject HTML into the page, and don't wish to do this directly in jQuery/vanilla JS
 
 React must be in a `.tsx` file, and you must import React in every file you're using any react code.
 
