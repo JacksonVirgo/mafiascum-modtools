@@ -5,12 +5,16 @@ import mountVoteCounter from '../../features/votecounter/mount';
 import { fetchUsingDebugMode } from '../popup/debug';
 
 $(async function () {
+	await mountFeatures();
+});
+
+async function mountFeatures() {
 	const isUsingDebugMode = (await fetchUsingDebugMode()) ?? false;
 
 	mountVoteCounter(isUsingDebugMode);
 	mountMultiISO();
 	mountQuotehighlighting();
-});
+}
 
 // eslint-disable-next-line @typescript-eslint/no-unused-vars
 function testPostAutoFooter() {
