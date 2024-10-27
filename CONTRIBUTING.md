@@ -12,6 +12,22 @@ There's a few guidelines I wish to impose on people contributing to this project
 
 ## General Overview of Codebase
 
+### General Workflow
+
+<details>
+<summary>Adding a new feature</summary>
+
+TBA
+
+</details>
+
+<details>
+<summary>Interacting with background scripts</summary>
+
+TBA
+
+</details>
+
 ### Folder Layout
 
 All folders referred to are within the `/src` directory.
