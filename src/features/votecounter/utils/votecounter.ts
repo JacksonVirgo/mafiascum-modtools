@@ -7,7 +7,7 @@ import {
 import $ from 'jquery';
 import { findBestMatch } from '../../../lib/stringSimilarity';
 import { getThreadData } from './thread';
-import { Vote } from '../background/getPageData';
+import { Post } from '../background/getPageData';
 
 const CORRECTION_ERROR_THRESHOLD = 0.88;
 const CORRECTION_WARN_THRESHOLD = 0.95;
@@ -29,8 +29,6 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 		const startPost = lastDay?.startPost ?? 0;
 		const endPost = lastDay?.endPost;
 
-		console.log(threadId, startPost, endPost);
-
 		const threadData = await getThreadData(threadId, startPost);
 		if (!threadData) throw new Error('Could not fetch thread data.');
 
@@ -49,13 +47,12 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 			end: endPost,
 		};
 
-		const validVotes = threadData.votes
-			.filter((v) => isVoteValid(v, gameData))
-			.map((v) => validateVote(v, gameData))
+		const validVotes = threadData.posts
+			.filter((v) => isPostValid(v, gameData))
+			.map((v) => validatePost(v, gameData))
 			.sort((a, b) => a.post - b.post);
 
 		const votecount = countVotes(validVotes, gameData);
-		console.log(votecount);
 		const formattedVotecount = formatVotecount(votecount);
 
 		return {
@@ -68,13 +65,13 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 	}
 }
 
-function fetchRelativeUrl() {
+export function fetchRelativeUrl() {
 	const threadRelativeUrl = $('h2').first().find('a').first().attr('href');
 	if (!threadRelativeUrl) return null;
 	return threadRelativeUrl;
 }
 
-function getThreadFromRelativeUrl(relativeUrl: string) {
+export function getThreadFromRelativeUrl(relativeUrl: string) {
 	const t = relativeUrl.match(THREAD_ID_REGEX);
 	if (!t) return null;
 	const withoutPrefix = t.shift()?.slice('t='.length).trim();
@@ -97,34 +94,40 @@ interface GameData {
 	end?: number;
 }
 
-function isVoteValid(vote: Vote, data: GameData) {
-	if (vote.post === undefined) return false;
-	const isAfterStart = vote.post >= data.start;
-	const isBeforeEnd = !data.end || vote.post <= data.end;
-	if (!(isAfterStart && isBeforeEnd)) return false;
+function isPostValid(post: Post, data: GameData) {
+	if (post.postNumber === undefined) return false;
+	const afterStart = post.postNumber >= data.start;
+	const beforeEnd = !data.end || post.postNumber <= data.end;
+	if (!(afterStart && beforeEnd)) return false;
 
 	const author = data.gameDefinition.players.find(
-		(p) => p.current.toLowerCase() == vote.author.toLowerCase(),
+		(p) => p.current.toLowerCase() == post.author.toLowerCase(),
 	);
 	if (!author) return false;
-	if (author.diedAt && author.diedAt >= vote.post) return false;
+	if (author.diedAt && author.diedAt >= post.postNumber) return false;
 	return true;
 }
 
-function validateVote(
-	v: Vote,
+function validatePost(
+	post: Post,
 	{ aliasLegend, gameDefinition }: GameData,
 ): ValidatedVote {
+	let lastVote: string | undefined;
+	if (post.votes.length > 0)
+		lastVote = post.votes.reduce((pre, cur) => {
+			return pre.index > cur.index ? pre : cur;
+		}).value;
+
 	const vote: ValidatedVote = {
 		type: VoteType.VOTE,
-		author: v.author,
-		target: v.vote,
-		post: v.post,
+		author: post.author,
+		target: lastVote,
+		post: post.postNumber,
 		validity: VoteCorrection.REJECT,
 	};
 
 	const manualCorrection = gameDefinition.votes.find((vArr) => {
-		return v.post == vArr.postNumber;
+		return post.postNumber == vArr.postNumber;
 	});
 
 	vote.ignore = manualCorrection?.ignore ?? false;
@@ -148,8 +151,6 @@ function validateVote(
 	const closestMatchedTarget = findBestMatch(vote.target, allVotableTargets);
 	if (!closestMatchedTarget) return vote;
 	const match = closestMatchedTarget.bestMatch;
-
-	console.log(`Author: ${vote.author}`, match);
 
 	vote.target = match.value;
 	if (match.rating <= CORRECTION_ERROR_THRESHOLD)
@@ -258,13 +259,17 @@ function formatVotecount(votecount: VoteCount) {
 		const calculatedMajority = votecount.majority;
 		const wagonLength = wagon.length;
 		const wagonTitle = wagonHandle;
-		const wagonStr = `[b]${wagonTitle} (${wagon.length}/${calculatedMajority})[/b] -> ${wagon
+		const wagonStr = `[b]${wagonTitle} (${
+			wagon.length
+		}/${calculatedMajority})[/b] -> ${wagon
 			.map((v) => `${v.author} ([post]${v.post}[/post])`)
 			.join(', ')}`;
 		wagonStrings.push([wagonStr, wagonLength]);
 	}
 
-	const notVotingStr = `[b]Not Voting (${votecount.notVoting.length})[/b] -> ${votecount.notVoting.join(', ')}`;
+	const notVotingStr = `[b]Not Voting (${
+		votecount.notVoting.length
+	})[/b] -> ${votecount.notVoting.join(', ')}`;
 
 	wagonStrings.sort((a, b) => b[1] - a[1]);
 

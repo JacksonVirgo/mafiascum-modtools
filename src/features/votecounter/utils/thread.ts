@@ -1,4 +1,4 @@
-import fetchPageData, { Vote } from '../background/getPageData';
+import fetchPageData, { Post } from '../background/getPageData';
 
 export type PageQuery = {
 	threadId: string;
@@ -35,7 +35,7 @@ export async function getThreadData(threadId: string, startFrom: number) {
 
 	let totalPages: number | undefined;
 	let pageTitle: string | undefined;
-	let votes: Vote[] = [];
+	let posts: Post[] = [];
 
 	let loopIndex = 0;
 	while (totalPages == undefined || loopIndex < totalPages) {
@@ -49,7 +49,7 @@ export async function getThreadData(threadId: string, startFrom: number) {
 
 		totalPages = pageData.lastPage;
 		pageTitle = pageData.title;
-		votes = [...votes, ...pageData.votes];
+		posts = [...posts, ...pageData.posts];
 
 		loopIndex++;
 	}
@@ -60,6 +60,6 @@ export async function getThreadData(threadId: string, startFrom: number) {
 	return {
 		title: pageTitle,
 		pageCount: totalPages,
-		votes: votes,
+		posts: posts,
 	};
 }
