@@ -14,3 +14,16 @@
 	background: transparent;
 	border: none;
 }
+
+.popup-reset {
+	margin: 0;
+	padding: 0;
+	display: contents;
+	overflow: hidden;
+	background: transparent;
+	border: none;
+}
+
+.popup {
+	background-color: black;
+}

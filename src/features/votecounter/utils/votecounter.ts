@@ -258,17 +258,13 @@ function formatVotecount(votecount: VoteCount) {
 		const calculatedMajority = votecount.majority;
 		const wagonLength = wagon.length;
 		const wagonTitle = wagonHandle;
-		const wagonStr = `[b]${wagonTitle} (${
-			wagon.length
-		}/${calculatedMajority})[/b] -> ${wagon
+		const wagonStr = `[b]${wagonTitle} (${wagon.length}/${calculatedMajority})[/b] -> ${wagon
 			.map((v) => `${v.author} ([post]${v.post}[/post])`)
 			.join(', ')}`;
 		wagonStrings.push([wagonStr, wagonLength]);
 	}
 
-	const notVotingStr = `[b]Not Voting (${
-		votecount.notVoting.length
-	})[/b] -> ${votecount.notVoting.join(', ')}`;
+	const notVotingStr = `[b]Not Voting (${votecount.notVoting.length})[/b] -> ${votecount.notVoting.join(', ')}`;
 
 	wagonStrings.sort((a, b) => b[1] - a[1]);
 

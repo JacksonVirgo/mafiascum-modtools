@@ -2,9 +2,12 @@ import $ from 'jquery';
 import mountQuotehighlighting from '../../features/quoteHighlighting/mount';
 import mountMultiISO from '../../features/multiISO/mount';
 import mountVoteCounter from '../../features/votecounter/mount';
+import { fetchUsingDebugMode } from '../popup/debug';
 
 $(async function () {
-	mountVoteCounter();
+	const isUsingDebugMode = (await fetchUsingDebugMode()) ?? false;
+
+	mountVoteCounter(isUsingDebugMode);
 	mountMultiISO();
 	mountQuotehighlighting();
 });

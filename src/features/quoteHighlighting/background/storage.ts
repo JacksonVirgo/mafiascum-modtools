@@ -2,7 +2,7 @@ import { BackgroundScript } from '../../../builders/background';
 import { z } from 'zod';
 import browser from 'webextension-polyfill';
 
-const TAG = 'quoteHighlighting';
+const TAG = 'setting_quote_highlighting';
 
 export const getQuoteHighlighting = new BackgroundScript('getHighlightQuotes')
 	.input(z.object({}))
