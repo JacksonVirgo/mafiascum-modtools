@@ -81,8 +81,11 @@ class ScriptHandler<Req extends ZodSchema, Res extends ZodSchema> {
 	}
 
 	public async query(data: z.infer<Req>): Promise<z.infer<Res> | null> {
+		// If you're here to track the code that was called
+		// from this, check the parent "x.query" and find the
+		// onQuery function call there.
+
 		const instanceType = getInstanceType();
-		console.log('Instance Type: ', instanceType);
 		if (instanceType == InstanceType.Content)
 			return this.runAsContent(data);
 		else if (instanceType == InstanceType.Background)
