@@ -29,7 +29,14 @@ export default function mountFeature() {
 
 3. In `/src/app/content/content.ts` there is a `mountFeatures` function. Import the file you had created, and call that mount function in this one.
 
-4. The feature now gets initialised when the extension does. Check simple features like `/features/quoteHighlighting` to see how you can advance from here.
+4. The feature now gets initialised when the extension does. Check the "first steps with a feature" section or take a peek at a simple features like `/features/quoteHighlighting` to see how you can advance from here.
+
+</details>
+
+<details>
+<summary>First steps with a feature</summary>
+
+TBA
 
 </details>
 
