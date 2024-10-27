@@ -2,26 +2,38 @@
 
 This is primarily made for MafiaScum, but is labeled Mafia Engine as that's my overarching project name for all mafia-related projects.
 
-## Setup
-
-Follow these steps to set up and run the project locally. If these steps aren't up to date, please let me know and I will fix them.
-
 ### Prerequisites
 
-Make sure you have the following installed on your machine:
+-   [Node.js v22.9 or higher](https://nodejs.org/)
 
--   [Node.js](https://nodejs.org/)
--   Run `npm install` to install all the dependencies
+### Installation
+
+1. Clone the repository
+
+```sh
+git clone https://github.com/JacksonVirgo/mafiascum-modtools.git
+cd mafiascum-modtools
+```
+
+2. Install dependencies
+
+```sh
+npm i
+```
+
+3. Check out [CONTRIBUTING.md](CONTRIBUTING.md) for information about the codebase and how to effectively contribute.
 
 ### Compiling
 
-As this project uses Typescript and SCSS, it requires compilation to be used, to do so perform the following command
+This project is set up to compile to both v2 and v3 browser extensions, please don't use permissions/features that do not work in both.
+
+-   Release build (slower)
 
 ```bash
 npm run build
 ```
 
-If you wish to run this in production, restarting automatically when a change has been made use
+-   Development build (watches for changes so it can recompile automatically)
 
 ```bash
 npm run dev
