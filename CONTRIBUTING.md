@@ -4,6 +4,12 @@ There's a few guidelines I wish to impose on people contributing to this project
 
 ## Table of Contents
 
+-   [General Overview](#general-overview-of-codebase)
+    -   [Folder Layout](#folder-layout)
+    -   [Import Restrictions](#import-restrictions)
+-   [Pull Requests](#pull-requests)
+-   [Styleguide](#styleguides)
+
 ## General Overview of Codebase
 
 ### Folder Layout
@@ -44,11 +50,9 @@ When sending in a pull request (PR), please make sure that the following are don
 -   Make sure that the CI passes
     -   If you think that the CI is failing due to something outside of what you're sending a PR in for, just make a comment of that in the PR.
 
-### Linting
+## Styleguides
 
-### Styleguides
-
--   All typescript code is formatted with [Prettier](https://prettier.io/).
+-   All javascript/typescript code (`.ts .tsx .js .jsx`) are to be formatted with [Prettier](https://prettier.io/).
 -   Prefer the spread operator for arrays (`[...arr]`) and objects (`{...obj}`) instead of `Object.assign()` or `[].concat` respectively.
--   Inline `export x` where possible
+-   Inline `export` statements where possible
 -   Avoid code that does not work on both manifest v2 and v3.
