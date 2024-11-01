@@ -41,7 +41,7 @@ There are a few important sections to a feature.
 -   The entrypoint `mount.ts`
 -   The `/background` folder
 
-The `mount.ts` folder is used to initialise the feature. Any file within this feature folder _must_ be a content script (aka running on the site itself). If you're mounting react, you can also use `mount.tsx` as the folder name
+The `mount.ts` file is used to initialise the feature. Any file within this feature folder _must_ be a content script (aka running on the site itself). If you're mounting react, you can also use `mount.tsx` as the mounting file name
 
 Any script you wish to run in a background process must be both within a `/background` subfolder.
 
