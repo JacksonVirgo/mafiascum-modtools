@@ -27,7 +27,11 @@ export async function getPageData(query: PageQuery) {
 	}
 }
 
-export async function getThreadData(threadId: string, startFrom: number) {
+export async function getThreadData(
+	threadId: string,
+	startFrom: number,
+	endAt?: number,
+) {
 	const throwErr = (...values: string[]) => {
 		console.error(...values);
 		return null;
@@ -39,10 +43,17 @@ export async function getThreadData(threadId: string, startFrom: number) {
 
 	let loopIndex = 0;
 	while (totalPages == undefined || loopIndex < totalPages) {
+		const currentIndex = loopIndex * 200 + startFrom;
+		const amountLeft = endAt ? endAt + 1 - currentIndex : Infinity;
+		if (amountLeft <= 0) break;
+
+		const take = Math.min(200, amountLeft);
+		const skip = loopIndex * 200 + startFrom;
+
 		const pageData = await getPageData({
 			threadId,
-			take: 200,
-			skip: loopIndex * 200 + startFrom,
+			take,
+			skip,
 		});
 
 		if (!pageData) return throwErr('Could not fetch page data.');

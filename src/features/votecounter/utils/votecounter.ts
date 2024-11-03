@@ -45,7 +45,7 @@ export async function startVoteCount(
 			startPost = lastDay?.startPost ?? 0;
 		}
 
-		const threadData = await getThreadData(threadId, startPost);
+		const threadData = await getThreadData(threadId, startPost, endPost);
 		if (!threadData) throw new Error('Could not fetch thread data.');
 
 		const aliasLegend = new Map<string, string>();
@@ -62,6 +62,8 @@ export async function startVoteCount(
 			start: startPost,
 			end: endPost,
 		};
+
+		console.log(threadData.posts.length, 'posts');
 
 		const validVotes = threadData.posts
 			.filter((v) => isPostValid(v, gameData))
