@@ -62,17 +62,11 @@ export async function startVoteCount(
 			start: startPost,
 			end: endPost,
 		};
-		console.log(gameData);
 
-		console.log(threadData.posts);
-		const filtered = threadData.posts.filter((v) =>
-			isPostValid(v, gameData),
-		);
-		console.log(filtered);
-		const mapped = filtered.map((v) => validatePost(v, gameData));
-		console.log(mapped);
-		const validVotes = mapped.sort((a, b) => a.post - b.post);
-		console.log(validVotes);
+		const validVotes = threadData.posts
+			.filter((v) => isPostValid(v, gameData))
+			.map((v) => validatePost(v, gameData))
+			.sort((a, b) => a.post - b.post);
 
 		const votecount = countVotes(validVotes, gameData);
 		const formattedVotecount = formatVotecount(votecount);
