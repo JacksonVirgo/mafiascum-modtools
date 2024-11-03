@@ -2,7 +2,7 @@
 	"commonFields": {
 		"name": "Mafia Engine",
 		"description": "Aid in the playing and hosting of games on MafiaScum",
-		"version": "0.0.2",
+		"version": "1.0.0",
 		"icons": {
 			"128": "/images/cog-128.png",
 			"512": "/images/cog-512.png"
