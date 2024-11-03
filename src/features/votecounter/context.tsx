@@ -19,6 +19,7 @@ interface ModalHandle {
 	setResponse: (res: string, logs: FlaggedVotes) => void;
 	setResolvingVotes: (logs: FlaggedVotes) => void;
 	setError(res: string): void;
+	setPostNum(postNum: number): void;
 }
 
 export const modalRef = createRef<ModalHandle>();
@@ -56,6 +57,11 @@ export const stateManager = {
 	setError(res: string) {
 		if (modalRef.current) {
 			modalRef.current.setError(res);
+		}
+	},
+	setPostNum(postNum: number) {
+		if (modalRef.current) {
+			modalRef.current.setPostNum(postNum);
 		}
 	},
 };

@@ -1,4 +1,5 @@
 import {
+	Day,
 	GameDefinition,
 	ValidatedVote,
 	VoteCorrection,
@@ -17,7 +18,13 @@ const UNVOTE = 'unvote';
 const UNVOTE_TAG = 'UNVOTE:';
 const VOTE_TAG = 'VOTE:';
 
-export async function startVoteCount(gameDefinition: GameDefinition) {
+export type VoteCountOptions = {
+	targetPostNumber?: number;
+};
+export async function startVoteCount(
+	gameDefinition: GameDefinition,
+	options: VoteCountOptions = {},
+) {
 	try {
 		const relativeUrl = fetchRelativeUrl();
 		if (!relativeUrl) throw new Error('No thread relative url found.');
@@ -25,9 +32,18 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 		const threadId = getThreadFromRelativeUrl(relativeUrl);
 		if (!threadId) throw new Error('No thread id found.');
 
-		const lastDay = getLastDay(gameDefinition);
-		const startPost = lastDay?.startPost ?? 0;
-		const endPost = lastDay?.endPost;
+		let endPost = 0;
+		let startPost = 0;
+
+		if (options.targetPostNumber) {
+			const day = getDayOfPost(gameDefinition, options.targetPostNumber);
+			endPost = options.targetPostNumber;
+			startPost = day?.startPost ?? 0;
+		} else {
+			const lastDay = getLastDay(gameDefinition);
+			endPost = lastDay?.endPost ?? 0;
+			startPost = lastDay?.startPost ?? 0;
+		}
 
 		const threadData = await getThreadData(threadId, startPost);
 		if (!threadData) throw new Error('Could not fetch thread data.');
@@ -46,11 +62,17 @@ export async function startVoteCount(gameDefinition: GameDefinition) {
 			start: startPost,
 			end: endPost,
 		};
+		console.log(gameData);
 
-		const validVotes = threadData.posts
-			.filter((v) => isPostValid(v, gameData))
-			.map((v) => validatePost(v, gameData))
-			.sort((a, b) => a.post - b.post);
+		console.log(threadData.posts);
+		const filtered = threadData.posts.filter((v) =>
+			isPostValid(v, gameData),
+		);
+		console.log(filtered);
+		const mapped = filtered.map((v) => validatePost(v, gameData));
+		console.log(mapped);
+		const validVotes = mapped.sort((a, b) => a.post - b.post);
+		console.log(validVotes);
 
 		const votecount = countVotes(validVotes, gameData);
 		const formattedVotecount = formatVotecount(votecount);
@@ -87,6 +109,17 @@ function getLastDay(gameDefinition: GameDefinition) {
 	}, gameDefinition.days[0]);
 }
 
+function getDayOfPost(gameDefinition: GameDefinition, postNumber: number) {
+	let day: Day | undefined;
+	for (const checkDay of gameDefinition.days) {
+		if (day) continue;
+		if (checkDay.startPost && postNumber < checkDay.startPost) continue;
+		if (checkDay.endPost && postNumber > checkDay.endPost) continue;
+		return day;
+	}
+	return day ?? null;
+}
+
 interface GameData {
 	gameDefinition: GameDefinition;
 	aliasLegend: Map<string, string>;
@@ -96,15 +129,13 @@ interface GameData {
 
 function isPostValid(post: Post, data: GameData) {
 	if (post.postNumber === undefined) return false;
-	const afterStart = post.postNumber >= data.start;
-	const beforeEnd = !data.end || post.postNumber <= data.end;
-	if (!(afterStart && beforeEnd)) return false;
-
+	if (data.end && post.postNumber > data.end) return false;
+	if (post.postNumber < data.start) return false;
 	const author = data.gameDefinition.players.find(
-		(p) => p.current.toLowerCase() == post.author.toLowerCase(),
+		(p) => p.current.toLowerCase() === post.author.toLowerCase(),
 	);
 	if (!author) return false;
-	if (author.diedAt && author.diedAt >= post.postNumber) return false;
+	if (author.diedAt && author.diedAt <= post.postNumber) return false;
 	return true;
 }
 

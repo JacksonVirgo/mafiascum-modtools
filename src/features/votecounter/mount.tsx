@@ -20,7 +20,25 @@ export default async (debug: boolean = false) => {
 			if (targetElement.length <= 0) return;
 			targetElement.after(
 				renderReact(
-					<VcButton onClick={stateManager.show} label="VC" />,
+					<VcButton
+						onClick={() => {
+							const updatePostNum = () => {
+								const postNumberRaw = post
+									.find('span.post-number-bolded')
+									.first()
+									.text();
+								if (!postNumberRaw) return;
+								const postNumber = parseInt(
+									postNumberRaw.substring(1),
+								);
+								if (isNaN(postNumber)) return;
+								stateManager.setPostNum(postNumber);
+							};
+							updatePostNum();
+							stateManager.show();
+						}}
+						label="VC"
+					/>,
 				),
 			);
 

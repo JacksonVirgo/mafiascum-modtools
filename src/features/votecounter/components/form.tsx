@@ -12,7 +12,7 @@ import { saveGameDefinition } from '../background/storage';
 import { useGameDefinition, useVoteCountStateManager } from '../context';
 
 interface ModalFormProps {
-	onResponse: (res: string) => void;
+	postNumber: number | undefined;
 }
 
 enum ModalLoadingState {
@@ -22,7 +22,7 @@ enum ModalLoadingState {
 	ERROR,
 }
 
-export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
+export const ModalForm = ({ postNumber }: ModalFormProps) => {
 	const [loadState, setLoadState] = useState(ModalLoadingState.LOADED);
 
 	return (
@@ -35,7 +35,9 @@ export const ModalForm = ({ onResponse: _onResponse }: ModalFormProps) => {
 					<LoadingSpinner />
 				</div>
 			)}
-			{loadState == ModalLoadingState.LOADED && <FormInner />}
+			{loadState == ModalLoadingState.LOADED && (
+				<FormInner postNumber={postNumber} />
+			)}
 
 			{loadState == ModalLoadingState.ERROR && (
 				<div className="grow flex flex-col justify-center items-center">
@@ -113,7 +115,11 @@ interface SectionProps {
 	section: FormSection;
 }
 
-export const FormInner = () => {
+export const FormInner = ({
+	postNumber,
+}: {
+	postNumber: number | undefined;
+}) => {
 	const [activeSection, setActiveSection] = useState(FormSection.DAYS);
 	const [state] = useGameDefinition();
 	const stateManager = useVoteCountStateManager();
@@ -137,9 +143,11 @@ export const FormInner = () => {
 		setActiveSection(section);
 	};
 
-	const onSubmit = async () => {
+	const onSubmit = async (postNum?: number) => {
 		stateManager.setLoading();
-		const vcData = await startVoteCount(state);
+		const vcData = await startVoteCount(state, {
+			targetPostNumber: postNum,
+		});
 		if (!vcData) {
 			stateManager.setForm(); // TODO: Add an error page to redirect to
 			return;
@@ -191,8 +199,16 @@ export const FormInner = () => {
 
 				{activeSection == FormSection.EXPORT && <ExportTab />}
 
-				<div className="shrink flex flex-row items-center justify-center">
-					<Button label="Generate Votecount" onClick={onSubmit} />
+				<div className="shrink flex flex-row items-center justify-center gap-2">
+					<Button label="Generate Latest" onClick={onSubmit} />
+					{postNumber && (
+						<Button
+							label={`As at #${postNumber}`}
+							onClick={() => {
+								onSubmit(postNumber);
+							}}
+						/>
+					)}
 				</div>
 			</div>
 		</>

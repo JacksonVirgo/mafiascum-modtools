@@ -57,6 +57,8 @@ export const ModalInner = forwardRef((_props, ref) => {
 		errors: [],
 	});
 
+	const [postNumber, setPostNumber] = useState<number | undefined>();
+
 	const [error, setError] = useState<string | undefined>();
 	useImperativeHandle(ref, () => ({
 		show: () => setIsVisible(true),
@@ -75,6 +77,9 @@ export const ModalInner = forwardRef((_props, ref) => {
 		setError: (str: string) => {
 			setError(str);
 			setCurrentState(ModalState.Error);
+		},
+		setPostNum: (postNum: number) => {
+			setPostNumber(postNum);
 		},
 	}));
 
@@ -122,7 +127,7 @@ export const ModalInner = forwardRef((_props, ref) => {
 						</div>
 					)}
 					{currentState == ModalState.Form && (
-						<ModalForm onResponse={onResponse} />
+						<ModalForm postNumber={postNumber} />
 					)}
 					{currentState == ModalState.Response && (
 						<ModalResponse
