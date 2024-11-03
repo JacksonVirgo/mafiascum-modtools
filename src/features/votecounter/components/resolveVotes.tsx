@@ -8,6 +8,7 @@ import {
 import TextInput from '../../../components/form/TextInput';
 import Button from '../../../components/buttons/button';
 import { useGameDefinition, useVoteCountStateManager } from '../context';
+import $ from 'jquery';
 
 interface ResolveVotes {
 	flaggedVotes: FlaggedVotes;
@@ -173,6 +174,7 @@ interface EditVoteProps {
 function EditVote({ vote, setEdit }: EditVoteProps) {
 	const [target, setTarget] = useState(vote.target ?? '');
 	const [state, dispatch] = useGameDefinition();
+
 	return (
 		<div className="flex flex-col gap-2">
 			<ValidatedVoteTable vote={vote} />
@@ -251,12 +253,32 @@ function ValidatedVoteTable({ vote }: TableProps) {
 				? 'Error'
 				: 'Warning';
 
+	const getPostURL = (post: number) => {
+		const threadRelativeUrl = $('h2')
+			.first()
+			.find('a')
+			.first()
+			.attr('href');
+		if (!threadRelativeUrl) return null;
+		const regex = /t=([0-9]+)/;
+		const tVal = threadRelativeUrl.match(regex);
+		if (!tVal) return null;
+		const threadId = tVal[1];
+		if (!threadId) return null;
+
+		const url = `https://forum.mafiascum.net/viewtopic.php?t=${threadId}&ppp=1&start=${post}`;
+
+		return url;
+	};
+
 	const Row = ({
 		header,
 		data,
+		url,
 	}: {
 		header: string;
 		data: string | number;
+		url?: string | null;
 	}) => {
 		return (
 			<tr className="!border-b !border-white last:!border-b-0">
@@ -265,7 +287,17 @@ function ValidatedVoteTable({ vote }: TableProps) {
 					{':'}
 				</td>
 				<td className="px-4 py-2 whitespace-nowrap text-sm bg-primary-lightest text-gray-300 w-full">
-					{data}
+					{url && (
+						<a
+							href={url}
+							target="_blank"
+							rel="noreferrer"
+							className="hover:underline"
+						>
+							{data}
+						</a>
+					)}
+					{!url && data}
 				</td>
 			</tr>
 		);
@@ -276,7 +308,7 @@ function ValidatedVoteTable({ vote }: TableProps) {
 			<table className="min-w-full divide-y !divide-secondary-dark">
 				<tbody className="bg-primary-lighter divide-y divide-secondary-dark">
 					<Row header="Author" data={author} />
-					<Row header="Post" data={post} />
+					<Row header="Post" data={post} url={getPostURL(post)} />
 					<Row
 						header="Type"
 						data={type == VoteType.UNVOTE ? 'Unvote' : 'Vote'}

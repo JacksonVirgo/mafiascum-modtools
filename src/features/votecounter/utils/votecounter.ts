@@ -63,8 +63,6 @@ export async function startVoteCount(
 			end: endPost,
 		};
 
-		console.log(threadData.posts.length, 'posts');
-
 		const validVotes = threadData.posts
 			.filter((v) => isPostValid(v, gameData))
 			.map((v) => validatePost(v, gameData))
@@ -106,14 +104,12 @@ function getLastDay(gameDefinition: GameDefinition) {
 }
 
 function getDayOfPost(gameDefinition: GameDefinition, postNumber: number) {
-	let day: Day | undefined;
 	for (const checkDay of gameDefinition.days) {
-		if (day) continue;
-		if (checkDay.startPost && postNumber < checkDay.startPost) continue;
-		if (checkDay.endPost && postNumber > checkDay.endPost) continue;
-		return day;
+		if (checkDay.startPost && postNumber <= checkDay.startPost) continue;
+		if (checkDay.endPost && postNumber >= checkDay.endPost) continue;
+		return checkDay;
 	}
-	return day ?? null;
+	return null;
 }
 
 interface GameData {
@@ -128,9 +124,16 @@ function isPostValid(post: Post, data: GameData) {
 	if (post.votes.length === 0) return false;
 	if (data.end && post.postNumber > data.end) return false;
 	if (post.postNumber < data.start) return false;
-	const author = data.gameDefinition.players.find(
-		(p) => p.current.toLowerCase() === post.author.toLowerCase(),
-	);
+	const author = data.gameDefinition.players.find((p) => {
+		if (p.current.toLowerCase() === post.author.toLowerCase()) return true;
+		if (
+			p.previous.find(
+				(prev) => prev.toLowerCase() == post.author.toLowerCase(),
+			)
+		)
+			return true;
+		return false;
+	});
 	if (!author) return false;
 	if (author.diedAt && author.diedAt <= post.postNumber) return false;
 	return true;
@@ -162,7 +165,8 @@ function validatePost(
 
 	if (vote.target?.startsWith(UNVOTE_TAG)) {
 		vote.type = VoteType.UNVOTE;
-		vote.target = vote.target.replace(UNVOTE_TAG, '').trim();
+		vote.target = 'unvote'; //vote.target.replace(UNVOTE_TAG, '').trim();
+		// TODO: Add functionality to handle unvotes being blank or of specific people later, as usesPython has suggested
 	} else if (vote.target?.startsWith(VOTE_TAG)) {
 		vote.type = VoteType.VOTE;
 		vote.target = vote.target.replace(VOTE_TAG, '').trim();
