@@ -1,6 +1,6 @@
 import { BackgroundScript } from '../../../builders/background';
 import { z } from 'zod';
-import cheerio, { type Cheerio, load } from 'cheerio';
+import { type Cheerio, load } from 'cheerio';
 import { Element as DomHandlerElement } from 'domhandler';
 
 const postSchema = z.object({

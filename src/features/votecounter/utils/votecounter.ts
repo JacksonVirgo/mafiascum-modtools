@@ -1,5 +1,4 @@
 import {
-	Day,
 	GameDefinition,
 	ValidatedVote,
 	VoteCorrection,

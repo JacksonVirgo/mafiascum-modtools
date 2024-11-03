@@ -87,10 +87,6 @@ export const ModalInner = forwardRef((_props, ref) => {
 		document.body.style.overflow = isVisible ? 'hidden' : 'auto';
 	}, [isVisible]);
 
-	const onResponse = (res: string) => {
-		setResponse(res);
-	};
-
 	return (
 		<GameDefinitionContext>
 			<div
