@@ -123,6 +123,7 @@ interface GameData {
 
 function isPostValid(post: Post, data: GameData) {
 	if (post.postNumber === undefined) return false;
+	if (post.votes.length === 0) return false;
 	if (data.end && post.postNumber > data.end) return false;
 	if (post.postNumber < data.start) return false;
 	const author = data.gameDefinition.players.find(
