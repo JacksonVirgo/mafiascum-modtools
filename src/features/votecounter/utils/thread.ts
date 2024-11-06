@@ -62,6 +62,8 @@ export async function getThreadData(
 		pageTitle = pageData.title;
 		posts = [...posts, ...pageData.posts];
 
+		if (pageData.currentPage == pageData.lastPage) break;
+
 		loopIndex++;
 	}
 
