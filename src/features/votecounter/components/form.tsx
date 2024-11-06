@@ -201,7 +201,7 @@ export const FormInner = ({
 
 				<div className="shrink flex flex-row items-center justify-center gap-2">
 					<Button label="Generate Latest" onClick={onSubmit} />
-					{postNumber && (
+					{postNumber != undefined && (
 						<Button
 							label={`As at #${postNumber}`}
 							onClick={() => {
