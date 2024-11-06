@@ -2,7 +2,7 @@
 	"commonFields": {
 		"name": "MafiaScum Modtools",
 		"description": "Aid in the playing and hosting of games on MafiaScum",
-		"version": "1.0.0",
+		"version": "1.0.1",
 		"icons": {
 			"128": "/images/logo-128.png",
 			"512": "/images/logo-512.png"
