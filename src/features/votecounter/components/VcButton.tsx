@@ -8,9 +8,9 @@ export default ({ onClick, label = 'VC' }: VcButtonProps) => {
 	return (
 		<span>
 			{' - '}
-			<button onClick={onClick} className="text-white">
+			<a onClick={onClick} className="hover:cursor-pointer">
 				{label}
-			</button>
+			</a>
 		</span>
 	);
 };

@@ -128,7 +128,9 @@ export const FormInner = ({
 		return (
 			<li
 				className={`${
-					focused ? 'bg-secondary-color text-primary-color' : ''
+					focused
+						? 'bg-secondary-color text-primary-color'
+						: 'text-white'
 				} w-full rounded-md p-2 hover:cursor-pointer`}
 				onClick={() => {
 					if (onClick) onClick(section);
