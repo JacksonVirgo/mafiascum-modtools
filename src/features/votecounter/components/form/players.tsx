@@ -80,6 +80,11 @@ interface TableProps {
 }
 
 export default function PlayerTable({ data, columns, editRow }: TableProps) {
+	const parseTableNum = (num: number) => {
+		if (num != 0) return num;
+		else return '-';
+	};
+
 	return (
 		<div className="overflow-auto max-h-96 border !border-secondary-dark text-gray-200 rounded-md">
 			<table className="min-w-full divide-y !divide-secondary-dark">
@@ -124,13 +129,13 @@ export default function PlayerTable({ data, columns, editRow }: TableProps) {
 									key={`${player.current}-alias`}
 									className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
 								>
-									{player.aliases.length}
+									{parseTableNum(player.aliases.length)}
 								</td>
 								<td
 									key={`${player.current}-previous`}
 									className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
 								>
-									{player.previous.length}
+									{parseTableNum(player.previous.length)}
 								</td>
 								<td
 									key={`${player.current}-died`}
