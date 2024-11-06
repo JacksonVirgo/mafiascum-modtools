@@ -50,8 +50,8 @@ export async function startVoteCount(
 		const aliasLegend = new Map<string, string>();
 		for (const player of gameDefinition.players) {
 			aliasLegend.set(player.current.toLowerCase(), player.current);
-			for (const username of [...player.aliases, ...player.previous]) {
-				aliasLegend.set(username.toLowerCase(), username);
+			for (const alias of [...player.aliases, ...player.previous]) {
+				aliasLegend.set(alias.toLowerCase(), player.current);
 			}
 		}
 
@@ -172,7 +172,6 @@ function validatePost(
 	} else if (vote.target === undefined) return vote;
 	vote.rawTarget = vote.target;
 
-	console.log(vote.author, vote.target, manualCorrection?.target);
 	if (manualCorrection) vote.target = manualCorrection.target ?? undefined;
 	if (vote.target === undefined) return vote;
 
@@ -182,6 +181,12 @@ function validatePost(
 	const closestMatchedTarget = findBestMatch(vote.target, allVotableTargets);
 	if (!closestMatchedTarget) return vote;
 	const match = closestMatchedTarget.bestMatch;
+
+	const correctedAuthor = aliasLegend.get(vote.author.toLowerCase());
+	vote.author = correctedAuthor ?? vote.author;
+
+	const correctedTarget = aliasLegend.get(match.value.toLowerCase());
+	vote.target = correctedTarget ?? match.value;
 
 	vote.target = match.value;
 	if (match.rating <= CORRECTION_ERROR_THRESHOLD)
@@ -213,6 +218,7 @@ function countVotes(
 
 	const warnings: ValidatedVote[] = [];
 	const errors: ValidatedVote[] = [];
+	console.log(aliasLegend);
 
 	for (const vote of votes) {
 		const { author, type, validity, ignore } = vote;
