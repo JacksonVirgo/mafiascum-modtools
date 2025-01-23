@@ -21,6 +21,11 @@ export function SyncTab() {
 					will sync the extension to the selected post.
 				</p>
 
+				<p>
+					You can sync even as a player, you will fetch the latest
+					settings but will not be able to change them.
+				</p>
+
 				<p className="px-4 text-red-500">
 					If sync has been set up by someone else, you will lose all
 					data for this thread and sync to what is there.
@@ -33,7 +38,26 @@ export function SyncTab() {
 					onChange={(value) => setPostNumber(value)}
 				/>
 
-				<Button label="Sync Settings" onClick={() => {}} />
+				<Button
+					label="Sync Settings"
+					onClick={() => {
+						// 1. Check if settings already exists in the selected post
+						// 2. If it does, sync to it.
+						// 3. If it doesn't, attempt to create it
+						// 4. If failed, show error message
+						// 5. If successful, show a success message and prompt to refresh
+						//
+						// -------
+						//
+						// Don't do all this in this function, silly
+						// Also why did I do inline comments here? Cuz I'm cool that's why
+						//
+						// -------
+						//
+						// Stretch Goals
+						// - Option to remove syncing to a post
+					}}
+				/>
 			</div>
 		</section>
 	);
