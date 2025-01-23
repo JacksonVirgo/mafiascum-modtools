@@ -55,7 +55,10 @@ function EditDay({ day, setCurrentEdit }: EditDayProps) {
 				name="endPost"
 				label="End Post Number"
 				defaultValue={day.endPost}
-				onChange={(value) => setEndPost(value)}
+				onChange={(value) => {
+					console.log(value);
+					setEndPost(value);
+				}}
 			/>
 
 			<br />
@@ -64,6 +67,7 @@ function EditDay({ day, setCurrentEdit }: EditDayProps) {
 				<Button
 					label="Save"
 					onClick={() => {
+						console.log(dayNumber, startPost, endPost);
 						dispatch({
 							type: 'UPDATE_DAY',
 							dayNumber: day.dayNumber,
@@ -104,9 +108,7 @@ function DayTableView({ setEdit }: DayTableViewProps) {
 	const [state, dispatch] = useGameDefinition();
 
 	const columns = ['Day', 'Start Post #', 'End Post #'];
-	const [newDay, setNewDay] = useState<number>(
-		state.days.reduce((max, day) => Math.max(max, day.dayNumber), 0) + 1,
-	);
+	const [newDay, setNewDay] = useState<number>();
 
 	return (
 		<>
@@ -117,20 +119,20 @@ function DayTableView({ setEdit }: DayTableViewProps) {
 					withoutLabel={true}
 					placeholder="New Day #"
 					className="grow"
-					defaultValue={newDay}
 					onChange={(value) => setNewDay(value)}
 				/>
 				<Button
 					label="Add Day"
 					onClick={() => {
-						dispatch({
-							type: 'ADD_DAY',
-							day: {
-								dayNumber: newDay,
-								startPost: undefined,
-								endPost: undefined,
-							},
-						});
+						if (newDay)
+							dispatch({
+								type: 'ADD_DAY',
+								day: {
+									dayNumber: newDay,
+									startPost: undefined,
+									endPost: undefined,
+								},
+							});
 					}}
 				/>
 			</div>

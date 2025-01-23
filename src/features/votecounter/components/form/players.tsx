@@ -141,7 +141,9 @@ export default function PlayerTable({ data, columns, editRow }: TableProps) {
 									key={`${player.current}-died`}
 									className="px-4 py-2 whitespace-nowrap text-sm text-gray-300"
 								>
-									{player.diedAt ? 'Dead' : 'Alive'}
+									{player.diedAt
+										? `Died at ${player.diedAt}`
+										: '-'}
 								</td>
 							</tr>
 						))

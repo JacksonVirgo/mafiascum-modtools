@@ -27,7 +27,7 @@ export const ModalForm = ({ postNumber }: ModalFormProps) => {
 
 	return (
 		<form
-			className="border-2 border-white grow w-full flex flex-row"
+			className="border-2 border-white grow w-full h-full flex flex-row"
 			onSubmit={(e) => e.preventDefault()}
 		>
 			{loadState == ModalLoadingState.LOADING && (
@@ -157,6 +157,23 @@ export const FormInner = ({
 		stateManager.setResponse(vcData.formatted, vcData.votecount.logs);
 	};
 
+	const checkPostIsWithinADay = (postNum: number) => {
+		for (const day of state.days) {
+			const start = day.startPost ?? 0;
+			const end = day.endPost;
+			if (!end) return true;
+			if (postNum >= start && postNum <= end) return true;
+		}
+		return false;
+	};
+
+	const checkDayIsOpenEnded = () => {
+		for (const day of state.days) {
+			if (!day.endPost) return true;
+		}
+		return false;
+	};
+
 	return (
 		<>
 			<nav className="bg-primary-lighter p-4 rounded-md">
@@ -201,16 +218,36 @@ export const FormInner = ({
 
 				{activeSection == FormSection.EXPORT && <ExportTab />}
 
-				<div className="shrink flex flex-row items-center justify-center gap-2">
-					<Button label="Generate Latest" onClick={onSubmit} />
-					{postNumber != undefined && (
-						<Button
-							label={`As at #${postNumber}`}
-							onClick={() => {
-								onSubmit(postNumber);
-							}}
-						/>
+				<div className="shrink flex flex-col items-center justify-center gap-2">
+					{postNumber != undefined &&
+						!checkPostIsWithinADay(postNumber) && (
+							<div className="text-red-500 text-center mt-2">
+								This post is not within a day.
+								<br />
+								Add or edit a day to include this post.
+							</div>
+						)}
+
+					{!checkDayIsOpenEnded() && (
+						<div className="text-red-500 text-center mt-2">
+							There is no days that are set as "current".
+							<br />
+							"Generate Latest" will create for the latest
+							registered day
+						</div>
 					)}
+					<div className="grow flex flex-row items-center justify-center gap-2">
+						<Button label="Generate Latest" onClick={onSubmit} />
+						{postNumber != undefined &&
+							checkPostIsWithinADay(postNumber) && (
+								<Button
+									label={`As at #${postNumber}`}
+									onClick={() => {
+										onSubmit(postNumber);
+									}}
+								/>
+							)}
+					</div>
 				</div>
 			</div>
 		</>
