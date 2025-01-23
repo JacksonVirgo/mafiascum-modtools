@@ -10,6 +10,7 @@ import { ImportTab } from './form/import';
 import { startVoteCount } from '../utils/votecounter';
 import { saveGameDefinition } from '../background/storage';
 import { useGameDefinition, useVoteCountStateManager } from '../context';
+import { SyncTab } from './form/sync';
 
 interface ModalFormProps {
 	postNumber: number | undefined;
@@ -105,6 +106,7 @@ enum FormSection {
 	DAYS = 'Days',
 	PLAYERS = 'Players',
 	VOTES = 'Votes',
+	SYNC = 'Sync',
 	IMPORT = 'Import',
 	EXPORT = 'Export',
 }
@@ -195,6 +197,11 @@ export const FormInner = ({
 					/>
 					<div className="grow"></div>
 					<Section
+						section={FormSection.SYNC}
+						focused={activeSection == FormSection.SYNC}
+						onClick={sectionChange}
+					/>
+					<Section
 						section={FormSection.IMPORT}
 						focused={activeSection == FormSection.IMPORT}
 						onClick={sectionChange}
@@ -213,6 +220,8 @@ export const FormInner = ({
 				{activeSection == FormSection.PLAYERS && <PlayersTab />}
 
 				{activeSection == FormSection.VOTES && <VotesTab />}
+
+				{activeSection == FormSection.SYNC && <SyncTab />}
 
 				{activeSection == FormSection.IMPORT && <ImportTab />}
 
