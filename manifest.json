@@ -25,6 +25,7 @@
 		"permissions": [
 			"storage",
 			"unlimitedStorage",
+			"tabs",
 			"https://forum.mafiascum.net/*"
 		],
 		"browser_action": {
@@ -47,7 +48,7 @@
 				"matches": ["https://forum.mafiascum.net/*"]
 			}
 		],
-		"permissions": ["storage"],
+		"permissions": ["storage", "tabs", "unlimitedStorage"],
 		"action": {
 			"default_popup": "popup.html",
 			"default_icon": {

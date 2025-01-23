@@ -5,6 +5,7 @@ import React, {
 	Dispatch,
 	useEffect,
 	useReducer,
+	useState,
 } from 'react';
 import { GameDefinition } from './types/gameDefinition';
 import { GameAction, initialFormState, vcFormReducer } from './reducer';
@@ -66,7 +67,13 @@ export const stateManager = {
 	},
 };
 
-const VoteCountContext = createContext<GameDefinition>(initialFormState);
+export interface ExtendedGameDefinition extends GameDefinition {
+	isInitial?: boolean;
+}
+
+const VoteCountContext = createContext<ExtendedGameDefinition | GameDefinition>(
+	initialFormState,
+);
 const VoteCountDispatch = createContext<Dispatch<GameAction>>(() => {});
 const VoteCountStateManager = createContext<typeof stateManager>(stateManager);
 
@@ -85,29 +92,31 @@ interface ContextProps {
 	children: React.ReactNode;
 }
 
-export default function GameDefinitionContext({ children }: ContextProps) {
-	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
+const getThreadId = () => {
+	const threadRelativeUrl = $('h2').first().find('a').first().attr('href');
+	if (!threadRelativeUrl) return null;
+	const regex = /t=([0-9]+)/;
+	const tVal = threadRelativeUrl.match(regex);
+	if (!tVal) return null;
+	const threadId = tVal[1];
+	if (!threadId) return null;
+	return threadId;
+};
 
-	const getThreadId = () => {
-		const threadRelativeUrl = $('h2')
-			.first()
-			.find('a')
-			.first()
-			.attr('href');
-		if (!threadRelativeUrl) return null;
-		const regex = /t=([0-9]+)/;
-		const tVal = threadRelativeUrl.match(regex);
-		if (!tVal) return null;
-		const threadId = tVal[1];
-		if (!threadId) return null;
-		return threadId;
-	};
+export default function GameDefinitionContext({ children }: ContextProps) {
+	const [initialState, setInitialState] = useState<GameDefinition | null>(
+		null,
+	);
+	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
+	const [isReady, setIsReady] = React.useState(false); // Tracks if the game definition has loaded
+	const initialLoadRef = React.useRef(true); // Tracks if it's the first load to prevent saving
 
 	const loadGameDef = async () => {
 		const threadId = getThreadId();
 		if (!threadId) return stateManager.setError('Could not find thread');
 		const res = await getGameDefinition.query({ gameId: threadId });
 		if (!res) return await saveGameDef();
+
 		dispatch({ type: 'SET_FULL_GAME_DEF', gameDef: res });
 		stateManager.setForm();
 	};
@@ -131,6 +140,16 @@ export default function GameDefinitionContext({ children }: ContextProps) {
 		// This currently saves a game def even on an initial load.
 		// Later make sure it only saves if an actual change has been made
 		// And not just an initial load
+
+		console.log(state);
+
+		if (
+			state.days.length == 0 &&
+			state.players.length == 0 &&
+			state.votes.length == 0
+		)
+			return;
+		console.log('SAVING GAME DEF');
 		saveGameDef();
 	}, [state]);
 

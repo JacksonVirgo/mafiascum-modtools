@@ -1,9 +1,11 @@
+import { ExtendedGameDefinition } from './context';
 import { GameDefinition, Player, Vote } from './types/gameDefinition';
 
-export const initialFormState: GameDefinition = {
+export const initialFormState: ExtendedGameDefinition = {
 	days: [],
 	players: [],
 	votes: [],
+	isInitial: true,
 };
 
 type SetFullGameDef = {

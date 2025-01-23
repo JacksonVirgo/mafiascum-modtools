@@ -1,10 +1,13 @@
 import { BackgroundScript } from '../../../builders/background';
 import { z } from 'zod';
 import {
+	GameDefinition,
 	GameDefinitionSchema,
 	isGameDefinition,
 } from '../types/gameDefinition';
 import browser from 'webextension-polyfill';
+import { load } from 'cheerio';
+import { getGameSyncDefinition, syncToOp } from './opSync';
 
 const TAG_PREFIX = 'gameDef-';
 
@@ -21,12 +24,15 @@ export const getGameDefinition = new BackgroundScript('getGameDefinition')
 			const gameDef = await browser.storage.local.get(tag);
 			const response = gameDef[tag];
 
-			console.log('Of', gameDef);
-			console.log('Loaded', response);
-
-			if (!response) return null;
-			if (!isGameDefinition(response)) return null;
-			return response;
+			if ('isSync' in response) {
+				if (response.type == 'thread') {
+					const opPostNum = response.opPostNum;
+				}
+			} else {
+				if (!response) return null;
+				if (!isGameDefinition(response)) return null;
+				return response;
+			}
 		} catch (err) {
 			console.log(err);
 			return null;
@@ -53,10 +59,32 @@ export const saveGameDefinition = new BackgroundScript('saveGameDefinition')
 		try {
 			const tag = TAG_PREFIX + gameId;
 			const fetched = await getGameDefinition.query({ gameId });
-			console.log('FETCHED', fetched);
-			if (isGameDefinition(fetched)) {
-				const isSame =
-					JSON.stringify(fetched) === JSON.stringify(gameDef);
+
+			if (
+				gameDef.days.length == 0 &&
+				gameDef.players.length == 0 &&
+				gameDef.votes.length == 0
+			) {
+				console.log('Skipping saving empty game def');
+				return null;
+			}
+
+			console.log('AHHHHHHH');
+			console.log(gameDef);
+
+			let isSame = false;
+			if (fetched && isGameDefinition(fetched)) {
+				const normalizedFetch = JSON.stringify(
+					normalizeObject(fetched),
+				).trim();
+				const normalizedGameDef = JSON.stringify(
+					normalizeObject(gameDef),
+				).trim();
+
+				console.log(normalizedGameDef, '\n', normalizedFetch);
+				isSame = normalizedGameDef === normalizedFetch;
+				console.log(`Is above equal?: ${isSame}`);
+
 				if (isSame)
 					return {
 						savedGameDef: gameDef,
@@ -66,6 +94,20 @@ export const saveGameDefinition = new BackgroundScript('saveGameDefinition')
 			await browser.storage.local.set({
 				[tag]: gameDef,
 			});
+
+			if (!isSame) {
+				const gameSync = await getGameSyncDefinition.query({
+					threadId: gameId,
+				});
+
+				if (gameSync) {
+					await syncToOp.query({
+						threadId: gameId,
+						postId: gameSync.opPostNum,
+					});
+				}
+			}
+
 			return {
 				savedGameDef: gameDef,
 				isSame: false,
@@ -75,3 +117,25 @@ export const saveGameDefinition = new BackgroundScript('saveGameDefinition')
 			return null;
 		}
 	});
+
+export function normalizeObject(input: { [key: string]: any }): any {
+	if (Array.isArray(input)) {
+		return input
+			.map(normalizeObject)
+			.sort((a, b) => JSON.stringify(a).localeCompare(JSON.stringify(b)));
+	} else if (
+		input &&
+		typeof input === 'object' &&
+		input.constructor === Object
+	) {
+		const normalizedObject: { [key: string]: any } = {};
+		Object.keys(input)
+			.sort()
+			.forEach((key) => {
+				normalizedObject[key] = normalizeObject(input[key]);
+			});
+		return normalizedObject;
+	} else {
+		return input;
+	}
+}
