@@ -1,6 +1,5 @@
 import { z } from 'zod';
 import { wrapZod } from '../utils/zodWrapper';
-import { SyncSchema } from './subdefs/syncDef';
 
 export const { schema: DaySchema, validate: isDay } = wrapZod(
 	z.object({

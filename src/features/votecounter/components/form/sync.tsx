@@ -1,14 +1,12 @@
 import React, { useState } from 'react';
 import Button from '../../../../components/buttons/button';
-import { FileInput } from '../../../../components/form/FileInput';
-import { GameDefinition, isGameDefinition } from '../../types/gameDefinition';
 import { useGameDefinition } from '../../context';
 import NumberInput from '../../../../components/form/NumberInput';
 
 export function SyncTab() {
-	const [_state, dispatch] = useGameDefinition();
+	const [_state, _dispatch] = useGameDefinition();
 
-	const [postNumber, setPostNumber] = useState(0);
+	const [_postNumber, setPostNumber] = useState(0);
 
 	return (
 		<section className="grow w-full gap-2 flex flex-col">

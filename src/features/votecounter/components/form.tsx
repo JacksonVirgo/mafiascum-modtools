@@ -1,3 +1,5 @@
+/* eslint-disable indent */
+
 import React, { useState } from 'react';
 import Button from '../../../components/buttons/button';
 import $ from 'jquery';

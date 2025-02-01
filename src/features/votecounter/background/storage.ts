@@ -1,12 +1,10 @@
 import { BackgroundScript } from '../../../builders/background';
 import { z } from 'zod';
 import {
-	GameDefinition,
 	GameDefinitionSchema,
 	isGameDefinition,
 } from '../types/gameDefinition';
 import browser from 'webextension-polyfill';
-import { load } from 'cheerio';
 import { getGameSyncDefinition, syncToOp } from './opSync';
 
 const TAG_PREFIX = 'gameDef-';
@@ -24,15 +22,9 @@ export const getGameDefinition = new BackgroundScript('getGameDefinition')
 			const gameDef = await browser.storage.local.get(tag);
 			const response = gameDef[tag];
 
-			if ('isSync' in response) {
-				if (response.type == 'thread') {
-					const opPostNum = response.opPostNum;
-				}
-			} else {
-				if (!response) return null;
-				if (!isGameDefinition(response)) return null;
-				return response;
-			}
+			if (!response) return null;
+			if (!isGameDefinition(response)) return null;
+			return response;
 		} catch (err) {
 			console.log(err);
 			return null;
@@ -118,6 +110,7 @@ export const saveGameDefinition = new BackgroundScript('saveGameDefinition')
 		}
 	});
 
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
 export function normalizeObject(input: { [key: string]: any }): any {
 	if (Array.isArray(input)) {
 		return input
@@ -128,6 +121,7 @@ export function normalizeObject(input: { [key: string]: any }): any {
 		typeof input === 'object' &&
 		input.constructor === Object
 	) {
+		// eslint-disable-next-line @typescript-eslint/no-explicit-any
 		const normalizedObject: { [key: string]: any } = {};
 		Object.keys(input)
 			.sort()

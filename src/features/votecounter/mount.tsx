@@ -9,25 +9,9 @@ import {
 	getThreadFromRelativeUrl,
 } from './utils/votecounter';
 import { getPageData } from './utils/thread';
-import {
-	getGameSyncDefinition,
-	saveGameSyncDefinition,
-	syncFromOp,
-} from './background/opSync';
 
 export default async (debug: boolean = false) => {
-	const threadId = 12551;
-	const postId = 14489051;
-
 	const modal = createModal();
-
-	// const data = await saveGameSyncDefinition.query({
-	// 	threadId: threadId.toString(),
-	// 	syncDef: {
-	// 		opPostNum: postId,
-	// 		type: 'thread',
-	// 	},
-	// });
 
 	if (modal) {
 		$('.post').each((_, postElement) => {

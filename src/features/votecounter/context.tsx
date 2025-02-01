@@ -5,7 +5,6 @@ import React, {
 	Dispatch,
 	useEffect,
 	useReducer,
-	useState,
 } from 'react';
 import { GameDefinition } from './types/gameDefinition';
 import { GameAction, initialFormState, vcFormReducer } from './reducer';
@@ -104,12 +103,7 @@ const getThreadId = () => {
 };
 
 export default function GameDefinitionContext({ children }: ContextProps) {
-	const [initialState, setInitialState] = useState<GameDefinition | null>(
-		null,
-	);
 	const [state, dispatch] = useReducer(vcFormReducer, initialFormState);
-	const [isReady, setIsReady] = React.useState(false); // Tracks if the game definition has loaded
-	const initialLoadRef = React.useRef(true); // Tracks if it's the first load to prevent saving
 
 	const loadGameDef = async () => {
 		const threadId = getThreadId();

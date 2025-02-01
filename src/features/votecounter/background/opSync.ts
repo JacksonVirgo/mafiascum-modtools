@@ -1,16 +1,11 @@
 import { z } from 'zod';
 import { BackgroundScript } from '../../../builders/background';
-import {
-	GameDefinition,
-	GameDefinitionSchema,
-	isGameDefinition,
-} from '../types/gameDefinition';
-import { getGameDefinition, saveGameDefinition } from './storage';
+import { GameDefinition, isGameDefinition } from '../types/gameDefinition';
+import { getGameDefinition } from './storage';
 import browser from 'webextension-polyfill';
 import {
 	CachedDefinition,
 	isCachedDefinition,
-	Sync,
 	SyncSchema,
 } from '../types/subdefs/syncDef';
 import { load } from 'cheerio';
@@ -30,9 +25,6 @@ export const getGameSyncDefinition = new BackgroundScript(
 			const tag = SYNC_TAG_PREFIX + threadId;
 			const gameDef = await browser.storage.local.get(tag);
 			const response = gameDef[tag];
-
-			console.log('Of', gameDef);
-			console.log('Loaded', response);
 
 			if (!response) return null;
 			if (!isCachedDefinition(response)) return null;
@@ -57,14 +49,13 @@ export const saveGameSyncDefinition = new BackgroundScript(
 	)
 	.onQuery(async (saveData) => {
 		const { threadId, syncDef } = saveData;
-		const { opPostNum, type } = syncDef;
-		console.log('Saving Sync Def', opPostNum, type);
+		// const { opPostNum, type } = syncDef;
 		try {
 			const tag = SYNC_TAG_PREFIX + threadId;
 			const fetched = await getGameSyncDefinition.query({
 				threadId,
 			});
-			console.log('FETCHED', fetched);
+
 			if (isCachedDefinition(fetched)) {
 				const isSame =
 					JSON.stringify(fetched) === JSON.stringify(syncDef);
