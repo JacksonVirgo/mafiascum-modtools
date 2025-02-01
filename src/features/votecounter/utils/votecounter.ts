@@ -68,7 +68,7 @@ export async function startVoteCount(
 			.sort((a, b) => a.post - b.post);
 
 		const votecount = countVotes(validVotes, gameData);
-		const formattedVotecount = formatVotecount(votecount);
+		const formattedVotecount = formatVotecount(votecount, gameData);
 
 		return {
 			votecount,
@@ -201,11 +201,15 @@ function validatePost(
 }
 
 export type VoteCount = NonNullable<Awaited<ReturnType<typeof countVotes>>>;
+export type Wagon = {
+	votes: ValidatedVote[];
+	reachedAt: number;
+};
 function countVotes(
 	votes: ValidatedVote[],
 	{ gameDefinition, aliasLegend, end }: GameData,
 ) {
-	const wagons: Record<string, ValidatedVote[]> = {};
+	const wagons: Record<string, Wagon> = {};
 	const players = gameDefinition.players;
 	const livingPlayers = players.filter((p) => {
 		if (!p.diedAt) return true;
@@ -218,10 +222,9 @@ function countVotes(
 
 	const warnings: ValidatedVote[] = [];
 	const errors: ValidatedVote[] = [];
-	console.log(aliasLegend);
 
 	for (const vote of votes) {
-		const { author, type, validity, ignore } = vote;
+		const { author, type, validity, ignore, post } = vote;
 		let { target } = vote;
 
 		if (ignore) continue;
@@ -229,7 +232,8 @@ function countVotes(
 		if (target) target = aliasLegend.get(target.toLowerCase()) ?? target;
 		let isMajorityReached: boolean | undefined;
 		for (const wagon of Object.keys(wagons)) {
-			if (wagons[wagon].length >= majority) {
+			const { votes } = wagons[wagon];
+			if (votes.length >= majority) {
 				isMajorityReached = true;
 				break;
 			}
@@ -241,33 +245,41 @@ function countVotes(
 
 		if (type == VoteType.UNVOTE) {
 			for (const wagon in wagons) {
-				wagons[wagon] = wagons[wagon].filter(
-					(v) => v.author !== author,
-				);
+				const { votes } = wagons[wagon];
+				wagons[wagon].votes = votes.filter((v) => v.author !== author);
 			}
 		} else if (type == VoteType.VOTE) {
 			if (!target) continue;
 			for (const wagon in wagons) {
+				const { votes } = wagons[wagon];
 				if (wagon !== target || target == UNVOTE)
-					wagons[wagon] = wagons[wagon].filter(
+					wagons[wagon].votes = votes.filter(
 						(v) => v.author !== author,
 					);
 			}
 
 			if (target.toLowerCase() == UNVOTE.toLowerCase()) continue;
 
-			if (!wagons[target]) wagons[target] = [];
-			const alreadyExists = wagons[target].some(
+			if (!wagons[target])
+				wagons[target] = {
+					votes: [],
+					reachedAt: 0,
+				};
+
+			const alreadyExists = wagons[target].votes.some(
 				(v) => v.author === author,
 			);
-			if (!alreadyExists) wagons[target].push(vote);
+			if (!alreadyExists) {
+				wagons[target].votes.push(vote);
+				wagons[target].reachedAt = post;
+			}
 		}
 	}
 
 	const playersNotVoting = livingPlayers
 		.filter((p) => {
 			for (const wagon in wagons) {
-				if (wagons[wagon].some((v) => v.author === p.current))
+				if (wagons[wagon].votes.some((v) => v.author === p.current))
 					return false;
 			}
 			return true;
@@ -286,23 +298,44 @@ function countVotes(
 	};
 }
 
-function formatVotecount(votecount: VoteCount) {
+function formatVotecount(votecount: VoteCount, { gameDefinition }: GameData) {
 	const wagonStrings: [string, number][] = [];
 
-	for (const wagonHandle in votecount.wagons) {
-		const wagon = votecount.wagons[wagonHandle];
-		if (wagon.length <= 0) continue;
+	const wagonKeys = Object.keys(votecount.wagons);
+	if (gameDefinition.misc?.voteOrdering == 'firstToReach') {
+		// Order by wagon size and then reachedAt (plurality ordering)
+		wagonKeys.sort((a, b) => {
+			const aSize = votecount.wagons[a].votes.length;
+			const bSize = votecount.wagons[b].votes.length;
+			if (aSize != bSize) return bSize - aSize;
+
+			const aReached = votecount.wagons[a].reachedAt;
+			const bReached = votecount.wagons[b].reachedAt;
+			return aReached - bReached;
+		});
+	} else {
+		// Order by wagon size
+		wagonKeys.sort((a, b) => {
+			const aSize = votecount.wagons[a].votes.length;
+			const bSize = votecount.wagons[b].votes.length;
+			return bSize - aSize;
+		});
+	}
+
+	wagonKeys.forEach((handle) => {
+		const wagon = votecount.wagons[handle];
+		if (wagon.votes.length <= 0) return;
 
 		const calculatedMajority = votecount.majority;
-		const wagonLength = wagon.length;
-		const wagonTitle = wagonHandle;
+		const wagonLength = wagon.votes.length;
+		const wagonTitle = handle;
 		const wagonStr = `[b]${wagonTitle} (${
-			wagon.length
-		}/${calculatedMajority})[/b] -> ${wagon
+			wagonLength
+		}/${calculatedMajority})[/b] -> ${wagon.votes
 			.map((v) => `${v.author} ([post]${v.post}[/post])`)
 			.join(', ')}`;
 		wagonStrings.push([wagonStr, wagonLength]);
-	}
+	});
 
 	const notVotingStr = `[b]Not Voting (${
 		votecount.notVoting.length

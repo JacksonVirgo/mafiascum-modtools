@@ -32,12 +32,22 @@ export const { schema: VoteSchema, validate: isVote } = wrapZod(
 
 export type Vote = z.infer<typeof VoteSchema>;
 
+const voteOrderingEnum = z.enum(['default', 'firstToReach']);
+
+export const { schema: MiscSettingSchema, validate: isMiscSettingsSchema } =
+	wrapZod(
+		z.object({
+			voteOrdering: voteOrderingEnum.default('default'),
+		}),
+	);
+
 export const { schema: GameDefinitionSchema, validate: isGameDefinition } =
 	wrapZod(
 		z.object({
 			days: DaySchema.array(),
 			players: PlayerSchema.array(),
 			votes: VoteSchema.array(),
+			misc: MiscSettingSchema.optional(),
 		}),
 	);
 
