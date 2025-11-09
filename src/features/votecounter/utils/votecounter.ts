@@ -215,7 +215,7 @@ function countVotes(
 		if (!p.diedAt) return true;
 		if (!end) return false;
 		if (p.diedAt > end) return true; // Allow for previous snapshots.
-		return true;
+		return false;
 	});
 
 	const majority = Math.floor(livingPlayers.length / 2) + 1;
